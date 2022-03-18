@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { Ad4mClient, LanguageHandle } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import { ErrorMessage } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
 
@@ -15,12 +18,16 @@ const App = () => {
   const [did, setDid] = useState("");
   const [languageAddr, setLanguageAddr] = useState("");
   const [language, setLanguage] = useState<LanguageHandle | null>(null);
-  const [error, setError] = useState("");
 
   let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
 
   useEffect(() => {
     window.addEventListener('load', async () => {
+      ad4mClient.runtime.addErrorCallback((message: ErrorMessage) => {
+        toast.error(`${message.title}, ${message.message}`);
+        console.log(message);
+        return null
+      })
       await checkIfAgentIsInitialized();
     });
   });
@@ -39,7 +46,6 @@ const App = () => {
   };
 
   const unlockAgent = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
     let status = await ad4mClient.agent.unlock(password);
     console.log("agent status in unlock: ", status);
   }
@@ -81,9 +87,8 @@ const App = () => {
       setLanguage(language);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error("Error to get language");
       }
-      alert(err);
     }
 
   };
@@ -112,12 +117,6 @@ const App = () => {
     </div>
   )
 
-  const renderErrorContainer = () => (
-    <div>
-      Error: {error}
-    </div>
-  )
-
   return (
     <div className="App">
       <Header />
@@ -126,7 +125,7 @@ const App = () => {
       {isUnlocked && renderDidContainer()}
       {isUnlocked && renderGetLanguageContainer()}
       {language && renderLanguageContainer()}
-      {error && renderErrorContainer()}
+      <ToastContainer autoClose={false} />
     </div>
   );
 }
