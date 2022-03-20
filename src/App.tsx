@@ -23,11 +23,6 @@ const App = () => {
 
   useEffect(() => {
     window.addEventListener('load', async () => {
-      ad4mClient.runtime.addErrorCallback((message: ErrorMessage) => {
-        toast.error(`${message.title}, ${message.message}`);
-        console.log(message);
-        return null
-      })
       await checkIfAgentIsInitialized();
     });
   });
@@ -55,6 +50,14 @@ const App = () => {
     let { value } = event.target;
     setPassword(value);
   }
+
+  const subscribeError = () => {
+    ad4mClient.runtime.addErrorCallback((message: ErrorMessage) => {
+      toast.error(`${message.title}, ${message.message}`);
+      console.log(message);
+      return null
+    })
+  };
 
   const renderNotInitializedContainer = () => (
     <button onClick={generateAgent}>
@@ -125,6 +128,9 @@ const App = () => {
       {isUnlocked && renderDidContainer()}
       {isUnlocked && renderGetLanguageContainer()}
       {language && renderLanguageContainer()}
+      <button onClick={subscribeError}>
+        Subscribe Error
+      </button>
       <ToastContainer autoClose={false} />
     </div>
   );
