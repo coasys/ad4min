@@ -50,9 +50,15 @@ const App = () => {
   }
 
   const subscribeError = () => {
-    ad4mClient.runtime.addErrorCallback((message: ErrorMessage) => {
-      toast.error(`${message.title}, ${message.message}`);
-      console.log(message);
+    ad4mClient.runtime.addErrorCallback((exception: ErrorMessage) => {
+      Notification.requestPermission()
+        .then(response => {
+          if (response === 'granted') {
+            new Notification(exception.title, { body: exception.message })
+          }
+        });
+      toast.error(`${exception.title}, ${exception.message}`);
+      console.log(exception);
       return null
     })
   };
