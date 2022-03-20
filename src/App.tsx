@@ -22,10 +22,8 @@ const App = () => {
   let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
 
   useEffect(() => {
-    window.addEventListener('load', async () => {
-      await checkIfAgentIsInitialized();
-    });
-  });
+    checkIfAgentIsInitialized();
+  }, []);
 
   const checkIfAgentIsInitialized = async () => {
     let status = await ad4mClient.agent.status();
