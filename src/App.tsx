@@ -1,12 +1,12 @@
 import Header from './components/Header';
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import { Ad4mClient, LanguageHandle } from '@perspect3vism/ad4m';
+import { Ad4mClient, LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import { ErrorMessage } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
 
@@ -50,7 +50,10 @@ const App = () => {
   }
 
   const subscribeError = () => {
-    ad4mClient.runtime.addErrorCallback((exception: ErrorMessage) => {
+    ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
+      if (exception.type === ExceptionType.LanguageIsNotLoaded) {
+        console.log("do something if language is not loaded")
+      }
       Notification.requestPermission()
         .then(response => {
           if (response === 'granted') {
