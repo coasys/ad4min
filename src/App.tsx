@@ -35,12 +35,18 @@ const App = () => {
   };
 
   // TODO generate agent if agent is not initialized
-  const generateAgent = async () => {
+  const generateAgent = async (event: React.SyntheticEvent) => {
+    let agentStatus = await ad4mClient.agent.generate(password);
+    setIsInitialized(agentStatus.isInitialized);
+    setIsUnlocked(agentStatus.isUnlocked);
+    setDid(agentStatus.did!);
+    console.log("agent status in generate: ", agentStatus);
   };
 
   const unlockAgent = async (event: React.SyntheticEvent) => {
-    let status = await ad4mClient.agent.unlock(password);
-    console.log("agent status in unlock: ", status);
+    let agentStatus = await ad4mClient.agent.unlock(password);
+    setIsUnlocked(agentStatus.isUnlocked);
+    console.log("agent status in unlock: ", agentStatus);
   }
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,14 +79,9 @@ const App = () => {
   );
 
   const renderNotUnlockedContainer = () => (
-    <div>
-      <form onSubmit={unlockAgent}>
-        <input type="text" placeholder="Input password" value={password} onChange={onPasswordChange} />
-        <button type='submit'>
-          Unlock agent
-        </button>
-      </form>
-    </div>
+    <button onClick={unlockAgent}>
+      Unlock agent
+    </button>
   );
 
   const renderDidContainer = () => (
@@ -130,8 +131,9 @@ const App = () => {
   return (
     <div className="App">
       <Header />
+      {!isUnlocked && <input type="text" placeholder="Input password" value={password} onChange={onPasswordChange} />}
       {!isInitialized && renderNotInitializedContainer()}
-      {!isUnlocked && renderNotUnlockedContainer()}
+      {isInitialized && !isUnlocked && renderNotUnlockedContainer()}
       {isUnlocked && renderDidContainer()}
       {isUnlocked && renderGetLanguageContainer()}
       {language && renderLanguageContainer()}
