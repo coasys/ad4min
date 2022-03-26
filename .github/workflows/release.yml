@@ -33,9 +33,8 @@ jobs:
         run: npm install && npm run tauri info
       - name: download ad4m-host
         run: ./scripts/setup-binaries.sh
-      - name: setup binaries (macos only)
       - name: build the app
-        run: npm run build
+        run: npm run build-all
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

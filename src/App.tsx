@@ -22,17 +22,16 @@ const App = () => {
   let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
 
   useEffect(() => {
+    const checkIfAgentIsInitialized = async () => {
+      let status = await buildAd4mClient(AD4M_ENDPOINT).agent.status();
+      console.log("agent status in init: ", status);
+  
+      setIsInitialized(status.isInitialized);
+      setIsUnlocked(status.isUnlocked);
+      setDid(status.did!);
+    };
     checkIfAgentIsInitialized();
   }, []);
-
-  const checkIfAgentIsInitialized = async () => {
-    let status = await ad4mClient.agent.status();
-    console.log("agent status in init: ", status);
-
-    setIsInitialized(status.isInitialized);
-    setIsUnlocked(status.isUnlocked);
-    setDid(status.did!);
-  };
 
   // TODO generate agent if agent is not initialized
   const generateAgent = async (event: React.SyntheticEvent) => {
