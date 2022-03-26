@@ -11,6 +11,9 @@
 # production
 /build
 
+# bin
+src-tauri/bins
+
 # misc
 .DS_Store
 .env.local
