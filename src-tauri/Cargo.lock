@@ -8,6 +8,7 @@ version = "0.0.1"
 dependencies = [
  "log",
  "log4rs",
+ "nix",
  "serde",
  "serde_json",
  "tauri",

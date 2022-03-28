@@ -1,3 +1,8 @@
+use std::thread;
+use std::time::Duration;
+
+use nix::sys::signal::{self, Signal};
+use nix::unistd::Pid;
 use tauri::{
     AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
     WindowBuilder, WindowUrl, Wry,
@@ -15,7 +20,7 @@ pub fn build_system_tray() -> SystemTray {
     SystemTray::new().with_menu(sys_tray_menu)
 }
 
-pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
+pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, child_pid: i32) {
     match event_id.as_str() {
         "show_ad4min" => {
             let ad4min_window = app.get_window("ad4min");
@@ -37,7 +42,14 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
                 log::info!("Creating ad4min UI {:?}", new_ad4min_window);
             }
         }
-        "quit" => app.exit(0),
+        "quit" => {
+            let kill_result = signal::kill(Pid::from_raw(child_pid), Signal::SIGINT);
+            if let Err(err) = kill_result {
+                log::error!("Error killing child: {:?}", err);
+            }
+            thread::sleep(Duration::from_millis(1000));
+            app.exit(0);
+        }
         _ => log::error!("Event is not defined."),
     }
 }

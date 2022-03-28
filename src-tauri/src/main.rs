@@ -8,7 +8,7 @@ use logs::setup_logs;
 use system_tray::{build_system_tray, handle_system_tray_event};
 use tauri::{
     api::process::{Command, CommandEvent},
-    SystemTrayEvent,
+    RunEvent, SystemTrayEvent,
 };
 
 mod config;
@@ -30,7 +30,7 @@ fn main() {
         assert!(status.success());
     }
 
-    let (mut rx, mut _child) = Command::new_sidecar("ad4m")
+    let (mut rx, child) = Command::new_sidecar("ad4m")
         .expect("Failed to create ad4m command")
         .args(["serve"])
         .spawn()
@@ -46,12 +46,23 @@ fn main() {
         }
     });
 
-    tauri::Builder::default()
+    let builder_result = tauri::Builder::default()
         .system_tray(build_system_tray())
-        .on_system_tray_event(|app, event| match event {
-            SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
+        .on_system_tray_event(move |app, event| match event {
+            SystemTrayEvent::MenuItemClick { id, .. } => {
+                handle_system_tray_event(app, id, child.pid() as i32)
+            }
             _ => {}
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!());
+
+    match builder_result {
+        Ok(builder) => {
+            builder.run(|_app_handle, event| match event {
+                RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
+                _ => {}
+            });
+        }
+        Err(err) => log::error!("Error building the app: {:?}", err),
+    }
 }
