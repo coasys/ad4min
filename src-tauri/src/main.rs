@@ -3,32 +3,24 @@
     windows_subsystem = "windows"
 )]
 
-use config::binary_path;
+use config::holochain_binary_path;
 use logs::setup_logs;
+use system_tray::{build_system_tray, handle_system_tray_event};
 use tauri::{
     api::process::{Command, CommandEvent},
-    CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
+    SystemTrayEvent,
 };
 
 mod config;
 mod logs;
+mod system_tray;
 
 fn main() {
     if let Err(err) = setup_logs() {
         println!("Error setting up the logs: {:?}", err);
     }
 
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let hide = CustomMenuItem::new("hide".to_string(), "Hide");
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(quit)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(hide);
-    let system_tray = SystemTray::new().with_menu(tray_menu);
-
-    let exist_holochain_binary = binary_path().join("holochain").exists();
-
-    if !exist_holochain_binary {
+    if !holochain_binary_path().exists() {
         log::info!("init command by copy holochain binary");
         let status = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
@@ -55,7 +47,11 @@ fn main() {
     });
 
     tauri::Builder::default()
-        .system_tray(system_tray)
+        .system_tray(build_system_tray())
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::MenuItemClick { id, .. } => handle_system_tray_event(app, id),
+            _ => {}
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -58,9 +58,10 @@
     },
     "windows": [
       {
-        "title": "ad4min",
-        "width": 800,
-        "height": 600,
+        "label": "ad4min",
+        "title": "Ad4min UI",
+        "width": 1000,
+        "height": 700,
         "resizable": true,
         "fullscreen": false
       }
