@@ -96,9 +96,7 @@ const App = () => {
       console.log("language get result, ", language);
       setLanguage(language);
     } catch (err) {
-      if (err instanceof Error) {
-        toast.error("Error to get language");
-      }
+      console.log(err);
     }
 
   };
