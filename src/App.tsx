@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { Ad4mClient, LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
-import { Button } from '@mantine/core';
+import { Button, Group, Modal, TextInput, Space, Notification as NotifyWeb } from '@mantine/core';
+import { Check } from 'tabler-icons-react';
+
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
 
@@ -19,6 +20,9 @@ const App = () => {
   const [did, setDid] = useState("");
   const [languageAddr, setLanguageAddr] = useState("");
   const [language, setLanguage] = useState<LanguageHandle | null>(null);
+  const [trustCandidate, setTrustCandidate] = useState("");
+  const [opened, setOpened] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
 
@@ -26,7 +30,7 @@ const App = () => {
     const checkIfAgentIsInitialized = async () => {
       let status = await buildAd4mClient(AD4M_ENDPOINT).agent.status();
       console.log("agent status in init: ", status);
-      
+
       setIsInitialized(status.isInitialized);
       setIsUnlocked(status.isUnlocked);
       setDid(status.did!);
@@ -49,6 +53,13 @@ const App = () => {
     console.log("agent status in unlock: ", agentStatus);
   }
 
+  const addTrustedAgent = async (event: React.SyntheticEvent) => {
+    let agents = await ad4mClient.runtime.addTrustedAgents([trustCandidate]);
+    setOpened(false);
+    setSuccess(true);
+    console.log("agent is now trusted: ", agents);
+  }
+
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     let { value } = event.target;
@@ -57,8 +68,9 @@ const App = () => {
 
   const subscribeError = () => {
     ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
-      if (exception.type === ExceptionType.LanguageIsNotLoaded) {
-        console.log("do something if language is not loaded")
+      if (exception.type === ExceptionType.AgentIsUntrusted) {
+        setTrustCandidate(exception.addon!);
+        setOpened(true);
       }
       Notification.requestPermission()
         .then(response => {
@@ -66,7 +78,6 @@ const App = () => {
             new Notification(exception.title, { body: exception.message })
           }
         });
-      toast.error(`${exception.title}, ${exception.message}`);
       console.log(exception);
       return null
     })
@@ -124,6 +135,31 @@ const App = () => {
     </div>
   )
 
+  const renderTrustAgentModal = () => (
+    <div>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Trust Agent"
+      >
+        <TextInput
+          defaultValue={trustCandidate}
+          label="Agent DID"
+        />
+        <Group>
+          <Button variant="outline" onClick={() => setOpened(false)}>
+            Close
+          </Button>
+          <Space h="md" />
+          <Button onClick={addTrustedAgent}>
+            Trust Agent
+          </Button>
+        </Group>
+
+      </Modal>
+    </div>
+  )
+
   return (
     <div className="App">
       <Header />
@@ -133,10 +169,15 @@ const App = () => {
       {isUnlocked && renderDidContainer()}
       {isUnlocked && renderGetLanguageContainer()}
       {language && renderLanguageContainer()}
-      <button onClick={subscribeError}>
+      {opened && renderTrustAgentModal()}
+      {success && (
+        <NotifyWeb icon={<Check size={20} />}>
+          Agent is trusted now.
+        </NotifyWeb>
+      )}
+      <Button onClick={subscribeError}>
         Subscribe Error
-      </button>
-      <ToastContainer autoClose={false} />
+      </Button>
     </div>
   );
 }
