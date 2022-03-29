@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { Ad4mClient, LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import 'react-toastify/dist/ReactToastify.css';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
-import { Button, Group, Modal, TextInput, Space, Notification as NotifyWeb } from '@mantine/core';
-import { Check } from 'tabler-icons-react';
+import { Button, Group, Modal, TextInput, Space } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
@@ -22,7 +21,6 @@ const App = () => {
   const [language, setLanguage] = useState<LanguageHandle | null>(null);
   const [trustCandidate, setTrustCandidate] = useState("");
   const [opened, setOpened] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
 
@@ -56,7 +54,9 @@ const App = () => {
   const addTrustedAgent = async (event: React.SyntheticEvent) => {
     let agents = await ad4mClient.runtime.addTrustedAgents([trustCandidate]);
     setOpened(false);
-    setSuccess(true);
+    showNotification({
+      message: 'Great, the agent is trusted now! 🤥',
+    })
     console.log("agent is now trusted: ", agents);
   }
 
@@ -170,11 +170,6 @@ const App = () => {
       {isUnlocked && renderGetLanguageContainer()}
       {language && renderLanguageContainer()}
       {opened && renderTrustAgentModal()}
-      {success && (
-        <NotifyWeb icon={<Check size={20} />}>
-          Agent is trusted now.
-        </NotifyWeb>
-      )}
       <Button onClick={subscribeError}>
         Subscribe Error
       </Button>
