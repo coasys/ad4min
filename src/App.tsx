@@ -7,6 +7,7 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
+import { Button } from '@mantine/core';
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
 
@@ -25,7 +26,7 @@ const App = () => {
     const checkIfAgentIsInitialized = async () => {
       let status = await buildAd4mClient(AD4M_ENDPOINT).agent.status();
       console.log("agent status in init: ", status);
-  
+      
       setIsInitialized(status.isInitialized);
       setIsUnlocked(status.isUnlocked);
       setDid(status.did!);
@@ -109,12 +110,10 @@ const App = () => {
 
   const renderGetLanguageContainer = () => (
     <div>
-      <form onSubmit={getLanguage}>
-        <input type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
-        <button type='submit'>
-          Get Language
-        </button>
-      </form>
+      <input type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
+      <Button onClick={getLanguage}>
+        Get Language
+      </Button>
     </div>
   );
 
