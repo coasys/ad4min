@@ -1,4 +1,4 @@
-import { TextInput, Button } from '@mantine/core';
+import { TextInput, Button, Stack } from '@mantine/core';
 import { Ad4mClient } from '@perspect3vism/ad4m';
 import { useState } from 'react';
 
@@ -34,19 +34,21 @@ const Login = (props: Props) => {
 
   return (
     <div>
-      <TextInput type="text" placeholder="Input passphrase" value={password} onChange={onPasswordChange} />
-      {
-        !props.isInitialized &&
-        <Button onClick={generateAgent}>
-          Generate agent
-        </Button>
-      }
-      {
-        props.isInitialized && !props.isUnlocked &&
-        <Button onClick={unlockAgent}>
-          Unlock agent
-        </Button>
-      }
+      <Stack align="center" spacing="xl">
+        <TextInput type="text" placeholder="Input passphrase" value={password} onChange={onPasswordChange} />
+        {
+          !props.isInitialized &&
+          <Button onClick={generateAgent}>
+            Generate agent
+          </Button>
+        }
+        {
+          props.isInitialized && !props.isUnlocked &&
+          <Button onClick={unlockAgent}>
+            Unlock agent
+          </Button>
+        }
+      </Stack>
     </div>
   )
 }

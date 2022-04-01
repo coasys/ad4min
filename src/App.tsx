@@ -6,7 +6,7 @@ import { Ad4mClient, LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
-import { Button, Group, Modal, TextInput, Space, Loader } from '@mantine/core';
+import { Button, Group, Modal, TextInput, Space, Loader, Stack } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
@@ -143,13 +143,15 @@ const App = () => {
 
   return (
     <div className="App">
-      <Header />
-      {!connected && <Loader />}
-      {connected && !isUnlocked && <Login ad4mClient={ad4mClient} isInitialized={isInitialized} isUnlocked={isUnlocked} handleLogin={handleLogin} />}
-      {isUnlocked && <p>{did}</p>}
-      {isUnlocked && renderGetLanguageContainer()}
-      {language && renderLanguageContainer()}
-      {opened && renderTrustAgentModal()}
+      <Stack align="center" spacing="xl">
+        <Header />
+        {!connected && <Loader />}
+        {connected && !isUnlocked && <Login ad4mClient={ad4mClient} isInitialized={isInitialized} isUnlocked={isUnlocked} handleLogin={handleLogin} />}
+        {isUnlocked && <p>{did}</p>}
+        {isUnlocked && renderGetLanguageContainer()}
+        {language && renderLanguageContainer()}
+        {opened && renderTrustAgentModal()}
+      </Stack>
     </div>
   );
 }

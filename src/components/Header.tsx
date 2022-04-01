@@ -1,10 +1,12 @@
+import { Title } from '@mantine/core';
+
 type Props = {}
 
 const Header = (props: Props) => {
   return (
-    <header>
-      <h1>Ad4min UI</h1>
-    </header>
+    <>
+      <Title order={1}> Ad4min UI</Title>
+    </>
   )
 }
 
