@@ -2,18 +2,18 @@ import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
 import React, { useContext, useEffect, useState } from 'react';
-import { LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
+import { ExceptionType } from '@perspect3vism/ad4m';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 import { Button, Group, Modal, TextInput, Space, Loader, Stack } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { Ad4mContext } from '.';
 import Profile from './components/Profile';
+import Language from './components/Language';
 
 const App = () => {
 
   const ad4mClient = useContext(Ad4mContext);
-  const [languageAddr, setLanguageAddr] = useState("");
-  const [language, setLanguage] = useState<LanguageHandle | null>(null);
+  
   const [trustCandidate, setTrustCandidate] = useState("");
   const [opened, setOpened] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -44,39 +44,6 @@ const App = () => {
     })
     console.log("agent is now trusted: ", agents);
   }
-
-  const getLanguage = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    try {
-      let language = await ad4mClient.languages.byAddress(languageAddr);
-      console.log("language get result, ", language);
-      setLanguage(language);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const onLanguageAddrChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    let { value } = event.target;
-    setLanguageAddr(value);
-  }
-
-  const renderGetLanguageContainer = () => (
-    <div>
-      <TextInput type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
-      <Button onClick={getLanguage}>
-        Get Language
-      </Button>
-    </div>
-  );
-
-  const renderLanguageContainer = () => (
-    <div>
-      <p>Name: {language?.name}</p>
-      <p>Address: {language?.address}</p>
-    </div>
-  )
 
   const renderTrustAgentModal = () => (
     <div>
@@ -132,8 +99,7 @@ const App = () => {
         {!connected && <Loader />}
         {connected && !isLogined && <Login handleLogin={handleLogin} />}
         {isLogined && <Profile did={did}/>}
-        {isLogined && renderGetLanguageContainer()}
-        {language && renderLanguageContainer()}
+        {isLogined && <Language />}
         {opened && renderTrustAgentModal()}
       </Stack>
     </div>
