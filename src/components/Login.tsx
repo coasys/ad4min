@@ -12,6 +12,7 @@ const Login = (props: Props) => {
   const [password, setPassword] = useState("");
   const [isInitialized, setIsInitialized] = useState<Boolean | null>(null);
   const [isUnlocked, setIsUnlocked] = useState<Boolean | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkIfAgentIsInitialized = async () => {
@@ -35,6 +36,7 @@ const Login = (props: Props) => {
   }
 
   const generateAgent = async (event: React.SyntheticEvent) => {
+    setLoading(true);
     let agentStatus = await ad4mClient.agent.generate(password);
     props.handleLogin(agentStatus.isUnlocked, agentStatus.did!);
 
@@ -42,6 +44,7 @@ const Login = (props: Props) => {
   };
 
   const unlockAgent = async (event: React.SyntheticEvent) => {
+    setLoading(true);
     let agentStatus = await ad4mClient.agent.unlock(password);
     props.handleLogin(agentStatus.isUnlocked, agentStatus.did!);
 
@@ -54,13 +57,13 @@ const Login = (props: Props) => {
         <TextInput type="text" placeholder="Input passphrase" value={password} onChange={onPasswordChange} />
         {
           !isInitialized &&
-          <Button onClick={generateAgent}>
+          <Button onClick={generateAgent} loading={loading}>
             Generate agent
           </Button>
         }
         {
           isInitialized && !isUnlocked &&
-          <Button onClick={unlockAgent}>
+          <Button onClick={unlockAgent} loading={loading}>
             Unlock agent
           </Button>
         }
