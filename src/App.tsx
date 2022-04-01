@@ -7,6 +7,7 @@ import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolv
 import { Button, Group, Modal, TextInput, Space, Loader, Stack } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { Ad4mContext } from '.';
+import Profile from './components/Profile';
 
 const App = () => {
 
@@ -130,7 +131,7 @@ const App = () => {
         <Header />
         {!connected && <Loader />}
         {connected && !isLogined && <Login handleLogin={handleLogin} />}
-        {isLogined && <p>{did}</p>}
+        {isLogined && <Profile did={did}/>}
         {isLogined && renderGetLanguageContainer()}
         {language && renderLanguageContainer()}
         {opened && renderTrustAgentModal()}

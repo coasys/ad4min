@@ -1,4 +1,4 @@
-import { TextInput, Button, Stack } from '@mantine/core';
+import { PasswordInput, Button, Stack } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
 import { Ad4mContext } from '..';
 
@@ -25,7 +25,7 @@ const Login = (props: Props) => {
       props.handleLogin(status.isUnlocked, status.did ? status.did! : "");
     };
     checkIfAgentIsInitialized();
-    
+
     console.log("Check if agent is initialized.")
   }, [ad4mClient, props]);
 
@@ -54,7 +54,14 @@ const Login = (props: Props) => {
   return (
     <div>
       <Stack align="center" spacing="xl">
-        <TextInput type="text" placeholder="Input passphrase" value={password} onChange={onPasswordChange} />
+        <PasswordInput
+          placeholder="Password"
+          label="Input your phrase"
+          radius="md"
+          size="md"
+          required
+          onChange={onPasswordChange}
+        />
         {
           !isInitialized &&
           <Button onClick={generateAgent} loading={loading}>
