@@ -1,16 +1,32 @@
 import { TextInput, Button, Stack } from '@mantine/core';
-import { Ad4mClient } from '@perspect3vism/ad4m';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { Ad4mContext } from '..';
 
 type Props = {
-  ad4mClient: Ad4mClient,
-  isInitialized: Boolean | null,
-  isUnlocked: Boolean | null,
-  handleLogin: (isUnlocked: Boolean, did: String) => void;
+  handleLogin: (isUnlocked: Boolean, did: string) => void;
 }
 
 const Login = (props: Props) => {
+  const ad4mClient = useContext(Ad4mContext);
+
   const [password, setPassword] = useState("");
+  const [isInitialized, setIsInitialized] = useState<Boolean | null>(null);
+  const [isUnlocked, setIsUnlocked] = useState<Boolean | null>(null);
+
+  useEffect(() => {
+    const checkIfAgentIsInitialized = async () => {
+      let status = await ad4mClient.agent.status();
+      console.log("agent status in init: ", status);
+
+      setIsInitialized(status.isInitialized);
+      setIsUnlocked(status.isUnlocked);
+
+      props.handleLogin(status.isUnlocked, status.did ? status.did! : "");
+    };
+    checkIfAgentIsInitialized();
+    
+    console.log("Check if agent is initialized.")
+  }, [ad4mClient, props]);
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -19,14 +35,14 @@ const Login = (props: Props) => {
   }
 
   const generateAgent = async (event: React.SyntheticEvent) => {
-    let agentStatus = await props.ad4mClient.agent.generate(password);
+    let agentStatus = await ad4mClient.agent.generate(password);
     props.handleLogin(agentStatus.isUnlocked, agentStatus.did!);
 
     console.log("agent status in generate: ", agentStatus);
   };
 
   const unlockAgent = async (event: React.SyntheticEvent) => {
-    let agentStatus = await props.ad4mClient.agent.unlock(password);
+    let agentStatus = await ad4mClient.agent.unlock(password);
     props.handleLogin(agentStatus.isUnlocked, agentStatus.did!);
 
     console.log("agent status in unlock: ", agentStatus);
@@ -37,13 +53,13 @@ const Login = (props: Props) => {
       <Stack align="center" spacing="xl">
         <TextInput type="text" placeholder="Input passphrase" value={password} onChange={onPasswordChange} />
         {
-          !props.isInitialized &&
+          !isInitialized &&
           <Button onClick={generateAgent}>
             Generate agent
           </Button>
         }
         {
-          props.isInitialized && !props.isUnlocked &&
+          isInitialized && !isUnlocked &&
           <Button onClick={unlockAgent}>
             Unlock agent
           </Button>

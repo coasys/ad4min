@@ -1,59 +1,39 @@
 import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
-import React, { useEffect, useState } from 'react';
-import { Ad4mClient, LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { WebSocketLink } from '@apollo/client/link/ws';
+import React, { useContext, useEffect, useState } from 'react';
+import { LanguageHandle, ExceptionType } from '@perspect3vism/ad4m';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 import { Button, Group, Modal, TextInput, Space, Loader, Stack } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-
-const AD4M_ENDPOINT = "ws://localhost:4000/graphql";
+import { Ad4mContext } from '.';
 
 const App = () => {
 
-  const [isInitialized, setIsInitialized] = useState<Boolean | null>(null);
-  const [isUnlocked, setIsUnlocked] = useState<Boolean | null>(null);
-  const [did, setDid] = useState("");
+  const ad4mClient = useContext(Ad4mContext);
   const [languageAddr, setLanguageAddr] = useState("");
   const [language, setLanguage] = useState<LanguageHandle | null>(null);
   const [trustCandidate, setTrustCandidate] = useState("");
   const [opened, setOpened] = useState(false);
   const [connected, setConnected] = useState(false);
-
-  let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
+  const [isLogined, setIsLogined] = useState<Boolean>(false);
+  const [did, setDid] = useState("");
 
   useEffect(() => {
-    const checkIfAgentIsInitialized = async () => {
-      let ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
-      let status = await ad4mClient.agent.status();
-      console.log("agent status in init: ", status);
-
-      setIsInitialized(status.isInitialized);
-      setIsUnlocked(status.isUnlocked);
-      setDid(status.did!);
-      setConnected(true);
-
-      if (status.isInitialized) {
-        ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
-          if (exception.type === ExceptionType.AgentIsUntrusted) {
-            setTrustCandidate(exception.addon!);
-            setOpened(true);
-          }
-          Notification.requestPermission()
-            .then(response => {
-              if (response === 'granted') {
-                new Notification(exception.title, { body: exception.message })
-              }
-            });
-          console.log(exception);
-          return null
-        })
+    const checkConnection = async () => {
+      try {
+        await ad4mClient.runtime.hcAgentInfos(); // TODO runtime info is broken
+        console.log("get hc agent infos success.");
+        setConnected(true);
+      } catch(err) {
+        setConnected(false);
       }
-    };
-    checkIfAgentIsInitialized();
-  }, []);
+    }
+    
+    checkConnection();
+    
+    console.log("Check if ad4m service is connected.")
+  }, [ad4mClient]);
 
   const addTrustedAgent = async (event: React.SyntheticEvent) => {
     let agents = await ad4mClient.runtime.addTrustedAgents([trustCandidate]);
@@ -122,23 +102,26 @@ const App = () => {
     </div>
   )
 
-  const handleLogin = (isUnlocked: Boolean) => {
-    setIsUnlocked(isUnlocked);
+  const handleLogin = (login: Boolean, did: string) => {
+    setIsLogined(login);
+    setDid(did);
 
-    ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
-      if (exception.type === ExceptionType.AgentIsUntrusted) {
-        setTrustCandidate(exception.addon!);
-        setOpened(true);
-      }
-      Notification.requestPermission()
-        .then(response => {
-          if (response === 'granted') {
-            new Notification(exception.title, { body: exception.message })
-          }
-        });
-      console.log(exception);
-      return null
-    })
+    if(login) {
+      ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
+        if (exception.type === ExceptionType.AgentIsUntrusted) {
+          setTrustCandidate(exception.addon!);
+          setOpened(true);
+        }
+        Notification.requestPermission()
+          .then(response => {
+            if (response === 'granted') {
+              new Notification(exception.title, { body: exception.message })
+            }
+          });
+        console.log(exception);
+        return null
+      })
+    }
   }
 
   return (
@@ -146,9 +129,9 @@ const App = () => {
       <Stack align="center" spacing="xl">
         <Header />
         {!connected && <Loader />}
-        {connected && !isUnlocked && <Login ad4mClient={ad4mClient} isInitialized={isInitialized} isUnlocked={isUnlocked} handleLogin={handleLogin} />}
-        {isUnlocked && <p>{did}</p>}
-        {isUnlocked && renderGetLanguageContainer()}
+        {connected && !isLogined && <Login handleLogin={handleLogin} />}
+        {isLogined && <p>{did}</p>}
+        {isLogined && renderGetLanguageContainer()}
         {language && renderLanguageContainer()}
         {opened && renderTrustAgentModal()}
       </Stack>
@@ -156,26 +139,6 @@ const App = () => {
   );
 }
 
-export function buildAd4mClient(server: string): Ad4mClient {
-  let apolloClient = new ApolloClient({
-    link: new WebSocketLink({
-      uri: server,
-      options: { reconnect: true },
-      webSocketImpl: WebSocket,
-    }),
-    cache: new InMemoryCache({ resultCaching: false, addTypename: false }),
-    defaultOptions: {
-      watchQuery: {
-        fetchPolicy: "no-cache",
-      },
-      query: {
-        fetchPolicy: "no-cache",
-      }
-    },
-  });
 
-  //@ts-ignore
-  return new Ad4mClient(apolloClient);
-}
 
 export default App;
