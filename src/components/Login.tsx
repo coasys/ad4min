@@ -54,14 +54,17 @@ const Login = (props: Props) => {
   return (
     <div>
       <Stack align="center" spacing="xl">
-        <PasswordInput
-          placeholder="Password"
-          label="Input your phrase"
-          radius="md"
-          size="md"
-          required
-          onChange={onPasswordChange}
-        />
+        <div style={{ width: 280 }}>
+          <PasswordInput
+            placeholder="Password"
+            label="Input your passphrase"
+            radius="md"
+            size="md"
+            required
+            onChange={onPasswordChange}
+          />
+        </div>
+
         {
           !isInitialized &&
           <Button onClick={generateAgent} loading={loading}>

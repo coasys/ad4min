@@ -35,7 +35,9 @@ const Login = (props: Props) => {
   return (
     <div>
       <Stack align="center" spacing="xl">
-        <TextInput type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
+        <div style={{ width: 480 }}>
+          <TextInput type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
+        </div>
         <Button onClick={getLanguage} loading={loading}>
           Get Language
         </Button>
