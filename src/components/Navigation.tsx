@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
 
 type Props = {
-  // did: String,
+  did: String,
 }
 
 const useStyles = createStyles((theme, _params, getRef) => {
@@ -97,12 +97,12 @@ const Navigation = (props: Props) => {
           </Group>
           {links}
         </Navbar.Section>
-        <Routes>
-          <Route path="/" element={<Profile did="test-did" />} />
-          <Route path="/language" element={<Profile did="test-did2" />} />
-          <Route path="/perspective" element={<Profile did="test-did3" />} />
-        </Routes>
       </Navbar>
+      <Routes>
+        <Route path="/" element={<Profile did={props.did} />} />
+        <Route path="/language" element={<Profile did="test-did2" />} />
+        <Route path="/perspective" element={<Profile did="test-did3" />} />
+      </Routes>
     </Router>
   )
 }

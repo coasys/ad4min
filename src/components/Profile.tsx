@@ -1,4 +1,4 @@
-import { Text } from '@mantine/core';
+import { Container, Space, Text } from '@mantine/core';
 
 type Props = {
   did: String,
@@ -6,10 +6,13 @@ type Props = {
 
 const Login = (props: Props) => {
   return (
-    <div>
+    <Container
+      style={{ marginLeft: 10 }}
+    >
+      <Space h="md" />
       <Text size='lg' weight={700}>Agent DID: </Text>
       <Text size="md">{props.did}</Text>
-    </div>
+    </Container>
   )
 }
 

@@ -65,7 +65,7 @@ const App = () => {
       {!connected && (
         <Stack align="center" spacing="xl">
           <Header />
-          <Loader  />
+          <Loader />
         </Stack>
       )}
       {connected && !isLogined && (
@@ -76,7 +76,7 @@ const App = () => {
       )}
       {/* {isLogined && <Profile did={did} />} */}
       {/* {isLogined && <Language />} */}
-      {isLogined && <Navigation />}
+      {isLogined && <Navigation did={did} />}
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
     </div>
   );
