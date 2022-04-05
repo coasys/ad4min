@@ -9,6 +9,7 @@ import { Ad4mContext } from '.';
 import Profile from './components/Profile';
 import Language from './components/Language';
 import TrustAgent from './components/TrustAgent';
+import Navigation from './components/Navigation';
 
 const App = () => {
   const ad4mClient = useContext(Ad4mContext);
@@ -55,20 +56,28 @@ const App = () => {
     }
   }
 
-  const  handleTrustAgent = (candidate: string) => {
+  const handleTrustAgent = (candidate: string) => {
     setCandidate(candidate);
   }
 
   return (
     <div className="App">
-      <Stack align="center" spacing="xl">
-        <Header />
-        {!connected && <Loader />}
-        {connected && !isLogined && <Login handleLogin={handleLogin} />}
-        {isLogined && <Profile did={did} />}
-        {isLogined && <Language />}
-        {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
-      </Stack>
+      {!connected && (
+        <Stack align="center" spacing="xl">
+          <Header />
+          <Loader  />
+        </Stack>
+      )}
+      {connected && !isLogined && (
+        <Stack align="center" spacing="xl">
+          <Header />
+          <Login handleLogin={handleLogin} />
+        </Stack>
+      )}
+      {/* {isLogined && <Profile did={did} />} */}
+      {/* {isLogined && <Language />} */}
+      {isLogined && <Navigation />}
+      {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
     </div>
   );
 }
