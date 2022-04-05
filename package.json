@@ -20,6 +20,7 @@
     "graphql": "^15.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "4.0.3",
     "subscriptions-transport-ws": "^0.9.19",
     "tabler-icons-react": "^1.43.0",

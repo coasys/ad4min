@@ -1,6 +1,8 @@
-import { Code, createStyles, Group, Navbar, Text } from '@mantine/core';
+import { Anchor, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
 import { useState } from 'react';
 import { Grain, Stack2, User } from 'tabler-icons-react';
+import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
+import Profile from './Profile';
 
 type Props = {
   // did: String,
@@ -12,9 +14,8 @@ const useStyles = createStyles((theme, _params, getRef) => {
     header: {
       paddingBottom: theme.spacing.md,
       marginBottom: theme.spacing.md * 1.5,
-      borderBottom: `1px solid ${
-        theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
-      }`,
+      borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
+        }`,
     },
 
     link: {
@@ -60,9 +61,9 @@ const useStyles = createStyles((theme, _params, getRef) => {
 });
 
 const data = [
-  { label: 'Agent Profile', link: '', icon: User },
-  { label: 'Language & Expression', link: '', icon: Stack2 },
-  { label: 'Perspectives', link: '', icon: Grain },
+  { label: 'Agent Profile', link: '/', icon: User },
+  { label: 'Language & Expression', link: '/language', icon: Stack2 },
+  { label: 'Perspectives', link: '/perspective', icon: Grain },
 ]
 
 const Navigation = (props: Props) => {
@@ -70,30 +71,39 @@ const Navigation = (props: Props) => {
   const [active, setActive] = useState('Agent Profile');
 
   const links = data.map((item) => (
-    <a
+    <Anchor
+      component={Link}
       className={cx(classes.link, { [classes.linkActive]: item.label === active })}
-      href={item.link}
+      underline={false}
+      to={item.link}
       key={item.label}
-      onClick={(event) => {
-        event.preventDefault();
+      onClick={() => {
         setActive(item.label);
       }}
     >
       <item.icon className={classes.linkIcon} />
       <span>{item.label}</span>
-    </a>
+    </Anchor>
+
   ))
 
   return (
-    <Navbar height={700} width={{ sm: 300 }} p="md">
-      <Navbar.Section grow>
-        <Group className={classes.header} position="apart">
-          <Text>Ad4min</Text>
-          <Code>v0.0.3</Code>
-        </Group>
-        {links}
-      </Navbar.Section>
-    </Navbar>
+    <Router>
+      <Navbar height={700} width={{ sm: 300 }} p="md">
+        <Navbar.Section grow>
+          <Group className={classes.header} position="apart">
+            <Text>Ad4min</Text>
+            <Code>v0.0.3</Code>
+          </Group>
+          {links}
+        </Navbar.Section>
+        <Routes>
+          <Route path="/" element={<Profile did="test-did" />} />
+          <Route path="/language" element={<Profile did="test-did2" />} />
+          <Route path="/perspective" element={<Profile did="test-did3" />} />
+        </Routes>
+      </Navbar>
+    </Router>
   )
 }
 
