@@ -1,19 +1,19 @@
-import { Container, Space, Text } from '@mantine/core';
+import { Container, Space, Text, Title } from '@mantine/core';
 
 type Props = {
   did: String,
 }
 
-const Login = (props: Props) => {
+const Profile = (props: Props) => {
   return (
     <Container
       style={{ marginLeft: 10 }}
     >
       <Space h="md" />
-      <Text size='lg' weight={700}>Agent DID: </Text>
+      <Title order={3}>Agent DID: </Title>
       <Text size="md">{props.did}</Text>
     </Container>
   )
 }
 
-export default Login
+export default Profile

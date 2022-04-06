@@ -63,13 +63,13 @@ const App = () => {
   return (
     <div className="App">
       {!connected && (
-        <Stack align="center" spacing="xl">
+        <Stack align="center" spacing="xl" style={{margin: "auto"}}>
           <Header />
           <Loader />
         </Stack>
       )}
       {connected && !isLogined && (
-        <Stack align="center" spacing="xl">
+        <Stack align="center" spacing="xl" style={{margin: "auto"}}>
           <Header />
           <Login handleLogin={handleLogin} />
         </Stack>

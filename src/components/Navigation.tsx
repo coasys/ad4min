@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Grain, Stack2, User } from 'tabler-icons-react';
 import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
+import Language from './Language';
 
 type Props = {
   did: String,
@@ -100,7 +101,7 @@ const Navigation = (props: Props) => {
       </Navbar>
       <Routes>
         <Route path="/" element={<Profile did={props.did} />} />
-        <Route path="/language" element={<Profile did="test-did2" />} />
+        <Route path="/language" element={<Language />} />
         <Route path="/perspective" element={<Profile did="test-did3" />} />
       </Routes>
     </Router>

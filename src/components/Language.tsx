@@ -1,4 +1,4 @@
-import { Button, Container, Stack, TextInput, Text } from '@mantine/core';
+import { Button, Container, Stack, TextInput, Text, Space } from '@mantine/core';
 import { LanguageHandle } from '@perspect3vism/ad4m';
 import { useContext, useState } from 'react';
 import { Ad4mContext } from '..';
@@ -6,7 +6,7 @@ import { Ad4mContext } from '..';
 type Props = {
 }
 
-const Login = (props: Props) => {
+const Language = (props: Props) => {
   const ad4mClient = useContext(Ad4mContext);
 
   const [languageAddr, setLanguageAddr] = useState("");
@@ -34,9 +34,15 @@ const Login = (props: Props) => {
 
   return (
     <div>
-      <Stack align="center" spacing="xl">
+      <Stack align="flex-start" spacing="md" style={{margin: 20}}>
         <div style={{ width: 480 }}>
-          <TextInput type="text" placeholder="Input language address" value={languageAddr} onChange={onLanguageAddrChange} />
+          <TextInput
+            type="text"
+            placeholder="Input language address"
+            label="Language Address"
+            value={languageAddr}
+            onChange={onLanguageAddrChange}
+          />
         </div>
         <Button onClick={getLanguage} loading={loading}>
           Get Language
@@ -52,4 +58,4 @@ const Login = (props: Props) => {
   )
 }
 
-export default Login
+export default Language
