@@ -6,8 +6,6 @@ import { ExceptionType } from '@perspect3vism/ad4m';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 import { Loader, Stack } from '@mantine/core';
 import { Ad4mContext } from '.';
-import Profile from './components/Profile';
-import Language from './components/Language';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
 

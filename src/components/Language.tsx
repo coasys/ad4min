@@ -1,4 +1,4 @@
-import { Button, Container, Stack, TextInput, Text, Space } from '@mantine/core';
+import { Button, Container, Stack, TextInput, Text } from '@mantine/core';
 import { LanguageHandle } from '@perspect3vism/ad4m';
 import { useContext, useState } from 'react';
 import { Ad4mContext } from '..';
