@@ -4,6 +4,7 @@ import { Grain, Stack2, User } from 'tabler-icons-react';
 import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
 import Language from './Language';
+import Perspectives from './Perspectives';
 
 type Props = {
   did: String,
@@ -102,7 +103,7 @@ const Navigation = (props: Props) => {
       <Routes>
         <Route path="/" element={<Profile did={props.did} />} />
         <Route path="/language" element={<Language />} />
-        <Route path="/perspective" element={<Profile did="test-did3" />} />
+        <Route path="/perspective" element={<Perspectives />} />
       </Routes>
     </Router>
   )

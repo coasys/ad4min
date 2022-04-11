@@ -34,7 +34,7 @@ const Language = (props: Props) => {
 
   return (
     <div>
-      <Stack align="flex-start" spacing="md" style={{margin: 20}}>
+      <Stack align="flex-start" spacing="md" style={{ marginLeft: 48, marginTop: 82 }}>
         <div style={{ width: 480 }}>
           <TextInput
             type="text"

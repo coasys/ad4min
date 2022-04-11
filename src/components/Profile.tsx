@@ -7,7 +7,7 @@ type Props = {
 const Profile = (props: Props) => {
   return (
     <Container
-      style={{ marginLeft: 10 }}
+      style={{ marginLeft: 30, marginTop: 62 }}
     >
       <Space h="md" />
       <Title order={3}>Agent DID: </Title>
