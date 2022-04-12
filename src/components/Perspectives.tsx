@@ -1,4 +1,4 @@
-import { Container, Space, Text, Title } from '@mantine/core';
+import { Container, Title } from '@mantine/core';
 
 type Props = {
 }
