@@ -7,6 +7,7 @@ import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolv
 import { Loader, Stack } from '@mantine/core';
 import { Ad4mContext } from '.';
 import TrustAgent from './components/TrustAgent';
+import Auth from './components/Auth';
 import Navigation from './components/Navigation';
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
   const [isLogined, setIsLogined] = useState<Boolean>(false);
   const [did, setDid] = useState("");
   const [candidate, setCandidate] = useState("");
+  const [auth, setAuth] = useState("");
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -42,6 +44,10 @@ const App = () => {
         if (exception.type === ExceptionType.AgentIsUntrusted) {
           setCandidate(exception.addon!);
         }
+        if (exception.type === ExceptionType.RequestAuth) {
+          setAuth(exception.addon!);
+        }
+
         Notification.requestPermission()
           .then(response => {
             if (response === 'granted') {
@@ -56,6 +62,10 @@ const App = () => {
 
   const handleTrustAgent = (candidate: string) => {
     setCandidate(candidate);
+  }
+
+  const handleAuth = (auth: string) => {
+    setAuth(auth);
   }
 
   return (
@@ -76,6 +86,7 @@ const App = () => {
       {/* {isLogined && <Language />} */}
       {isLogined && <Navigation did={did} />}
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
+      {auth && <Auth info={auth} handleAuth={handleAuth} />}
     </div>
   );
 }

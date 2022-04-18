@@ -6,7 +6,17 @@ export function buildAd4mClient(server: string): Ad4mClient {
 	let apolloClient = new ApolloClient({
 		link: new WebSocketLink({
 			uri: server,
-			options: { reconnect: true },
+			options: {
+				lazy: true,
+				reconnect: true,
+				connectionParams: async () => {
+					return {
+						headers: {
+							authorization: "test-token",
+						},
+					}
+				},
+			},
 			webSocketImpl: WebSocket,
 		}),
 		cache: new InMemoryCache({ resultCaching: false, addTypename: false }),

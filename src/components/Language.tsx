@@ -26,6 +26,16 @@ const Language = (props: Props) => {
     setLoading(false);
   };
 
+  const requestAuth = async (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    try {
+      let authResult = await ad4mClient.agent.requestAuth("demo-app", "demo-desc", "demo-url");
+      console.log("auth result info: ", authResult);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const onLanguageAddrChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     let { value } = event.target;
@@ -46,6 +56,9 @@ const Language = (props: Props) => {
         </div>
         <Button onClick={getLanguage} loading={loading}>
           Get Language
+        </Button>
+        <Button onClick={requestAuth} loading={loading}>
+          Request auth
         </Button>
         {language && (
           <Container>
