@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Space, Stack, TextInput } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { Ad4mContext } from '..';
+import { Ad4mContext } from '../Ad4m';
 import { showNotification } from '@mantine/notifications';
 
 type Props = {

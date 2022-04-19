@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ExceptionType } from '@perspect3vism/ad4m';
 import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
 import { Loader, Stack } from '@mantine/core';
-import { Ad4mContext } from '.';
+import { Ad4mContext } from './Ad4m';
 import TrustAgent from './components/TrustAgent';
 import Auth from './components/Auth';
 import Navigation from './components/Navigation';

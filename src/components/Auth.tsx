@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Space, Stack, TextInput } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { Ad4mContext } from '..';
 import { showNotification } from '@mantine/notifications';
+import { Ad4mContext } from '../Ad4m';
 
 type Props = {
   info: string,
@@ -24,7 +24,7 @@ const Auth = (props: Props) => {
 
     closeModal();
     showNotification({
-      message: 'Great, the authentication is permitted now! 🤥',
+      message: `Great, the authentication is permitted now! 🤥   ${result}`,
     })
   }
 

@@ -7,15 +7,20 @@ use config::holochain_binary_path;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{build_system_tray, handle_system_tray_event};
+use commands::credential::request_credential;
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent,
 };
+use uuid::Uuid;
 
 mod config;
 mod logs;
 mod system_tray;
 mod menu;
+mod commands;
+
+pub struct ReqCredential(String);
 
 fn main() {
     if let Err(err) = setup_logs() {
@@ -32,9 +37,15 @@ fn main() {
         assert!(status.success());
     }
 
+    let req_credential = Uuid::new_v4().to_string();
+
     let (mut rx, child) = Command::new_sidecar("ad4m")
         .expect("Failed to create ad4m command")
-        .args(["serve"])
+        .args([
+            "serve",
+            "--reqCredential",
+            &req_credential,
+        ])
         .spawn()
         .expect("Failed to spawn ad4m serve");
 
@@ -48,7 +59,9 @@ fn main() {
         }
     });
 
+    let state = ReqCredential(req_credential);
     let builder_result = tauri::Builder::default()
+        .manage(state)
         .menu(build_menu())
         .system_tray(build_system_tray())
         .on_system_tray_event(move |app, event| match event {
@@ -57,6 +70,9 @@ fn main() {
             }
             _ => {}
         })
+        .invoke_handler(tauri::generate_handler![
+            request_credential,
+        ])
         .build(tauri::generate_context!());
 
     match builder_result {

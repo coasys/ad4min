@@ -21,6 +21,7 @@ log = "0.4"
 log4rs = "1.0.0"
 nix = "0.23.1"
 tauri = { version = "1.0.0-rc.4", features = ["api-all", "system-tray"] }
+uuid = { version = "0.8", features = ["v4"] }
 
 [features]
 # by default Tauri runs in production mode

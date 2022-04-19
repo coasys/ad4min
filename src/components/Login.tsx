@@ -1,6 +1,6 @@
 import { PasswordInput, Button, Stack } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { Ad4mContext } from '..';
+import { Ad4mContext } from '../Ad4m';
 
 type Props = {
   handleLogin: (isUnlocked: Boolean, did: string) => void;
