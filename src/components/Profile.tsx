@@ -3,6 +3,7 @@ import { Agent } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
 import { Ad4mContext } from '..';
+import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 
 type Props = {
   did: String,
@@ -21,8 +22,6 @@ const Profile = (props: Props) => {
   })
 
   const getTrustedAgents = async () => {
-    const friends = await ad4mClient.runtime.friends()
-
     const trustedAgents = await ad4mClient.runtime.getTrustedAgents()
     
     const tempTempAgents = [];
@@ -50,10 +49,10 @@ const Profile = (props: Props) => {
     }
 
     for (const { data: {source, predicate, target} } of agent.perspective?.links!) {
-      if (source === 'ad4m://profile') {
-        if (predicate === 'sioc://has_firstname') {
+      if (source === SOURCE_PROFILE) {
+        if (predicate === PREDICATE_FIRSTNAME) {
           tempProfile.firstName = target
-        } else if (predicate === 'sioc://has_lastname') {
+        } else if (predicate === PREDICATE_LASTNAME) {
           tempProfile.lastName = target;
         }
       }
@@ -87,11 +86,9 @@ const Profile = (props: Props) => {
         <Text size="md" weight="bold" underline>Agent DID: </Text>
         <Text size="md">{props.did}</Text>
         <Space h="md" />
-        <Text size="md" weight="bold" underline>First Name: </Text>
-        <Text size="md">{profile.firstName}</Text>
+        <Text size="md" weight="bold" underline>Name: </Text>
+        <Text size="md">{profile.firstName} {profile.lastName}</Text>
         <Space h="md" />
-        <Text size="md" weight="bold" underline>Last Name: </Text>
-        <Text size="md">{profile.lastName}</Text>
       </Container>
       <Modal
         opened={trustedAgentModalOpen}
@@ -115,7 +112,7 @@ const Profile = (props: Props) => {
                 <Avatar radius="xl"></Avatar>
                 <Group direction='column' style={{marginTop: 4}}>
                   <Group  direction='row'>
-                    <Text weight="bold">Did: </Text>
+                    <Text weight="bold">DID: </Text>
                     <Text>{e.did}</Text>
                   </Group>
                   {(e.firstName || e.lastName) && (<Group>

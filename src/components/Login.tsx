@@ -2,6 +2,7 @@ import { PasswordInput, Button, Stack, TextInput } from '@mantine/core';
 import { Link } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { Ad4mContext } from '..';
+import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 
 type Props = {
   handleLogin: (isUnlocked: Boolean, did: string) => void;
@@ -54,7 +55,7 @@ const Login = (props: Props) => {
     setLoading(true);
     let agentStatus = await ad4mClient.agent.generate(password);
     const agentPerspective = await ad4mClient.perspective.add(
-      "My perspective"
+      "Agent Profile"
     );
     const links = [];
 
@@ -62,9 +63,9 @@ const Login = (props: Props) => {
       const link = await ad4mClient.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: 'ad4m://profile',
+          source: SOURCE_PROFILE,
           target: firstName,
-          predicate: 'sioc://has_firstname'
+          predicate: PREDICATE_FIRSTNAME
         })
       );
 
@@ -75,9 +76,9 @@ const Login = (props: Props) => {
       const link = await ad4mClient.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: 'ad4m://profile',
+          source: SOURCE_PROFILE,
           target: lastName,
-          predicate: 'sioc://has_lastname'
+          predicate: PREDICATE_LASTNAME
         })
       );
 
@@ -120,14 +121,14 @@ const Login = (props: Props) => {
             <>
               <TextInput 
                 label="First Name" 
-                placeholder='Jhon' 
+                placeholder='Satoshi' 
                 radius="md" 
                 size="md" 
                 onChange={onFirstNameChange}
               />
               <TextInput 
                 label="Last Name" 
-                placeholder='Doe' 
+                placeholder='Nakamoto' 
                 radius="md" 
                 size="md" 
                 onChange={onLastNameChange}
