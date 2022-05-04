@@ -12,10 +12,7 @@ type Props = {
 const Language = (props: Props) => {
   const ad4mClient = useContext(Ad4mContext);
 
-  const [languageAddr, setLanguageAddr] = useState("");
-  const [language, setLanguage] = useState<LanguageHandle | null>(null);
   const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);
-  const [loading, setLoading] = useState(false);
   const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(false);
 
   const [languageName, setLanguageName] = useState("");
@@ -55,7 +52,7 @@ const Language = (props: Props) => {
 
     setLanguages(langs);
   }
-  
+
   useEffect(() => {
     getLanguages();
   }, [])
