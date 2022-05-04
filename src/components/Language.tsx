@@ -1,8 +1,10 @@
-import { Button, Container, Stack, TextInput, Text, Modal, MultiSelect, Space, Group } from '@mantine/core';
+import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle } from '@perspect3vism/ad4m';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Ad4mContext } from '..';
+import { generateLanguageInitials, isSystemLanguage } from '../util';
+import { MainContainer, MainHeader } from './styles';
 
 type Props = {
 }
@@ -14,7 +16,7 @@ const Language = (props: Props) => {
   const [language, setLanguage] = useState<LanguageHandle | null>(null);
   const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);
   const [loading, setLoading] = useState(false);
-  const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(true);
+  const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(false);
 
   const [languageName, setLanguageName] = useState("");
   const [languageDescription, setLanguageDescription] = useState("");
@@ -22,27 +24,16 @@ const Language = (props: Props) => {
   const [languageBundlePath, setLanguageBundlePath] = useState("");
   const [data, setData] = useState<any[]>([]);
 
-  const getLanguage = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    setLoading(true);
-    try {
-      let language = await ad4mClient.languages.byAddress(languageAddr);
-      console.log("language get result, ", language);
-      setLanguage(language);
-    } catch (err) {
-      console.log(err);
-    }
-    setLoading(false);
-  };
-
   const installLanguage = async () => {
     if (languageBundlePath) {
-      await ad4mClient.languages.publish(languageBundlePath, {
+      const installedLanguage = await ad4mClient.languages.publish(languageBundlePath, {
         name: languageName,
         description: languageDescription,
         possibleTemplateParams: data,
         sourceCodeLink: languageSourceLink
       });
+
+      await ad4mClient.languages.byAddress(installedLanguage.address)
 
       await getLanguages()
 
@@ -64,44 +55,65 @@ const Language = (props: Props) => {
 
     setLanguages(langs);
   }
-
-  const onLanguageAddrChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    let { value } = event.target;
-    setLanguageAddr(value);
-  }
-
+  
   useEffect(() => {
     getLanguages();
   }, [])
 
   return (
-    <div>
-      <Stack align="flex-start" spacing="md" style={{ marginLeft: 48, marginTop: 82 }}>
-        <div style={{ width: 480 }}>
-          <TextInput
-            type="text"
-            placeholder="Input language address"
-            label="Language Address"
-            value={languageAddr}
-            onChange={onLanguageAddrChange}
-          />
-        </div>
-        <Button onClick={getLanguage} loading={loading}>
-          Get Language
-        </Button>
-        {language && (
-          <Container>
-            <Text>Name: {language?.name}</Text>
-            <Text>Address: {language?.address}</Text>
-          </Container>
-        )}
-      </Stack>
+    <div style={MainContainer}>
+      <Container style={MainHeader}>
+        <Button onClick={() => setInstallLanguageModalOpen(true)}>Install Language</Button>
+      </Container>
+      <List 
+        spacing="xs"
+        size="sm"
+        center
+        pl={20}
+        mt={20}
+        mr={20}
+        style={{
+          overflow: 'auto',
+          height: 'auto',
+          paddingTop: 80,
+        }}
+      >
+        {languages.map((e, i) => {
+          const isSystem = isSystemLanguage(e!.name)
+
+          return (
+          <Card key={`language-${e?.name}`} shadow="sm" withBorder={true} style={{ marginBottom: 20 }}>
+            <Group align="flex-start">
+              <Avatar radius="xl">{generateLanguageInitials(e!.name)}</Avatar>
+              <Group direction='column' style={{marginTop: 4}}>
+                <Group  direction='row'>
+                  <Text weight="bold">DID: </Text>
+                  <Text>{e?.address}</Text>
+                </Group>
+                <Group  direction='row'>
+                  <Text weight="bold">Name: </Text>
+                  <Text>{e?.name}</Text>
+                </Group>
+                {isSystem ? (
+                  <div style={{padding: '4px 12px', background: 'rgb(243, 240, 255)', borderRadius: 30, color: '#845EF7'}}>
+                    System
+                  </div>
+                ) : (
+                  <div style={{padding: '4px 12px', background: '#FFF0F6', borderRadius: 30, color: 'rgb(230, 73, 128)'}}>
+                  Installed
+                  </div>
+                )}
+              </Group>
+            </Group>
+          </Card>
+        )})}
+      </List>
       <Modal
         opened={installLanguageModalOpen}
         onClose={() => setInstallLanguageModalOpen(false)}
         title="Install Langauge"
         size={700}
+        style={{zIndex: 100}}
       >
         <TextInput 
           label="Name"
