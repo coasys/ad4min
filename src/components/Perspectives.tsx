@@ -1,12 +1,39 @@
-import { Button, Container, Group, Modal, MultiSelect, Select, Space, Switch, TextInput, Title } from '@mantine/core';
+import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu, Select, Space, Switch, TextInput, Title, Text, Popover, ActionIcon, ThemeIcon } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { LanguageHandle, Link, Perspective } from '@perspect3vism/ad4m';
+import { LanguageHandle, Link, Perspective, PerspectiveProxy } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Ad4mContext } from '..';
-import { sanatizeLink } from '../util';
+import { generateLanguageInitials, isSystemLanguage, sanatizeLink } from '../util';
 import { MainContainer, MainHeader } from './styles';
+import { Trash, DotsVertical } from 'tabler-icons-react';
+import { useDisclosure } from '@mantine/hooks';
 
 type Props = {
+}
+
+const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
+  const ad4mClient = useContext(Ad4mContext);
+  const [opened, handlers] = useDisclosure(false);
+
+  const deletePerspective = async (id: string) => {
+    await ad4mClient.perspective.remove(id);
+
+    await reload();
+
+    handlers.close();
+  }
+
+
+  return (
+    <Menu opened={opened} onOpen={handlers.open} onClose={handlers.close}>
+      <Menu.Item 
+        icon={<Trash size={16}/>}
+        onClick={() => deletePerspective(uuid)}
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  )
 }
 
 const Perspectives = (props: Props) => {
@@ -14,18 +41,19 @@ const Perspectives = (props: Props) => {
 
   const [perspectiveModalOpen, setPerspectiveModalOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);
+  const [perspectives, setPerspectives] = useState<PerspectiveProxy[] | null[]>([]);
   const [perspectiveName, setPerspectiveName] = useState("");
   const [isNeighbourhood, setIsNeighbourhood] = useState(false)
   const [linkLanguage, setLinkLanguage] = useState('');
   const [linkLanguages, setLinkLanguages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   
   const fetchPerspective = async () => {
     const perspectives = await ad4mClient.perspective.all();
 
-    const languages = await ad4mClient.languages.all();
+    console.log(perspectives)
 
-    console.log(perspectives, languages)
+    setPerspectives(perspectives)
   }
 
   const getLanguages = async () => {
@@ -120,6 +148,66 @@ const Perspectives = (props: Props) => {
         <Button onClick={() => setPerspectiveModalOpen(true)}>Add Perspective</Button>
       </Container>
       <Title order={3}>Perspectives </Title>
+
+      <List 
+        spacing="xs"
+        size="sm"
+        center
+        pl={20}
+        mt={20}
+        mr={20}
+        style={{
+          overflow: 'auto',
+          height: 'auto',
+          paddingTop: 80,
+        }}
+      >
+        {perspectives.map((e, i) => {
+          console.log(e?.name, Boolean(!e?.neighbourhood || e?.name !== 'Agent Profile'))
+          return (
+          <Card key={`perspectice-${e?.name}`} shadow="sm" withBorder={true} style={{ marginBottom: 20 }}>
+            <Group position="apart" align="flex-start">
+              <Group align="flex-start">
+                <Avatar radius="xl">{generateLanguageInitials(e!.name)}</Avatar>
+                <Group direction='column' style={{marginTop: 4}}>
+                  <Group  direction='row'>
+                    <Text weight="bold">DID: </Text>
+                    <Text>{e?.uuid}</Text>
+                  </Group>
+                  <Group  direction='row'>
+                    <Text weight="bold">Name: </Text>
+                    <Text>{e?.name}</Text>
+                  </Group>
+                  {e?.sharedUrl && (
+                    <>
+                      <Group  direction='row'>
+                        <Text weight="bold">Shared URL: </Text>
+                        <Text>{e?.sharedUrl}</Text>
+                      </Group>
+                      <Group  direction='row'>
+                        <Text weight="bold">Link Language: </Text>
+                        <Text>{e?.neighbourhood!.linkLanguage}</Text>
+                      </Group>
+                    </>
+                  )}
+                  {e?.neighbourhood ? (
+                    <div style={{padding: '2px 20px', background: 'rgb(243, 240, 255)', borderRadius: 30, color: '#845EF7'}}>
+                      Neighbourhood
+                    </div>
+                  ) : (
+                    <div style={{padding: '2px 20px', background: '#FFF0F6', borderRadius: 30, color: 'rgb(230, 73, 128)'}}>
+                      Perspective
+                    </div>
+                  )}
+                </Group>
+              </Group>
+              {!e?.neighbourhood && (
+                <PerspectiveMenu uuid={e!.uuid} reload={fetchPerspective} />
+              )}
+            </Group>
+          </Card>
+        )})}
+      </List>
       <Modal
         opened={perspectiveModalOpen}
         onClose={() => setPerspectiveModalOpen(false)}
