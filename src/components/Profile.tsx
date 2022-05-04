@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
 import { Ad4mContext } from '..';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
+import { MainContainer, MainHeader } from './styles';
 
 type Props = {
   did: String,
@@ -75,8 +76,8 @@ const Profile = (props: Props) => {
   }, [])
 
   return (
-    <Container style={{ width: '100%', maxWidth: '100%' }}>
-      <Container style={{ width: '95%', maxWidth: '100%', display: 'flex', justifyContent: 'flex-end', paddingRight: 30, paddingTop: 62 }}>
+    <Container style={MainContainer}>
+      <Container style={MainHeader}>
         <Button onClick={() => settrustedAgentModalOpen(true)}>Trusted Agents</Button>
       </Container>
       <Container

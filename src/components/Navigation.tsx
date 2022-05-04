@@ -91,7 +91,7 @@ const Navigation = (props: Props) => {
 
   return (
     <Router>
-      <Navbar height={700} width={{ sm: 300 }} p="md">
+      <Navbar height='100vh' width={{ sm: 300 }} p="md" style={{position: 'fixed', top: 0, left: 0, zIndex: 99}}>
         <Navbar.Section grow>
           <Group className={classes.header} position="apart">
             <Text>Ad4min</Text>
