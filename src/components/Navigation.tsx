@@ -1,11 +1,12 @@
 import { Anchor, AppShell, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
 import { useState } from 'react';
-import { Grain, Stack2, User } from 'tabler-icons-react';
+import { Grain, Stack2, User, Settings as SettingsIcon } from 'tabler-icons-react';
 import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
 import Language from './Language';
 import Perspectives from './Perspectives';
 import { RouteContainer } from './styles';
+import Settings from './Settings';
 
 type Props = {
   did: String,
@@ -67,6 +68,7 @@ const data = [
   { label: 'Agent Profile', link: '/', icon: User },
   { label: 'Language & Expression', link: '/language', icon: Stack2 },
   { label: 'Perspectives', link: '/perspective', icon: Grain },
+  { label: 'Settings', link: '/settings', icon: SettingsIcon },
 ]
 
 const Navigation = (props: Props) => {
@@ -111,6 +113,7 @@ const Navigation = (props: Props) => {
             <Route path="/" element={<Profile did={props.did} />} />
             <Route path="/language" element={<Language />} />
             <Route path="/perspective" element={<Perspectives />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
       </AppShell>

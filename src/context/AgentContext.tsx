@@ -24,6 +24,7 @@ type ContextProps = {
     setUrl: (str: string) => void,
     handleTrustAgent: (str: string) => void,
     unlockAgent: (str: string) => void,
+    lockAgent: (str: string) => void,
     generateAgent: (firstName: string, lastName: string, password: string) => void,
   };
 }
@@ -44,6 +45,7 @@ const initialState: ContextProps = {
     setUrl: () => null,
     handleTrustAgent: () => null,
     unlockAgent: () => null,
+    lockAgent: () => null,
     generateAgent: () => null,
   }
 }
@@ -121,7 +123,8 @@ export function AgentProvider({ children }: any) {
     setState((prev) => ({
       ...prev,
       isUnlocked: login,
-      did: did
+      did: did,
+      loading: false
     }))
 
     if (login) {
@@ -161,14 +164,18 @@ export function AgentProvider({ children }: any) {
       localStorage.setItem('url', url as string);
     }
   }
+  
+  const setLoading = (loading: boolean) => {
+    setState((prev) => ({
+      ...prev,
+      loading
+    }))
+  }
 
   const generateAgent = async (firstName: string, lastName: string, password: string) => {
     const client = state.client!;
     
-    setState((prev) => ({
-      ...prev,
-      loading: true,
-    }))
+    setLoading(true);
 
     let agentStatus = await client.agent.generate(password);
     const agentPerspective = await client.perspective.add(
@@ -223,10 +230,7 @@ export function AgentProvider({ children }: any) {
   };
 
   const unlockAgent = async (password: string) => {
-    setState((prev) => ({
-      ...prev,
-      loading: true,
-    }))
+    setLoading(true)
     let agentStatus = await state.client?.agent.unlock(password);
     handleLogin(agentStatus!.isUnlocked, agentStatus!.did!);
 
@@ -244,6 +248,16 @@ export function AgentProvider({ children }: any) {
     }
   }, [state.url])
   
+  const lockAgent = async (passphrase: string) => {
+    setLoading(true);
+
+    const client = state.client!;
+    
+    const status = await client.agent.lock(passphrase);
+
+    handleLogin(status!.isUnlocked, status!.did!);
+  } 
+
   return (
     <AgentContext.Provider 
       value={{
@@ -252,7 +266,8 @@ export function AgentProvider({ children }: any) {
           setUrl,
           handleTrustAgent,
           generateAgent,
-          unlockAgent
+          unlockAgent,
+          lockAgent
         }
       }}
     >
