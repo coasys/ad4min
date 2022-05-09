@@ -4,7 +4,7 @@ export const MainContainer = {
   height: '100vh',
   position: 'relative' as 'relative',
   padding: 0,
-  overflowX: 'hidden' as 'hidden'
+  overflowX: 'clip' as 'clip'
 }
 
 export const MainHeader = {
@@ -22,5 +22,6 @@ export const MainHeader = {
 
 export const RouteContainer = { 
   width: 'calc(100% - 301px)', 
-  marginLeft: 301
+  marginLeft: 301,
+  overflowX: 'hidden' as 'hidden'
 }
