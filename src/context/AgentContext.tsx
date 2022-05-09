@@ -22,6 +22,7 @@ type ContextProps = {
   state: State;
   methods: {
     setUrl: (str: string) => void,
+    resetUrl: () => void
     handleTrustAgent: (str: string) => void,
     unlockAgent: (str: string) => void,
     lockAgent: (str: string) => void,
@@ -43,6 +44,7 @@ const initialState: ContextProps = {
   },
   methods: {
     setUrl: () => null,
+    resetUrl: () => null,
     handleTrustAgent: () => null,
     unlockAgent: () => null,
     lockAgent: () => null,
@@ -72,26 +74,31 @@ export function AgentProvider({ children }: any) {
     }));
 
     const checkConnection = async () => {
-      try {
-        if (client) {
-          await client.runtime.hcAgentInfos(); // TODO runtime info is broken
-          console.log("get hc agent infos success.");
-          setConnected(true);
+        try {
+          if (client) {
+            await client.runtime.hcAgentInfos(); // TODO runtime info is broken
+            console.log("get hc agent infos success.");
+            setConnected(true);
+          }
+        } catch (err) {
+          if (state.url) {
+            showNotification({
+              message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
+              color: 'red',
+              autoClose: false
+            })
+          }
+  
+          setConnected(false);
         }
-      } catch (err) {
-        if (state.url) {
-          showNotification({
-            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-            color: 'red',
-            autoClose: false
-          })
-        }
-
-        setConnected(false);
-      }
     }
 
-    checkConnection()
+    if (localStorage.getItem('url')) {
+      checkConnection()
+    } else {
+      setConnected(false)
+    }
+
 
     console.log("Check if ad4m service is connected.")
   }, [state.client, state.url]);
@@ -163,6 +170,15 @@ export function AgentProvider({ children }: any) {
   
       localStorage.setItem('url', url as string);
     }
+  }
+
+  const resetUrl = () => {
+    setState((prev) => ({
+      ...prev,
+      url: ''
+    }))
+
+    localStorage.removeItem('url');
   }
   
   const setLoading = (loading: boolean) => {
@@ -267,7 +283,8 @@ export function AgentProvider({ children }: any) {
           handleTrustAgent,
           generateAgent,
           unlockAgent,
-          lockAgent
+          lockAgent,
+          resetUrl
         }
       }}
     >

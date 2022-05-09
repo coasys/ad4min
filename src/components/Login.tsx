@@ -1,8 +1,8 @@
-import { PasswordInput, Button, Stack, TextInput } from '@mantine/core';
-import { Link } from '@perspect3vism/ad4m';
+import { PasswordInput, Text, Button, Stack, TextInput, Popover, ActionIcon, Tooltip } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
 import { AgentContext } from '../context/AgentContext';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
+import { Link } from 'tabler-icons-react';
 
 
 const Login = (props: any) => {
@@ -12,12 +12,14 @@ const Login = (props: any) => {
     isUnlocked
   }, methods: {
     generateAgent,
-    unlockAgent
+    unlockAgent,
+    resetUrl
   }} = useContext(AgentContext)
   
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [opened, setOpened] = useState(false);
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -40,6 +42,27 @@ const Login = (props: any) => {
   return (
     <div>
       <Stack align="center" spacing="xl">
+        <div style={{
+          position: 'fixed',
+          top: 20,
+          right: 20
+        }}>
+          <Tooltip
+            label="Change ad4m-executor url"
+            opened={opened}
+            position="left"
+            placement="center"
+            withArrow
+          >
+            <ActionIcon 
+              onMouseEnter={() => setOpened(true)} 
+              onMouseLeave={() => setOpened(false)}
+              onClick={() => resetUrl()}
+            >
+              <Link />
+            </ActionIcon >
+          </Tooltip>
+        </div>
         <div style={{ width: 280 }}>
           {!isInitialized && (
             <>
