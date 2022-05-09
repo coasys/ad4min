@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, Theme
 import { Agent } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
-import { Ad4mContext } from '..';
+import { AgentContext } from '../context/AgentContext';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 import { MainContainer, MainHeader } from './styles';
 
@@ -11,7 +11,9 @@ type Props = {
 }
 
 const Profile = (props: Props) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(AgentContext);
 
   const [trustedAgents, setTrustedAgents] = useState<any[]>([]);
 
@@ -23,12 +25,12 @@ const Profile = (props: Props) => {
   })
 
   const getTrustedAgents = async () => {
-    const trustedAgents = await ad4mClient.runtime.getTrustedAgents()
+    const trustedAgents = await client!.runtime.getTrustedAgents()
     
     const tempTempAgents = [];
     
     for (const agent of trustedAgents) {
-      const fetchedAgent = await ad4mClient.agent.byDID(agent)
+      const fetchedAgent = await client!.agent.byDID(agent)
 
       if (fetchedAgent) {
         const profile = await fetchProfile(fetchedAgent)
@@ -63,7 +65,7 @@ const Profile = (props: Props) => {
   }
 
   const fetchCurrentAgentProfile = async () => {
-    const agent = await ad4mClient.agent.me();
+    const agent = await client!.agent.me();
 
     const profile = await fetchProfile(agent);
     
@@ -77,10 +79,10 @@ const Profile = (props: Props) => {
 
   return (
     <Container style={MainContainer}>
-      <Container style={MainHeader}>
+      <div style={MainHeader}>
         <Title order={3}>Agent Profile</Title>
         <Button onClick={() => settrustedAgentModalOpen(true)}>Trusted Agents</Button>
-      </Container>
+      </div>
       <Container
         style={{ marginLeft: 10, marginTop: 62 }}
       >

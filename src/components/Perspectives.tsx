@@ -2,21 +2,24 @@ import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu,
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle, Link, Perspective, PerspectiveProxy } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { Ad4mContext } from '..';
 import { generateLanguageInitials, isSystemLanguage, sanatizeLink } from '../util';
 import { MainContainer, MainHeader } from './styles';
 import { Trash, DotsVertical } from 'tabler-icons-react';
 import { useDisclosure } from '@mantine/hooks';
+import { AgentContext } from '../context/AgentContext';
 
 type Props = {
 }
 
 const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(AgentContext);
+  
   const [opened, handlers] = useDisclosure(false);
 
   const deletePerspective = async (id: string) => {
-    await ad4mClient.perspective.remove(id);
+    await client!.perspective.remove(id);
 
     await reload();
 
@@ -37,7 +40,9 @@ const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
 }
 
 const Perspectives = (props: Props) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(AgentContext);
 
   const [perspectiveModalOpen, setPerspectiveModalOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);
@@ -49,7 +54,7 @@ const Perspectives = (props: Props) => {
   const [loading, setLoading] = useState(false);
   
   const fetchPerspective = async () => {
-    const perspectives = await ad4mClient.perspective.all();
+    const perspectives = await client!.perspective.all();
 
     console.log(perspectives)
 
@@ -57,7 +62,7 @@ const Perspectives = (props: Props) => {
   }
 
   const getLanguages = async () => {
-    const langs = await ad4mClient.languages.all();
+    const langs = await client!.languages.all();
 
     setLanguages(langs);
   }
@@ -70,13 +75,13 @@ const Perspectives = (props: Props) => {
   const create = async () => {
     setLoading(true)
 
-    const perspective = await ad4mClient.perspective.add(perspectiveName);
+    const perspective = await client!.perspective.add(perspectiveName);
     
     try {
       if (isNeighbourhood) {
         const templateLangs = []
   
-        const templatedLinkLang = await ad4mClient.languages.applyTemplateAndPublish(
+        const templatedLinkLang = await client!.languages.applyTemplateAndPublish(
           linkLanguage,
           JSON.stringify({
             uid: '123',
@@ -84,14 +89,14 @@ const Perspectives = (props: Props) => {
           })
         );
   
-        const metaPerspective = await ad4mClient.perspective.add(`${perspectiveName}-meta`);
+        const metaPerspective = await client!.perspective.add(`${perspectiveName}-meta`);
 
         for (const linkLanguage of linkLanguages) {
           const lang = (languages as LanguageHandle[]).find((e: LanguageHandle) => e.address === linkLanguage);
   
           if (lang) {
   
-            const templatedLang = await ad4mClient.languages.applyTemplateAndPublish(
+            const templatedLang = await client!.languages.applyTemplateAndPublish(
               lang.address,
               JSON.stringify({
                 uid: '123',
@@ -99,7 +104,7 @@ const Perspectives = (props: Props) => {
               })
             );
   
-            const link = await ad4mClient.perspective.addLink(metaPerspective.uuid, new Link({
+            const link = await client!.perspective.addLink(metaPerspective.uuid, new Link({
               source: 'self',
               target: templatedLang.address,
               predicate: 'language'
@@ -109,9 +114,9 @@ const Perspectives = (props: Props) => {
           }
         }
 
-        await ad4mClient.perspective.remove(metaPerspective.uuid)
+        await client!.perspective.remove(metaPerspective.uuid)
   
-        await ad4mClient.neighbourhood.publishFromPerspective(
+        await client!.neighbourhood.publishFromPerspective(
           perspective.uuid, 
           templatedLinkLang.address,
           new Perspective(templateLangs)
@@ -127,7 +132,7 @@ const Perspectives = (props: Props) => {
         })
       }
     } catch (e) {
-      ad4mClient.perspective.remove(perspective.uuid)
+      client!.perspective.remove(perspective.uuid)
       showNotification({
         message: `Error: ${e}`,
         color: 'red'
@@ -144,10 +149,10 @@ const Perspectives = (props: Props) => {
     <Container
       style={MainContainer}
     >
-      <Container style={MainHeader}>
+      <div style={MainHeader}>
         <Title order={3}>Perspectives</Title>
         <Button onClick={() => setPerspectiveModalOpen(true)}>Add Perspective</Button>
-      </Container>
+      </div>
 
       <List 
         spacing="xs"

@@ -2,7 +2,7 @@ import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, L
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
-import { Ad4mContext } from '..';
+import { AgentContext } from '../context/AgentContext';
 import { generateLanguageInitials, isSystemLanguage } from '../util';
 import { MainContainer, MainHeader } from './styles';
 
@@ -10,7 +10,9 @@ type Props = {
 }
 
 const Language = (props: Props) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(AgentContext);
 
   const [languages, setLanguages] = useState<any[] | null[]>([]);
   const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(false);
@@ -23,14 +25,14 @@ const Language = (props: Props) => {
 
   const installLanguage = async () => {
     if (languageBundlePath) {
-      const installedLanguage = await ad4mClient.languages.publish(languageBundlePath, {
+      const installedLanguage = await client!.languages.publish(languageBundlePath, {
         name: languageName,
         description: languageDescription,
         possibleTemplateParams: data,
         sourceCodeLink: languageSourceLink
       });
 
-      await ad4mClient.languages.byAddress(installedLanguage.address)
+      await client!.languages.byAddress(installedLanguage.address)
 
       await getLanguages()
 
@@ -48,9 +50,9 @@ const Language = (props: Props) => {
   }
 
   const getLanguages = async () => {
-    const langs = await ad4mClient.languages.all();
+    const langs = await client!.languages.all();
 
-    const perspectives = await ad4mClient.perspective.all();
+    const perspectives = await client!.perspective.all();
 
     const tempLangs = [];
     
@@ -80,10 +82,10 @@ const Language = (props: Props) => {
 
   return (
     <Container style={MainContainer}>
-      <Container style={MainHeader}>
+      <div style={MainHeader}>
         <Title order={3}>Langauges</Title>
         <Button onClick={() => setInstallLanguageModalOpen(true)}>Install Language</Button>
-      </Container>
+      </div>
       <List 
         spacing="xs"
         size="sm"
