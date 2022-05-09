@@ -12,7 +12,7 @@ type Props = {
 const Language = (props: Props) => {
   const ad4mClient = useContext(Ad4mContext);
 
-  const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);
+  const [languages, setLanguages] = useState<any[] | null[]>([]);
   const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(false);
 
   const [languageName, setLanguageName] = useState("");
@@ -50,7 +50,28 @@ const Language = (props: Props) => {
   const getLanguages = async () => {
     const langs = await ad4mClient.languages.all();
 
-    setLanguages(langs);
+    const perspectives = await ad4mClient.perspective.all();
+
+    const tempLangs = [];
+    
+    for (const lang of langs) {
+      const found = perspectives.find(p => {
+        if (p.neighbourhood) {
+          if (p.neighbourhood.linkLanguage === lang.address) {
+            return true;
+          } else {
+            return p.neighbourhood.meta.links.filter(l => l.data.predicate === 'language')
+              .find(l => l.data.target === lang.address)
+          }
+        }
+
+        return false;
+      });
+
+      tempLangs.push({language: lang, perspective: found})
+    }
+
+    setLanguages(tempLangs);
   }
 
   useEffect(() => {
@@ -78,21 +99,28 @@ const Language = (props: Props) => {
         }}
       >
         {languages.map((e, i) => {
-          const isSystem = isSystemLanguage(e!.name)
+          const {language, perspective} = e;
+          const isSystem = isSystemLanguage(language!.name)
 
           return (
-          <Card key={`language-${e?.name}`} shadow="sm" withBorder={true} style={{ marginBottom: 20 }}>
+          <Card key={`language-${language?.address}`} shadow="sm" withBorder={true} style={{ marginBottom: 20 }}>
             <Group align="flex-start">
-              <Avatar radius="xl">{generateLanguageInitials(e!.name)}</Avatar>
+              <Avatar radius="xl">{generateLanguageInitials(language!.name)}</Avatar>
               <Group direction='column' style={{marginTop: 4}}>
                 <Group  direction='row'>
                   <Text weight="bold">DID: </Text>
-                  <Text>{e?.address}</Text>
+                  <Text>{language?.address}</Text>
                 </Group>
                 <Group  direction='row'>
                   <Text weight="bold">Name: </Text>
-                  <Text>{e?.name}</Text>
+                  <Text>{language?.name}</Text>
                 </Group>
+                {perspective && (
+                  <Group  direction='row'>
+                    <Text weight="bold">Perspective: </Text>
+                    <Text>{perspective?.name}</Text>
+                  </Group>
+                )}
                 {isSystem ? (
                   <div style={{padding: '4px 12px', background: 'rgb(243, 240, 255)', borderRadius: 30, color: '#845EF7'}}>
                     System
