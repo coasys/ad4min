@@ -1,3 +1,4 @@
+import { showNotification } from "@mantine/notifications";
 import { Ad4mClient, ExceptionType, Link } from "@perspect3vism/ad4m";
 import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
 import { createContext, useEffect, useState } from "react";
@@ -14,6 +15,7 @@ type State = {
   did: string,
   candidate: string;
   connected: boolean;
+  connectedLaoding: boolean;
 }
 
 type ContextProps = {
@@ -28,14 +30,15 @@ type ContextProps = {
 
 const initialState: ContextProps = {
   state: {
-    url: AD4M_ENDPOINT,
+    url: '',
     isInitialized: false,
     isUnlocked: false,
     client: null,
     loading: false,
     did: '',
     candidate: '',
-    connected: false
+    connected: false,
+    connectedLaoding: true
   },
   methods: {
     setUrl: () => null,
@@ -52,26 +55,44 @@ export function AgentProvider({ children }: any) {
   const [state, setState] = useState(initialState.state);
 
   useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      url: localStorage.getItem('url') as string
+    }))
+  }, [])
+
+  useEffect(() => {
     const client = state.client!;
     const setConnected = (connected: boolean) => setState((prev) => ({
       ...prev,
-      connected
+      connected,
+      connectedLaoding: false
     }));
 
     const checkConnection = async () => {
       try {
-        await client.runtime.hcAgentInfos(); // TODO runtime info is broken
-        console.log("get hc agent infos success.");
-        setConnected(true);
+        if (client) {
+          await client.runtime.hcAgentInfos(); // TODO runtime info is broken
+          console.log("get hc agent infos success.");
+          setConnected(true);
+        }
       } catch (err) {
+        if (state.url) {
+          showNotification({
+            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
+            color: 'red',
+            autoClose: false
+          })
+        }
+
         setConnected(false);
       }
     }
 
-    checkConnection();
+    checkConnection()
 
     console.log("Check if ad4m service is connected.")
-  }, [state.client]);
+  }, [state.client, state.url]);
 
   useEffect(() => {
     const client = state.client!;
@@ -87,10 +108,10 @@ export function AgentProvider({ children }: any) {
 
       handleLogin(status.isUnlocked, status.did ? status.did! : "");
     };
+
     if (client) {
       checkIfAgentIsInitialized();
     }
-
 
     console.log("Check if agent is initialized.")
   }, [state.client]);
@@ -131,10 +152,14 @@ export function AgentProvider({ children }: any) {
   }
 
   const setUrl = (url: string) => {
-    setState((prev) => ({
-      ...prev,
-      url
-    }))
+    if (url) {
+      setState((prev) => ({
+        ...prev,
+        url
+      }))
+  
+      localStorage.setItem('url', url as string);
+    }
   }
 
   const generateAgent = async (firstName: string, lastName: string, password: string) => {
@@ -209,14 +234,14 @@ export function AgentProvider({ children }: any) {
   }
 
   useEffect(() => {
-    const client = buildAd4mClient(state.url)
-    
-    setState((prev) => ({
-      ...prev,
-      client
-    }));
-
-    console.log('haha', state)
+    if (state.url) {
+      const client = buildAd4mClient(state.url)
+      
+      setState((prev) => ({
+        ...prev,
+        client
+      }));
+    }
   }, [state.url])
   
   return (
