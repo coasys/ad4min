@@ -111,7 +111,7 @@ const Profile = (props: Props) => {
           }
         >
           {trustedAgents.map((e, i) => (
-            <Card shadow="sm" withBorder={true} style={{ marginBottom: trustedAgents.length-1 === i ? 0 : 20 }}>
+            <Card key={`trusted-agent-${e.did}`} shadow="sm" withBorder={true} style={{ marginBottom: trustedAgents.length-1 === i ? 0 : 20 }}>
               <Group align="flex-start">
                 <Avatar radius="xl"></Avatar>
                 <Group direction='column' style={{marginTop: 4}}>
