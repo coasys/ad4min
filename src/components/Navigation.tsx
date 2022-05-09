@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
 import Language from './Language';
 import Perspectives from './Perspectives';
+import { RouteContainer } from './styles';
 
 type Props = {
   did: String,
@@ -105,11 +106,13 @@ const Navigation = (props: Props) => {
           </Navbar>
         }
       >
-        <Routes>
-          <Route path="/" element={<Profile did={props.did} />} />
-          <Route path="/language" element={<Language />} />
-          <Route path="/perspective" element={<Perspectives />} />
-        </Routes>
+        <div style={RouteContainer}>
+          <Routes>
+            <Route path="/" element={<Profile did={props.did} />} />
+            <Route path="/language" element={<Language />} />
+            <Route path="/perspective" element={<Perspectives />} />
+          </Routes>
+        </div>
       </AppShell>
     </Router>
   )

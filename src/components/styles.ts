@@ -1,16 +1,15 @@
 export const MainContainer = {
-  maxWidth: 'calc(100vw - 350px)', 
+  with: 'calc(100vw - 284px)', 
   width: '100%',
-  marginLeft: 300,
   height: '100vh',
   position: 'relative' as 'relative',
   padding: 0,
+  overflowX: 'hidden' as 'hidden'
 }
 
 export const MainHeader = {
-  maxWidth: 'calc(100vw - 400px)', 
-  width: '100%',
-  marginLeft: 300,
+  width: 'calc(100% - 341px)',
+  marginLeft: 301,
   position: 'fixed' as 'fixed',
   background: '#fff',
   zIndex: 98,
@@ -18,7 +17,10 @@ export const MainHeader = {
   right: 0,
   display: 'flex',
   justifyContent: 'space-between',
-  paddingRight: 30,
-  paddingTop: 40,
-  paddingLeft: 30,
+  padding: `20px 20px 20px 20px`,
+}
+
+export const RouteContainer = { 
+  width: 'calc(100% - 301px)', 
+  marginLeft: 301
 }
