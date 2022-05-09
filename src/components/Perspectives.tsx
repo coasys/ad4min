@@ -145,9 +145,9 @@ const Perspectives = (props: Props) => {
       style={MainContainer}
     >
       <Container style={MainHeader}>
+        <Title order={3}>Perspectives</Title>
         <Button onClick={() => setPerspectiveModalOpen(true)}>Add Perspective</Button>
       </Container>
-      <Title order={3}>Perspectives </Title>
 
       <List 
         spacing="xs"
@@ -160,6 +160,7 @@ const Perspectives = (props: Props) => {
           overflow: 'auto',
           height: 'auto',
           paddingTop: 80,
+          maxWidth: 960
         }}
       >
         {perspectives.map((e, i) => {

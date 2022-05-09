@@ -1,4 +1,4 @@
-import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip } from '@mantine/core';
+import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip, Header, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
@@ -58,8 +58,9 @@ const Language = (props: Props) => {
   }, [])
 
   return (
-    <div style={MainContainer}>
+    <Container style={MainContainer}>
       <Container style={MainHeader}>
+        <Title order={3}>Langauges</Title>
         <Button onClick={() => setInstallLanguageModalOpen(true)}>Install Language</Button>
       </Container>
       <List 
@@ -73,6 +74,7 @@ const Language = (props: Props) => {
           overflow: 'auto',
           height: 'auto',
           paddingTop: 80,
+          maxWidth: 960
         }}
       >
         {languages.map((e, i) => {
@@ -168,7 +170,7 @@ const Language = (props: Props) => {
           </Button>
         </Group>
       </Modal>
-    </div>
+    </Container>
   )
 }
 

@@ -78,10 +78,11 @@ const Profile = (props: Props) => {
   return (
     <Container style={MainContainer}>
       <Container style={MainHeader}>
+        <Title order={3}>Agent Profile</Title>
         <Button onClick={() => settrustedAgentModalOpen(true)}>Trusted Agents</Button>
       </Container>
       <Container
-        style={{ marginLeft: 30, marginTop: 62 }}
+        style={{ marginLeft: 10, marginTop: 62 }}
       >
         <Space h="md" />
         <Text size="md" weight="bold" underline>Agent DID: </Text>
