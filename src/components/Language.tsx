@@ -1,7 +1,10 @@
-import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip, Header, Title } from '@mantine/core';
+import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip, Header, Title, Menu } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { LanguageHandle } from '@perspect3vism/ad4m';
+import { LanguageHandle, LanguageMeta } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
+import { Download, Trash, Upload } from 'tabler-icons-react';
 import { AgentContext } from '../context/AgentContext';
 import { generateLanguageInitials, isSystemLanguage } from '../util';
 import { MainContainer, MainHeader } from './styles';
@@ -15,15 +18,24 @@ const Language = (props: Props) => {
   }} = useContext(AgentContext);
 
   const [languages, setLanguages] = useState<any[] | null[]>([]);
+  const [loading, setLoading] = useState(false);
   const [installLanguageModalOpen, setInstallLanguageModalOpen] = useState(false);
+  const [publishLanguageModalOpen, setPublishLanguageModalOpen] = useState(false);
+  const [publishLanguageResultModalOpen, setPublishLanguageResultModalOpen] = useState(false);
+  const [publishLanguageResult, setPublishLanguageResult] = useState<LanguageMeta | null>(null);
 
+
+  const [languageHash, setLanguageHash] = useState("");
   const [languageName, setLanguageName] = useState("");
   const [languageDescription, setLanguageDescription] = useState("");
   const [languageSourceLink, setLanguageSourceLink] = useState("");
   const [languageBundlePath, setLanguageBundlePath] = useState("");
   const [data, setData] = useState<any[]>([]);
 
-  const installLanguage = async () => {
+  const [opened, handlers] = useDisclosure(false);
+
+  const publishLanguage = async () => {
+    setLoading(true);
     if (languageBundlePath) {
       const installedLanguage = await client!.languages.publish(languageBundlePath, {
         name: languageName,
@@ -32,20 +44,48 @@ const Language = (props: Props) => {
         sourceCodeLink: languageSourceLink
       });
 
-      await client!.languages.byAddress(installedLanguage.address)
+      console.log(installedLanguage);
 
-      await getLanguages()
+      setPublishLanguageModalOpen(false)
 
-      setInstallLanguageModalOpen(false)
+      setPublishLanguageResultModalOpen(true)
 
-      showNotification({
-        message: 'Language sucessfully installed',
-      })
+      setPublishLanguageResult(installedLanguage);
+
     } else {
       showNotification({
         message: 'Language file missing',
         color: 'red'
       })
+    }
+    setLoading(false);
+  }
+
+  const installLanguage = async () => {
+    setLoading(true);
+    try {
+      if (languageBundlePath) {
+        await client!.languages.byAddress(languageHash)
+  
+        await getLanguages()
+  
+        
+        setInstallLanguageModalOpen(false)
+        
+        showNotification({
+          message: 'Language sucessfully installed',
+        })
+      } else {
+        showNotification({
+          message: 'Language file missing',
+          color: 'red'
+        })
+      }
+
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      throw e;
     }
   }
 
@@ -84,7 +124,20 @@ const Language = (props: Props) => {
     <Container style={MainContainer}>
       <div style={MainHeader}>
         <Title order={3}>Langauges</Title>
-        <Button onClick={() => setInstallLanguageModalOpen(true)}>Install Language</Button>
+        <Menu opened={opened} onOpen={handlers.open} onClose={handlers.close}>
+          <Menu.Item 
+            icon={<Upload size={16}/>}
+            onClick={() => setPublishLanguageModalOpen(true)}
+          >
+            Publish Language
+          </Menu.Item>
+          <Menu.Item 
+            icon={<Download size={16}/>}
+            onClick={() => setInstallLanguageModalOpen(true)}
+          >
+            Install Language
+          </Menu.Item>
+        </Menu>
       </div>
       <List 
         spacing="xs"
@@ -138,8 +191,8 @@ const Language = (props: Props) => {
         )})}
       </List>
       <Modal
-        opened={installLanguageModalOpen}
-        onClose={() => setInstallLanguageModalOpen(false)}
+        opened={publishLanguageModalOpen}
+        onClose={() => setPublishLanguageModalOpen(false)}
         title="Install Langauge"
         size={700}
         style={{zIndex: 100}}
@@ -195,10 +248,52 @@ const Language = (props: Props) => {
           <Button onClick={() => setInstallLanguageModalOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={installLanguage}>
+          <Button onClick={publishLanguage} loading={loading}>
             Install
           </Button>
         </Group>
+      </Modal>
+      <Modal
+        opened={installLanguageModalOpen}
+        onClose={() => setInstallLanguageModalOpen(false)}
+        title="Install Langauge"
+        size={700}
+        style={{zIndex: 100}}
+      >
+        <TextInput 
+          label="Language hash"
+          required
+          placeholder='ex. QmUTkvPcyaUGntqfzi3iR1xomADm5yYC2j8hcPdhMHpTem' 
+          radius="md" 
+          size="md" 
+          onChange={(e) => setLanguageHash(e.target.value)}
+        />
+        <Space h="md"  />
+        <Group direction='row'>
+          <Button onClick={() => setInstallLanguageModalOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={installLanguage} loading={loading}>
+            Install
+          </Button>
+        </Group>
+      </Modal>
+      <Modal
+        opened={publishLanguageResultModalOpen}
+        onClose={() => setPublishLanguageResultModalOpen(false)}
+        title="Install Langauge"
+        size={700}
+        style={{zIndex: 100}}
+      >
+        <Text>Name: {publishLanguageResult?.name}</Text>
+        <Text>Address: {publishLanguageResult?.address}</Text>
+        <Text>Description: {publishLanguageResult?.description}</Text>
+        <Text>Author: {publishLanguageResult?.author}</Text>
+        <Text>Source code link: {publishLanguageResult?.sourceCodeLink}</Text>
+        <Space h="md"  />
+        <Button onClick={() => setPublishLanguageResultModalOpen(false)}>
+          Done
+        </Button>
       </Modal>
     </Container>
   )
