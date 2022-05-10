@@ -2,9 +2,9 @@ import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, Theme
 import { Agent } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
-import { AgentContext } from '../context/AgentContext';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 import { MainContainer, MainHeader } from './styles';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
   did: String,
@@ -13,7 +13,7 @@ type Props = {
 const Profile = (props: Props) => {
   const {state: {
     client
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
 
   const [trustedAgents, setTrustedAgents] = useState<any[]>([]);
 

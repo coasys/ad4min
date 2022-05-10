@@ -1,29 +1,19 @@
 import { showNotification } from "@mantine/notifications";
 import { Ad4mClient, ExceptionType, Link } from "@perspect3vism/ad4m";
 import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AD4M_ENDPOINT } from "../config";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME } from "../constants/triples";
 import { buildAd4mClient } from "../util";
+import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
-  url: string;
-  isInitialized: Boolean;
-  isUnlocked: Boolean;
   loading: boolean;
-  client: Ad4mClient | null;
-  did: string,
-  candidate: string;
-  connected: boolean;
-  connectedLaoding: boolean;
 }
 
 type ContextProps = {
   state: State;
   methods: {
-    setUrl: (str: string) => void,
-    resetUrl: () => void
-    handleTrustAgent: (str: string) => void,
     unlockAgent: (str: string) => void,
     lockAgent: (str: string) => void,
     generateAgent: (firstName: string, lastName: string, password: string) => void,
@@ -32,20 +22,9 @@ type ContextProps = {
 
 const initialState: ContextProps = {
   state: {
-    url: '',
-    isInitialized: false,
-    isUnlocked: false,
-    client: null,
     loading: false,
-    did: '',
-    candidate: '',
-    connected: false,
-    connectedLaoding: true
   },
   methods: {
-    setUrl: () => null,
-    resetUrl: () => null,
-    handleTrustAgent: () => null,
     unlockAgent: () => null,
     lockAgent: () => null,
     generateAgent: () => null,
@@ -56,130 +35,14 @@ export const AgentContext = createContext(initialState);
 
 
 export function AgentProvider({ children }: any) {
+  const {state: {
+    client
+  }, methods: {
+    handleLogin
+  }} = useContext(Ad4minContext);
+  
   const [state, setState] = useState(initialState.state);
 
-  useEffect(() => {
-    setState((prev) => ({
-      ...prev,
-      url: localStorage.getItem('url') as string
-    }))
-  }, [])
-
-  useEffect(() => {
-    const client = state.client!;
-    const setConnected = (connected: boolean) => setState((prev) => ({
-      ...prev,
-      connected,
-      connectedLaoding: false
-    }));
-
-    const checkConnection = async () => {
-        try {
-          if (client) {
-            await client.runtime.hcAgentInfos(); // TODO runtime info is broken
-            console.log("get hc agent infos success.");
-            setConnected(true);
-          }
-        } catch (err) {
-          if (state.url) {
-            showNotification({
-              message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-              color: 'red',
-              autoClose: false
-            })
-          }
-  
-          setConnected(false);
-        }
-    }
-
-    if (localStorage.getItem('url')) {
-      checkConnection()
-    } else {
-      setConnected(false)
-    }
-
-
-    console.log("Check if ad4m service is connected.")
-  }, [state.client, state.url]);
-
-  useEffect(() => {
-    const client = state.client!;
-    const checkIfAgentIsInitialized = async () => {
-      let status = await client?.agent.status();
-      console.log("agent status in init: ", status);
-
-      setState((prev) => ({
-        ...prev,
-        isInitialized: status.isInitialized!,
-        isUnlocked: status.isUnlocked!
-      }))
-
-      handleLogin(status.isUnlocked, status.did ? status.did! : "");
-    };
-
-    if (client) {
-      checkIfAgentIsInitialized();
-    }
-
-    console.log("Check if agent is initialized.")
-  }, [state.client]);
-
-  const handleLogin = (login: Boolean, did: string) => {
-    const client = state.client!;
-    setState((prev) => ({
-      ...prev,
-      isUnlocked: login,
-      did: did,
-      loading: false
-    }))
-
-    if (login) {
-      client.runtime.addExceptionCallback((exception: ExceptionInfo) => {
-        if (exception.type === ExceptionType.AgentIsUntrusted) {
-          setState((prev) => ({
-            ...prev, 
-            candidate: exception.addon!
-          }));
-        }
-        Notification.requestPermission()
-          .then(response => {
-            if (response === 'granted') {
-              new Notification(exception.title, { body: exception.message })
-            }
-          });
-        console.log(exception);
-        return null
-      })
-    }
-  }
-
-  const handleTrustAgent = (candidate: string) => {
-    setState((prev) => ({
-      ...prev, 
-      candidate
-    }));
-  }
-
-  const setUrl = (url: string) => {
-    if (url) {
-      setState((prev) => ({
-        ...prev,
-        url
-      }))
-  
-      localStorage.setItem('url', url as string);
-    }
-  }
-
-  const resetUrl = () => {
-    setState((prev) => ({
-      ...prev,
-      url: ''
-    }))
-
-    localStorage.removeItem('url');
-  }
   
   const setLoading = (loading: boolean) => {
     setState((prev) => ({
@@ -189,18 +52,16 @@ export function AgentProvider({ children }: any) {
   }
 
   const generateAgent = async (firstName: string, lastName: string, password: string) => {
-    const client = state.client!;
-    
     setLoading(true);
 
-    let agentStatus = await client.agent.generate(password);
-    const agentPerspective = await client.perspective.add(
+    let agentStatus = await client!.agent.generate(password);
+    const agentPerspective = await client!.perspective.add(
       "Agent Profile"
     );
     const links = [];
 
     if (firstName) {
-      const link = await client.perspective.addLink(
+      const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
           source: SOURCE_PROFILE,
@@ -213,7 +74,7 @@ export function AgentProvider({ children }: any) {
     }
 
     if (lastName) {
-      const link = await client.perspective.addLink(
+      const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
           source: SOURCE_PROFILE,
@@ -236,42 +97,35 @@ export function AgentProvider({ children }: any) {
       cleanedLinks.push(newLink);
     }
 
-    await client.agent.updatePublicPerspective({
+    await client?.agent.updatePublicPerspective({
       links: cleanedLinks
     })
 
     handleLogin(agentStatus.isUnlocked, agentStatus.did!);
 
     console.log("agent status in generate: ", agentStatus);
+
+    setLoading(false);
   };
 
   const unlockAgent = async (password: string) => {
     setLoading(true)
-    let agentStatus = await state.client?.agent.unlock(password);
+    let agentStatus = await client?.agent.unlock(password);
     handleLogin(agentStatus!.isUnlocked, agentStatus!.did!);
 
     console.log("agent status in unlock: ", agentStatus);
+
+    setLoading(false);
   }
 
-  useEffect(() => {
-    if (state.url) {
-      const client = buildAd4mClient(state.url)
-      
-      setState((prev) => ({
-        ...prev,
-        client
-      }));
-    }
-  }, [state.url])
-  
   const lockAgent = async (passphrase: string) => {
     setLoading(true);
 
-    const client = state.client!;
-    
-    const status = await client.agent.lock(passphrase);
+    const status = await client!.agent.lock(passphrase);
 
     handleLogin(status!.isUnlocked, status!.did!);
+
+    setLoading(false);
   } 
 
   return (
@@ -279,12 +133,9 @@ export function AgentProvider({ children }: any) {
       value={{
         state,
         methods: {
-          setUrl,
-          handleTrustAgent,
           generateAgent,
           unlockAgent,
           lockAgent,
-          resetUrl
         }
       }}
     >
@@ -292,4 +143,3 @@ export function AgentProvider({ children }: any) {
     </AgentContext.Provider>
   )
 }
-

@@ -1,20 +1,24 @@
-import { PasswordInput, Text, Button, Stack, TextInput, Popover, ActionIcon, Tooltip } from '@mantine/core';
-import { useContext, useEffect, useState } from 'react';
+import { PasswordInput, Button, Stack, TextInput, ActionIcon, Tooltip } from '@mantine/core';
+import { useContext, useState } from 'react';
 import { AgentContext } from '../context/AgentContext';
-import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 import { Link } from 'tabler-icons-react';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 
 const Login = (props: any) => {
   const {state: {
-    isInitialized,
     loading,
-    isUnlocked
   }, methods: {
     generateAgent,
     unlockAgent,
-    resetUrl
   }} = useContext(AgentContext)
+
+  const {state: {
+    isInitialized,
+    isUnlocked,
+  }, methods: {
+    resetUrl
+  }} = useContext(Ad4minContext)
   
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");

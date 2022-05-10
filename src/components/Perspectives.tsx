@@ -1,12 +1,12 @@
-import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu, Select, Space, Switch, TextInput, Title, Text, Popover, ActionIcon, ThemeIcon } from '@mantine/core';
+import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu, Select, Space, Switch, TextInput, Title, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle, Link, Perspective, PerspectiveProxy } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { generateLanguageInitials, isSystemLanguage, sanitizeLink } from '../util';
+import { generateLanguageInitials, sanitizeLink } from '../util';
 import { MainContainer, MainHeader } from './styles';
-import { Trash, DotsVertical } from 'tabler-icons-react';
+import { Trash } from 'tabler-icons-react';
 import { useDisclosure } from '@mantine/hooks';
-import { AgentContext } from '../context/AgentContext';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
 }
@@ -14,7 +14,7 @@ type Props = {
 const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
   const {state: {
     client
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
   
   const [opened, handlers] = useDisclosure(false);
 
@@ -42,7 +42,7 @@ const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
 const Perspectives = (props: Props) => {
   const {state: {
     client
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
 
   const [perspectiveModalOpen, setPerspectiveModalOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageHandle[] | null[]>([]);

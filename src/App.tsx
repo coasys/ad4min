@@ -1,21 +1,19 @@
 import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
-import { useContext, useEffect, useState } from 'react';
-import { ExceptionType } from '@perspect3vism/ad4m';
-import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
+import { useContext, useState } from 'react';
 import { Button, Loader, Stack, TextInput } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
-import { AgentContext } from './context/AgentContext';
+import { Ad4minContext } from './context/Ad4minContext';
 
 const App = () => {
   const {state: {
-    connected, isUnlocked, candidate, did, connectedLaoding
+    connected, isUnlocked, candidate, connectedLaoding, did
   }, methods: {
     handleTrustAgent,
     setUrl
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
 
   const [url, setURL] = useState("");
 

@@ -5,19 +5,19 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
-import { createContext } from 'react';
-import { buildAd4mClient } from './util';
-import { AD4M_ENDPOINT } from './config';
 import { AgentProvider } from './context/AgentContext';
+import { Ad4minProvider } from './context/Ad4minContext';
 
 
 ReactDOM.render(
   <React.StrictMode>
     <MantineProvider>
       <NotificationsProvider>
-        <AgentProvider>
-          <App />
-        </AgentProvider>
+        <Ad4minProvider>
+          <AgentProvider>
+            <App />
+          </AgentProvider>
+        </Ad4minProvider>
       </NotificationsProvider>
     </MantineProvider>
   </React.StrictMode>,

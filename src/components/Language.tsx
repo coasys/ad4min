@@ -1,11 +1,10 @@
 import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Chip, Header, Title, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { LanguageHandle, LanguageMeta } from '@perspect3vism/ad4m';
+import { LanguageMeta } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
-import { Download, Trash, Upload } from 'tabler-icons-react';
-import { AgentContext } from '../context/AgentContext';
+import { Download, Upload } from 'tabler-icons-react';
+import { Ad4minContext } from '../context/Ad4minContext';
 import { generateLanguageInitials, isSystemLanguage } from '../util';
 import { MainContainer, MainHeader } from './styles';
 
@@ -15,7 +14,7 @@ type Props = {
 const Language = (props: Props) => {
   const {state: {
     client
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
 
   const [languages, setLanguages] = useState<any[] | null[]>([]);
   const [loading, setLoading] = useState(false);

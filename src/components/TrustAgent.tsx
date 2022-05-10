@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Space, Stack, TextInput } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
 import { showNotification } from '@mantine/notifications';
-import { AgentContext } from '../context/AgentContext';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
   candidate: string,
@@ -11,7 +11,7 @@ type Props = {
 const TrustAgent = (props: Props) => {
   const {state: {
     client
-  }} = useContext(AgentContext);
+  }} = useContext(Ad4minContext);
 
   const [opened, setOpened] = useState(false);
 
