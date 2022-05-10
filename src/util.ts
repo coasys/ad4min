@@ -38,7 +38,7 @@ export function isSystemLanguage(name: string) {
 	return ['languages', 'agent-expression-store', 'neighbourhood-store', 'perspective-language', 'direct-message-language'].includes(name)
 }
 
-export function sanatizeLink(link: LinkExpression) {
+export function sanitizeLink(link: LinkExpression) {
 	const newLink = JSON.parse(
 		JSON.stringify(link)
 	);

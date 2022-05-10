@@ -17,7 +17,7 @@ export const MainHeader = {
   right: 0,
   display: 'flex',
   justifyContent: 'space-between',
-  padding: `20px 20px 20px 20px`,
+  padding: `20px`,
 }
 
 export const RouteContainer = { 

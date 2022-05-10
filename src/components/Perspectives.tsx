@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu,
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle, Link, Perspective, PerspectiveProxy } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { generateLanguageInitials, isSystemLanguage, sanatizeLink } from '../util';
+import { generateLanguageInitials, isSystemLanguage, sanitizeLink } from '../util';
 import { MainContainer, MainHeader } from './styles';
 import { Trash, DotsVertical } from 'tabler-icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -110,7 +110,7 @@ const Perspectives = (props: Props) => {
               predicate: 'language'
             }));
   
-            templateLangs.push(sanatizeLink(link))
+            templateLangs.push(sanitizeLink(link))
           }
         }
 
