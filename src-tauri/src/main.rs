@@ -16,6 +16,8 @@ mod config;
 mod logs;
 mod system_tray;
 mod menu;
+use core::time::Duration;
+use std::thread;
 
 fn main() {
     if let Err(err) = setup_logs() {
@@ -53,7 +55,7 @@ fn main() {
         .system_tray(build_system_tray())
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id, child.pid() as i32)
+                handle_system_tray_event(app, id)
             }
             _ => {}
         })
