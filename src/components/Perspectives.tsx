@@ -7,6 +7,7 @@ import { MainContainer, MainHeader } from './styles';
 import { Trash } from 'tabler-icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { Ad4minContext } from '../context/Ad4minContext';
+import { nanoid } from 'nanoid';
 
 type Props = {
 }
@@ -70,7 +71,7 @@ const Perspectives = (props: Props) => {
   useEffect(() => {
     fetchPerspective()
     getLanguages()
-  }, [])
+  }, []);
 
   const create = async () => {
     setLoading(true)
@@ -79,13 +80,17 @@ const Perspectives = (props: Props) => {
     
     try {
       if (isNeighbourhood) {
-        const templateLangs = []
+        const templateLangs = [];
+
+        const uid = nanoid()
+
+        const language = (languages as LanguageHandle[]).find((e: LanguageHandle) => e.address === linkLanguage);
   
         const templatedLinkLang = await client!.languages.applyTemplateAndPublish(
-          linkLanguage,
+          language!.address,
           JSON.stringify({
-            uid: '123',
-            name: `${perspectiveName}-social-context`
+            uid,
+            name: `${perspectiveName}-${language?.name}`
           })
         );
   
@@ -95,12 +100,11 @@ const Perspectives = (props: Props) => {
           const lang = (languages as LanguageHandle[]).find((e: LanguageHandle) => e.address === linkLanguage);
   
           if (lang) {
-  
             const templatedLang = await client!.languages.applyTemplateAndPublish(
               lang.address,
               JSON.stringify({
-                uid: '123',
-                name: `${perspectiveName}-social-context`
+                uid,
+                name: `${perspectiveName}-${lang.name}`
               })
             );
   
