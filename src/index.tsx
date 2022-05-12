@@ -14,9 +14,7 @@ ReactDOM.render(
     <MantineProvider>
       <NotificationsProvider>
         <Ad4minProvider>
-          <AgentProvider>
-            <App />
-          </AgentProvider>
+          <App />
         </Ad4minProvider>
       </NotificationsProvider>
     </MantineProvider>

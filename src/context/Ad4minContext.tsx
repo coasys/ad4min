@@ -2,6 +2,7 @@ import { showNotification } from "@mantine/notifications";
 import { Ad4mClient, ExceptionType } from "@perspect3vism/ad4m";
 import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
 import { createContext, useEffect, useState } from "react";
+import { AD4M_ENDPOINT } from "../config";
 import { buildAd4mClient } from "../util";
 
 type State = {
@@ -53,9 +54,16 @@ export function Ad4minProvider({ children }: any) {
   const [state, setState] = useState(initialState.state);
 
   useEffect(() => {
+    let localStorageURL = localStorage.getItem('url');
+
+    if (!localStorageURL) {
+      localStorageURL = AD4M_ENDPOINT;
+      localStorage.setItem('url', AD4M_ENDPOINT);
+    }
+
     setState((prev) => ({
       ...prev,
-      url: localStorage.getItem('url') as string
+      url: localStorageURL as string
     }))
   }, [])
 
@@ -68,11 +76,22 @@ export function Ad4minProvider({ children }: any) {
     }));
 
     const checkConnection = async () => {
+      return new Promise(async (resolve, reject) => {
         try {
           if (client) {
+            const id = setTimeout(() => {
+              setConnected(false);
+
+              resolve(false)
+            }, 2000)
+
             await client.runtime.hcAgentInfos(); // TODO runtime info is broken
+            
+            clearTimeout(id);
+
             console.log("get hc agent infos success.");
             setConnected(true);
+            resolve(true)
           }
         } catch (err) {
           if (state.url) {
@@ -82,9 +101,11 @@ export function Ad4minProvider({ children }: any) {
               autoClose: false
             })
           }
-  
+
           setConnected(false);
+          resolve(false)
         }
+      })
     }
 
     if (localStorage.getItem('url')) {

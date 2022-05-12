@@ -7,6 +7,7 @@ import Language from './Language';
 import Perspectives from './Perspectives';
 import { RouteContainer } from './styles';
 import Settings from './Settings';
+import { AgentProvider } from '../context/AgentContext';
 
 type Props = {
   did: String,
@@ -113,7 +114,12 @@ const Navigation = (props: Props) => {
             <Route path="/" element={<Profile did={props.did} />} />
             <Route path="/language" element={<Language />} />
             <Route path="/perspective" element={<Perspectives />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={
+              <AgentProvider>
+                <Settings />
+              </AgentProvider>
+              }
+            />
           </Routes>
         </div>
       </AppShell>
