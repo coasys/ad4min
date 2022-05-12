@@ -12,7 +12,7 @@ const App = () => {
     connected, isUnlocked, candidate, connectedLaoding, did
   }, methods: {
     handleTrustAgent,
-    setUrl
+    configureEndpoint
   }} = useContext(Ad4minContext);
 
   const [url, setURL] = useState("");
@@ -30,7 +30,7 @@ const App = () => {
     } else if (!/^(wss?:\/\/)([0-9]{1,3}(?:\.[0-9]{1,3}){3}|[a-zA-Z]+):([0-9]{1,5})(?:\/[a-zA-Z]{0,100})$/.test(url)) {
       setURLError('Invalid websocket URL')
     } else {
-      setUrl(url);
+      configureEndpoint(url);
     }
   }
 

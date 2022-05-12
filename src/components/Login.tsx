@@ -17,7 +17,7 @@ const Login = (props: any) => {
     isInitialized,
     isUnlocked,
   }, methods: {
-    resetUrl
+    resetEndpoint
   }} = useContext(Ad4minContext)
   
   const [password, setPassword] = useState("");
@@ -61,7 +61,7 @@ const Login = (props: any) => {
             <ActionIcon 
               onMouseEnter={() => setOpened(true)} 
               onMouseLeave={() => setOpened(false)}
-              onClick={() => resetUrl()}
+              onClick={() => resetEndpoint()}
             >
               <Link />
             </ActionIcon >

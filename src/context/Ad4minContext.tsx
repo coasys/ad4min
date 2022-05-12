@@ -19,8 +19,8 @@ type State = {
 type ContextProps = {
   state: State;
   methods: {
-    setUrl: (str: string) => void,
-    resetUrl: () => void
+    configureEndpoint: (str: string) => void,
+    resetEndpoint: () => void
     handleTrustAgent: (str: string) => void,
     handleLogin: (login: Boolean, did: string) => void,
   };
@@ -39,8 +39,8 @@ const initialState: ContextProps = {
     connectedLaoding: true
   },
   methods: {
-    setUrl: () => null,
-    resetUrl: () => null,
+    configureEndpoint: () => null,
+    resetEndpoint: () => null,
     handleTrustAgent: () => null,
     handleLogin: () => null 
   }
@@ -155,7 +155,7 @@ export function Ad4minProvider({ children }: any) {
     }));
   }
 
-  const setUrl = (url: string) => {
+  const configureEndpoint = (url: string) => {
     if (url) {
       setState((prev) => ({
         ...prev,
@@ -166,7 +166,7 @@ export function Ad4minProvider({ children }: any) {
     }
   }
 
-  const resetUrl = () => {
+  const resetEndpoint = () => {
     setState((prev) => ({
       ...prev,
       url: ''
@@ -191,9 +191,9 @@ export function Ad4minProvider({ children }: any) {
       value={{
         state,
         methods: {
-          setUrl,
+          configureEndpoint,
           handleTrustAgent,
-          resetUrl,
+          resetEndpoint,
           handleLogin
         }
       }}
