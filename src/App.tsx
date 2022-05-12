@@ -16,11 +16,22 @@ const App = () => {
   }} = useContext(Ad4minContext);
 
   const [url, setURL] = useState("");
+  const [urlError, setURLError] = useState<string | null>(null);
 
   const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const { value } = event.target;
     setURL(value);
+  }
+
+  const onInitialize = () => {
+    if (!url) {
+      setURLError('URL is required')
+    } else if (!/^(wss?:\/\/)([0-9]{1,3}(?:\.[0-9]{1,3}){3}|[a-zA-Z]+):([0-9]{1,5})(?:\/[a-zA-Z]{0,100})$/.test(url)) {
+      setURLError('Invalid websocket URL')
+    } else {
+      setUrl(url);
+    }
   }
 
   return (
@@ -38,8 +49,10 @@ const App = () => {
                   radius="md" 
                   size="md" 
                   onChange={onUrlChange}
+                  required
+                  error={urlError}
                 />
-                <Button onClick={() => setUrl(url)}>
+                <Button onClick={onInitialize}>
                   Initialize Client
                 </Button>
               </>
