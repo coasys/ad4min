@@ -135,6 +135,8 @@ const Perspectives = (props: Props) => {
           message: 'Perspecctive sucessfully created',
         })
       }
+
+      await fetchPerspective()
     } catch (e) {
       client!.perspective.remove(perspective.uuid)
       showNotification({
