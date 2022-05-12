@@ -5,20 +5,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
-import { createContext } from 'react';
-import { buildAd4mClient } from './util';
-import { AD4M_ENDPOINT } from './config';
+import { AgentProvider } from './context/AgentContext';
+import { Ad4minProvider } from './context/Ad4minContext';
 
-const ad4mClient = buildAd4mClient(AD4M_ENDPOINT);
-export const Ad4mContext = createContext(ad4mClient);
 
 ReactDOM.render(
   <React.StrictMode>
     <MantineProvider>
       <NotificationsProvider>
-        <Ad4mContext.Provider value={ad4mClient}>
+        <Ad4minProvider>
           <App />
-        </Ad4mContext.Provider>
+        </Ad4minProvider>
       </NotificationsProvider>
     </MantineProvider>
   </React.StrictMode>,

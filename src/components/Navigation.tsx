@@ -1,10 +1,13 @@
-import { Anchor, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
+import { Anchor, AppShell, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
 import { useState } from 'react';
-import { Grain, Stack2, User } from 'tabler-icons-react';
+import { Grain, Stack2, User, Settings as SettingsIcon } from 'tabler-icons-react';
 import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
 import Profile from './Profile';
 import Language from './Language';
 import Perspectives from './Perspectives';
+import { RouteContainer } from './styles';
+import Settings from './Settings';
+import { AgentProvider } from '../context/AgentContext';
 
 type Props = {
   did: String,
@@ -66,6 +69,7 @@ const data = [
   { label: 'Agent Profile', link: '/', icon: User },
   { label: 'Language & Expression', link: '/language', icon: Stack2 },
   { label: 'Perspectives', link: '/perspective', icon: Grain },
+  { label: 'Settings', link: '/settings', icon: SettingsIcon },
 ]
 
 const Navigation = (props: Props) => {
@@ -91,20 +95,34 @@ const Navigation = (props: Props) => {
 
   return (
     <Router>
-      <Navbar height={700} width={{ sm: 300 }} p="md">
-        <Navbar.Section grow>
-          <Group className={classes.header} position="apart">
-            <Text>Ad4min</Text>
-            <Code>v0.0.3</Code>
-          </Group>
-          {links}
-        </Navbar.Section>
-      </Navbar>
-      <Routes>
-        <Route path="/" element={<Profile did={props.did} />} />
-        <Route path="/language" element={<Language />} />
-        <Route path="/perspective" element={<Perspectives />} />
-      </Routes>
+      <AppShell
+        padding={0}
+        navbar={
+          <Navbar height='100vh' width={{ sm: 300 }} p="md" fixed>
+            <Navbar.Section grow>
+              <Group className={classes.header} position="apart">
+                <Text>Ad4min</Text>
+                <Code>v0.0.3</Code>
+              </Group>
+              {links}
+            </Navbar.Section>
+          </Navbar>
+        }
+      >
+        <div style={RouteContainer}>
+          <Routes>
+            <Route path="/" element={<Profile did={props.did} />} />
+            <Route path="/language" element={<Language />} />
+            <Route path="/perspective" element={<Perspectives />} />
+            <Route path="/settings" element={
+              <AgentProvider>
+                <Settings />
+              </AgentProvider>
+              }
+            />
+          </Routes>
+        </div>
+      </AppShell>
     </Router>
   )
 }

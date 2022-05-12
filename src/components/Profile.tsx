@@ -2,15 +2,18 @@ import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, Theme
 import { Agent } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
-import { Ad4mContext } from '..';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
+import { MainContainer, MainHeader } from './styles';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
   did: String,
 }
 
 const Profile = (props: Props) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(Ad4minContext);
 
   const [trustedAgents, setTrustedAgents] = useState<any[]>([]);
 
@@ -22,12 +25,12 @@ const Profile = (props: Props) => {
   })
 
   const getTrustedAgents = async () => {
-    const trustedAgents = await ad4mClient.runtime.getTrustedAgents()
+    const trustedAgents = await client!.runtime.getTrustedAgents()
     
     const tempTempAgents = [];
     
     for (const agent of trustedAgents) {
-      const fetchedAgent = await ad4mClient.agent.byDID(agent)
+      const fetchedAgent = await client!.agent.byDID(agent)
 
       if (fetchedAgent) {
         const profile = await fetchProfile(fetchedAgent)
@@ -62,7 +65,7 @@ const Profile = (props: Props) => {
   }
 
   const fetchCurrentAgentProfile = async () => {
-    const agent = await ad4mClient.agent.me();
+    const agent = await client!.agent.me();
 
     const profile = await fetchProfile(agent);
     
@@ -75,12 +78,13 @@ const Profile = (props: Props) => {
   }, [])
 
   return (
-    <Container style={{ width: '100%', maxWidth: '100%' }}>
-      <Container style={{ width: '95%', maxWidth: '100%', display: 'flex', justifyContent: 'flex-end', paddingRight: 30, paddingTop: 62 }}>
+    <Container style={MainContainer}>
+      <div style={MainHeader}>
+        <Title order={3}>Agent Profile</Title>
         <Button onClick={() => settrustedAgentModalOpen(true)}>Trusted Agents</Button>
-      </Container>
+      </div>
       <Container
-        style={{ marginLeft: 30, marginTop: 62 }}
+        style={{ marginLeft: 10, marginTop: 62 }}
       >
         <Space h="md" />
         <Text size="md" weight="bold" underline>Agent DID: </Text>
@@ -107,7 +111,7 @@ const Profile = (props: Props) => {
           }
         >
           {trustedAgents.map((e, i) => (
-            <Card shadow="sm" withBorder={true} style={{ marginBottom: trustedAgents.length-1 === i ? 0 : 20 }}>
+            <Card key={`trusted-agent-${e.did}`} shadow="sm" withBorder={true} style={{ marginBottom: trustedAgents.length-1 === i ? 0 : 20 }}>
               <Group align="flex-start">
                 <Avatar radius="xl"></Avatar>
                 <Group direction='column' style={{marginTop: 4}}>

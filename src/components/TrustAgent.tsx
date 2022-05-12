@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Space, Stack, TextInput } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { Ad4mContext } from '..';
 import { showNotification } from '@mantine/notifications';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
   candidate: string,
@@ -9,7 +9,9 @@ type Props = {
 }
 
 const TrustAgent = (props: Props) => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    client
+  }} = useContext(Ad4minContext);
 
   const [opened, setOpened] = useState(false);
 
@@ -18,7 +20,7 @@ const TrustAgent = (props: Props) => {
   }, []);
 
   const addTrustedAgent = async () => {
-    let agents = await ad4mClient.runtime.addTrustedAgents([props.candidate]);
+    let agents = await client!.runtime.addTrustedAgents([props.candidate]);
     closeModal();
     showNotification({
       message: 'Great, the agent is trusted now! 🤥',

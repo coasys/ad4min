@@ -1,61 +1,77 @@
 import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
-import { useContext, useEffect, useState } from 'react';
-import { ExceptionType } from '@perspect3vism/ad4m';
-import { ExceptionInfo } from '@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver';
-import { Loader, Stack } from '@mantine/core';
-import { Ad4mContext } from '.';
+import { useContext, useState } from 'react';
+import { Button, Loader, Stack, TextInput } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
+import { Ad4minContext } from './context/Ad4minContext';
+import { AgentContext, AgentProvider } from './context/AgentContext';
+import { buildAd4mClient } from './util';
+import { showNotification } from '@mantine/notifications';
 
 const App = () => {
-  const ad4mClient = useContext(Ad4mContext);
+  const {state: {
+    connected, isUnlocked, candidate, connectedLaoding, did
+  }, methods: {
+    handleTrustAgent,
+    configureEndpoint
+  }} = useContext(Ad4minContext);
 
-  const [connected, setConnected] = useState(false);
-  const [isLogined, setIsLogined] = useState<Boolean>(false);
-  const [did, setDid] = useState("");
-  const [candidate, setCandidate] = useState("");
+  const [url, setURL] = useState("");
+  const [urlError, setURLError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        await ad4mClient.runtime.hcAgentInfos(); // TODO runtime info is broken
-        console.log("get hc agent infos success.");
-        setConnected(true);
-      } catch (err) {
-        setConnected(false);
-      }
-    }
-
-    checkConnection();
-
-    console.log("Check if ad4m service is connected.")
-  }, [ad4mClient]);
-
-  const handleLogin = (login: Boolean, did: string) => {
-    setIsLogined(login);
-    setDid(did);
-
-    if (login) {
-      ad4mClient.runtime.addExceptionCallback((exception: ExceptionInfo) => {
-        if (exception.type === ExceptionType.AgentIsUntrusted) {
-          setCandidate(exception.addon!);
-        }
-        Notification.requestPermission()
-          .then(response => {
-            if (response === 'granted') {
-              new Notification(exception.title, { body: exception.message })
-            }
-          });
-        console.log(exception);
-        return null
-      })
-    }
+  const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const { value } = event.target;
+    setURL(value);
   }
 
-  const handleTrustAgent = (candidate: string) => {
-    setCandidate(candidate);
+  const onInitialize = async () => {
+    setLoading(true);
+    
+    return new Promise(async (resolve, reject) => {      
+      if (!url) {
+        setURLError('URL is required')
+      } else if (!/^(wss?:\/\/)([0-9]{1,3}(?:\.[0-9]{1,3}){3}|[a-zA-Z]+):([0-9]{1,5})(?:\/[a-zA-Z]{0,100})$/.test(url)) {
+        setURLError('Invalid websocket URL')
+      } else {
+        try {
+          const client = buildAd4mClient(url!)
+
+          const id = setTimeout(() => {
+            resolve(true)
+
+            showNotification({
+              color: 'red',
+              message: 'Failed to connect to the endpoint provided'
+            });
+
+            setLoading(false)
+          }, 2000)
+          
+          await client.runtime.hcAgentInfos();
+  
+          clearTimeout(id)
+          
+          configureEndpoint(url);
+
+          resolve(true);
+        } catch(e) {
+          showNotification({
+            color: 'red',
+            message: 'Failed to connect to the endpoint provided'
+          })
+
+          reject()
+        } finally {
+          setLoading(false)
+        }
+      }
+      setLoading(false);
+      resolve(true)
+    })
   }
 
   return (
@@ -63,18 +79,38 @@ const App = () => {
       {!connected && (
         <Stack align="center" spacing="xl" style={{margin: "auto"}}>
           <Header />
-          <Loader />
+          {connectedLaoding ? (
+              <Loader />
+            ) : (
+              <>
+                <TextInput 
+                  label="Ad4m URL" 
+                  placeholder='ws://www.example.com/graphql' 
+                  radius="md" 
+                  size="md" 
+                  onChange={onUrlChange}
+                  required
+                  error={urlError}
+                />
+                <Button onClick={onInitialize} loading={loading}>
+                  Initialize Client
+                </Button>
+              </>
+            )
+          }
         </Stack>
       )}
-      {connected && !isLogined && (
+      {connected && !isUnlocked && (
         <Stack align="center" spacing="xl" style={{margin: "auto"}}>
           <Header />
-          <Login handleLogin={handleLogin} />
+          <AgentProvider>
+            <Login />
+          </AgentProvider>
         </Stack>
       )}
       {/* {isLogined && <Profile did={did} />} */}
       {/* {isLogined && <Language />} */}
-      {isLogined && <Navigation did={did} />}
+      {isUnlocked && <Navigation did={did} />}
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
     </div>
   );
