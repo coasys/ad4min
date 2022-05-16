@@ -5,6 +5,7 @@ import { useContext, useState } from 'react';
 import { Button, Loader, Stack, TextInput } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
+import Auth from './components/Auth'
 import { Ad4minContext } from './context/Ad4minContext';
 import { AgentContext, AgentProvider } from './context/AgentContext';
 import { buildAd4mClient } from './util';
@@ -12,9 +13,10 @@ import { showNotification } from '@mantine/notifications';
 
 const App = () => {
   const {state: {
-    connected, isUnlocked, candidate, connectedLaoding, did
+    connected, isUnlocked, candidate, auth, connectedLaoding, did
   }, methods: {
     handleTrustAgent,
+    handleAuth,
     configureEndpoint
   }} = useContext(Ad4minContext);
 
@@ -38,7 +40,7 @@ const App = () => {
         setURLError('Invalid websocket URL')
       } else {
         try {
-          const client = buildAd4mClient(url!)
+          const client = await buildAd4mClient(url!)
 
           const id = setTimeout(() => {
             resolve(true)
@@ -112,6 +114,7 @@ const App = () => {
       {/* {isLogined && <Language />} */}
       {isUnlocked && <Navigation did={did} />}
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
+      {auth && <Auth info={auth} handleAuth={handleAuth} />}
     </div>
   );
 }

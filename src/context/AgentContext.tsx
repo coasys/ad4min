@@ -2,9 +2,7 @@ import { showNotification } from "@mantine/notifications";
 import { Ad4mClient, ExceptionType, Link } from "@perspect3vism/ad4m";
 import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
 import { createContext, useContext, useEffect, useState } from "react";
-import { AD4M_ENDPOINT } from "../config";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME } from "../constants/triples";
-import { buildAd4mClient } from "../util";
 import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
