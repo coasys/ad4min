@@ -24,11 +24,12 @@ const Auth = (props: Props) => {
   const permitAuth = async () => {
     let result = await client!.agent.permitAuth(props.info);
 
-    console.log(`permit result: ${result}`);
+    let permitResult = JSON.stringify(result);
+    console.log(`permit result: ${permitResult}`);
 
     closeModal();
     showNotification({
-      message: `Great, the authentication is permitted now! 🤥   ${result}`,
+      message: `Great, the authentication is permitted now! 🤥   ${permitResult}`,
     })
   }
 
@@ -48,6 +49,31 @@ const Auth = (props: Props) => {
           <TextInput
             defaultValue={props.info}
             label="Auth Information"
+            disabled
+          />
+          <TextInput
+            defaultValue={JSON.parse(props.info).auth.appName}
+            label="app name"
+            disabled
+          />
+          <TextInput
+            defaultValue={JSON.parse(props.info).auth.appDesc}
+            label="app desc"
+            disabled
+          />
+          <TextInput
+            defaultValue={JSON.parse(props.info).auth.appUrl}
+            label="app url"
+            disabled
+          />
+          <TextInput
+            defaultValue={JSON.parse(props.info).auth.capabilities}
+            label="app cap"
+            disabled
+          />
+          <TextInput
+            defaultValue={JSON.parse(props.info).requestId}
+            label="request id"
             disabled
           />
           <Group>
