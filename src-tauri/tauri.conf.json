@@ -62,7 +62,9 @@
         "height": 700,
         "resizable": true,
         "fullscreen": false,
-        "visible": false,
+        "center": true,
+        "focus": true,
+        "decorations": false,
         "url": "splashscreen.html"
       }
     ],
