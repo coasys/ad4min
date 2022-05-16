@@ -1,7 +1,3 @@
-use std::thread;
-use std::time::Duration;
-
-use tauri::api::process::CommandChild;
 use crate::app_url;
 
 use tauri::{

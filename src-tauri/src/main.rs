@@ -17,11 +17,8 @@ mod config;
 mod logs;
 mod system_tray;
 mod menu;
-use core::time::Duration;
-use std::thread;
 use tauri::WindowUrl;
 use tauri::WindowBuilder;
-use tauri::Manager;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -48,7 +45,7 @@ fn main() {
         assert!(status.success());
     }
 
-    let (mut rx, child) = Command::new_sidecar("ad4m")
+    let (mut rx, _child) = Command::new_sidecar("ad4m")
         .expect("Failed to create ad4m command")
         .args(["serve", "--port", &free_port.to_string()])
         .spawn()
@@ -74,8 +71,6 @@ fn main() {
         .menu(build_menu())
         .system_tray(build_system_tray())
         .setup(move |app| {
-            let splashscreen_window = app.get_window("splashscreen").unwrap();
-
             let new_ad4min_window = WindowBuilder::new(
                 app,
                 "ad4min",
