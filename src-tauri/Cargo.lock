@@ -10,6 +10,7 @@ dependencies = [
  "log",
  "log4rs",
  "nix",
+ "portpicker",
  "serde",
  "serde_json",
  "tauri",
@@ -2072,6 +2073,15 @@ dependencies = [
  "crc32fast",
  "deflate 1.0.0",
  "miniz_oxide 0.5.1",
+]
+
+[[package]]
+name = "portpicker"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be97d76faf1bfab666e1375477b23fde79eccf0276e9b63b92a39d676a889ba9"
+dependencies = [
+ "rand 0.8.5",
 ]
 
 [[package]]

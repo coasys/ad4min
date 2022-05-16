@@ -54,12 +54,15 @@ export function Ad4minProvider({ children }: any) {
   const [state, setState] = useState(initialState.state);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
     let localStorageURL = localStorage.getItem('url');
 
     if (!localStorageURL) {
-      localStorageURL = AD4M_ENDPOINT;
-      localStorage.setItem('url', AD4M_ENDPOINT);
+      localStorageURL = params.get('ad4m') || AD4M_ENDPOINT;
     }
+    
+    localStorageURL = localStorageURL.includes('localhost') ? params.get('ad4m') : localStorageURL;
+    localStorage.setItem('url', localStorageURL as string);
 
     setState((prev) => ({
       ...prev,
