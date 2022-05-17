@@ -1,9 +1,9 @@
 import { showNotification } from "@mantine/notifications";
 import { Ad4mClient, ExceptionType } from "@perspect3vism/ad4m";
 import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
-import { createContext, useEffect, useState } from "react";
-import { AD4M_ENDPOINT } from "../config";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { buildAd4mClient } from "../util";
+import { appWindow } from '@tauri-apps/api/window'
 
 type State = {
   url: string;
@@ -23,7 +23,8 @@ type ContextProps = {
     configureEndpoint: (str: string) => void,
     resetEndpoint: () => void
     handleTrustAgent: (str: string) => void,
-    handleLogin: (login: Boolean, did: string) => void,
+    
+    handleLogin: (client: Ad4mClient, login: Boolean, did: string) => void,
   };
 }
 
@@ -53,98 +54,43 @@ export const Ad4minContext = createContext(initialState);
 export function Ad4minProvider({ children }: any) {
   const [state, setState] = useState(initialState.state);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    let localStorageURL = localStorage.getItem('url');
+  
+  const setConnected = (connected: boolean) => setState((prev) => ({
+    ...prev,
+    connected,
+    connectedLaoding: false
+  }));
 
-    if (!localStorageURL) {
-      localStorageURL = params.get('ad4m') || AD4M_ENDPOINT;
-    }
-    
-    localStorageURL = localStorageURL.includes('localhost') ? params.get('ad4m') : localStorageURL;
-    localStorage.setItem('url', localStorageURL as string);
+  const checkConnection = useCallback(async (url: string, client: Ad4mClient): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (client) {
+          const id = setTimeout(() => {
+            resolve('')
+          }, 1000);
 
-    setState((prev) => ({
-      ...prev,
-      url: localStorageURL as string
-    }))
+          await client.agent.status(); // TODO runtime info is broken
+          clearTimeout(id);
+
+          console.log("get hc agent infos success.");
+
+          resolve(url)
+        }
+      } catch (err) {
+        if (url) {
+          showNotification({
+            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
+            color: 'red',
+            autoClose: false
+          })
+        }
+
+        resolve('')
+      }
+    })
   }, [])
 
-  useEffect(() => {
-    const client = state.client!;
-    const setConnected = (connected: boolean) => setState((prev) => ({
-      ...prev,
-      connected,
-      connectedLaoding: false
-    }));
-
-    const checkConnection = async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          if (client) {
-            const id = setTimeout(() => {
-              setConnected(false);
-
-              resolve(false)
-            }, 2000)
-
-            await client.runtime.hcAgentInfos(); // TODO runtime info is broken
-            
-            clearTimeout(id);
-
-            console.log("get hc agent infos success.");
-            setConnected(true);
-            resolve(true)
-          }
-        } catch (err) {
-          if (state.url) {
-            showNotification({
-              message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-              color: 'red',
-              autoClose: false
-            })
-          }
-
-          setConnected(false);
-          resolve(false)
-        }
-      })
-    }
-
-    if (localStorage.getItem('url')) {
-      checkConnection()
-    } else {
-      setConnected(false)
-    }
-
-
-    console.log("Check if ad4m service is connected.")
-  }, [state.client, state.url]);
-
-  useEffect(() => {
-    const client = state.client!;
-    const checkIfAgentIsInitialized = async () => {
-      let status = await client?.agent.status();
-      console.log("agent status in init: ", status);
-
-      setState((prev) => ({
-        ...prev,
-        isInitialized: status.isInitialized!,
-        isUnlocked: status.isUnlocked!
-      }))
-
-      handleLogin(status.isUnlocked, status.did ? status.did! : "");
-    };
-
-    if (client) {
-      checkIfAgentIsInitialized();
-    }
-
-    console.log("Check if agent is initialized.")
-  }, [state.client]);
-
-  const handleLogin = (login: Boolean, did: string) => {
-    const client = state.client!;
+  const handleLogin = useCallback((client: Ad4mClient, login: Boolean, did: string) => {
     setState((prev) => ({
       ...prev,
       isUnlocked: login,
@@ -170,7 +116,111 @@ export function Ad4minProvider({ children }: any) {
         return null
       })
     }
-  }
+  }, []);
+  
+  const checkIfAgentIsInitialized = useCallback(async (client: Ad4mClient) => {
+    console.log("Check if agent is initialized.", client)
+
+    let status = await client?.agent.status();
+    console.log("agent status in init: ", status);
+
+    handleLogin(client, status.isUnlocked, status.did ? status.did! : "");
+
+    return status;
+  }, [handleLogin]);
+  
+  const Timeout = () => {
+    let controller = new AbortController();
+    setTimeout(() => controller.abort(), 20);
+    return controller;
+  };
+
+  const findAd4mPort = useCallback(async () => {
+    for (let i = 12000; i <= 13000; i++) {
+      const url = `ws://localhost:${i}/graphql`;
+
+      try {
+        await fetch(`http://localhost:${i}`, {
+          signal: Timeout().signal
+        })
+        const client = buildAd4mClient(url);
+        const ad4mUrl = await checkConnection(url, client);
+
+        const {isInitialized, isUnlocked} = await checkIfAgentIsInitialized(client);
+
+        setState(prev => ({
+          ...prev,
+          client,
+          url: ad4mUrl,
+          isInitialized,
+          isUnlocked,
+          connected: true,
+          connectedLaoding: false
+        }));
+
+
+        if (ad4mUrl) {
+          localStorage.setItem('url', url);
+
+          return ad4mUrl;
+        };
+      } catch (e) {
+        console.log('failed', e)
+      } 
+    }
+
+    setConnected(false);
+
+    showNotification({
+      message: 'Could not connect to ad4m executor running locally, please check if its running or submit the logs.',
+      color: 'red',
+      autoClose: false
+    });
+  }, [checkConnection, checkIfAgentIsInitialized])
+
+
+  useEffect(() => {
+    let localStorageURL = localStorage.getItem('url');
+
+    if (localStorageURL && localStorageURL === 'null' && !localStorageURL.includes('localhost')) {
+      console.log('gggg 1', localStorageURL);
+
+      if (localStorageURL) {
+        const client = buildAd4mClient(localStorageURL);
+        checkConnection(localStorageURL, client).then((url) => {
+          console.log('pp', url);
+  
+          checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
+            setState(prev => ({
+              ...prev,
+              client,
+              url,
+              isInitialized,
+              isUnlocked,
+              connected: true,
+              connectedLaoding: false
+            }));
+          });
+        }).catch((e) => {
+          console.log('err', e)
+  
+          showNotification({
+            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
+            color: 'red',
+            autoClose: false
+          });
+        });
+      }
+    } else {
+      findAd4mPort();
+    }
+  }, [checkConnection, checkIfAgentIsInitialized, findAd4mPort]);
+
+  useEffect(() => {
+    appWindow.listen('ready', () => {
+      findAd4mPort();
+    })
+  }, [findAd4mPort])
 
   const handleTrustAgent = (candidate: string) => {
     setState((prev) => ({
@@ -193,7 +243,8 @@ export function Ad4minProvider({ children }: any) {
   const resetEndpoint = () => {
     setState((prev) => ({
       ...prev,
-      url: ''
+      url: '',
+      connected: false
     }))
 
     localStorage.removeItem('url');
@@ -201,6 +252,7 @@ export function Ad4minProvider({ children }: any) {
 
   useEffect(() => {
     if (state.url) {
+      console.log('gggg 0', state.url);
       const client = buildAd4mClient(state.url)
       
       setState((prev) => ({
