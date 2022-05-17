@@ -5,6 +5,8 @@ use tauri::{
     AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
     WindowBuilder, WindowUrl, Wry,
 };
+use std::fs;
+use directories::UserDirs;
 
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
