@@ -64,7 +64,7 @@
         "fullscreen": false,
         "center": true,
         "focus": true,
-        "visible": false
+        "visible": true
       }
     ],
     "security": {
