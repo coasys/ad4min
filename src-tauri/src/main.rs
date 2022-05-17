@@ -14,16 +14,16 @@ use tauri::{
 };
 
 mod config;
+mod util;
 mod logs;
 mod system_tray;
 mod menu;
-use tauri::WindowUrl;
-use tauri::WindowBuilder;
 use tauri::api::dialog;
 use tauri::Manager;
 use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
+use crate::util::find_port;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -32,7 +32,7 @@ struct Payload {
 }
 
 fn main() {
-    let free_port = portpicker::pick_unused_port().expect("No ports free");
+    let free_port = find_port(12000, 13000);
 
     println!("Free port: {:?}", free_port);
 
@@ -60,31 +60,17 @@ fn main() {
         .menu(build_menu())
         .system_tray(build_system_tray())
         .setup(move |app| {
-            let splash_screen = app.get_window("splashscreen").unwrap();
+            let ad4min = app.get_window("ad4min").unwrap();
 
-            let new_ad4min_window = WindowBuilder::new(
-                app,
-                "ad4min",
-                WindowUrl::App(url.into()),
-            );
-            
-            log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
-            
-            let result = new_ad4min_window
-                .inner_size(1000.0, 700.0)
-                .center()
-                .visible(false)
-                .build();
+            let ad4min_clone = ad4min.clone();
 
-            let temp_result = result.unwrap().clone();
+            let _id = ad4min.listen("copyLogs", |event| {
+                println!("got window event-name with payload {:?} {:?}", event, event.payload());
 
-            let _id = splash_screen.listen("copyLogs", |event| {
                 if let Some(user_dirs) = UserDirs::new() {
                     let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
                     fs::copy(log_path(), path);
                 }
-
-                println!("got window event-name with payload {:?} {:?}", event, event.payload());
             });
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
@@ -100,23 +86,24 @@ fn main() {
                             log::info!("{}", line);
 
                             if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
-                                splash_screen.close().unwrap();
-                                temp_result.show().unwrap();
+                                println!("Executor started on: {:?}", url);
+                                ad4min.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
+                                ad4min_clone.show();
                             }
                         },
-                        CommandEvent::Stderr(line) => log::info!("{}", line),
+                        CommandEvent::Stderr(line) => log::error!("{}", line),
                         CommandEvent::Terminated(line) => {
                             println!("Terminated {:?}", line);
 
                             dialog::message(
-                                Some(&temp_result), 
+                                Some(&ad4min_clone), 
                                 "Error", 
                                 "Something went wrong while starting ad4m-executor please check the logs"
                             );
                             log::info!("Terminated {:?}", line);
                         },
                         CommandEvent::Error(line) => log::info!("Error {:?}", line),
-                        _ => log::info!("Error {:?}", event),
+                        _ => log::error!("{:?}", event),
                     }
                 }
             });
