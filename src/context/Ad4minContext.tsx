@@ -234,9 +234,24 @@ export function Ad4minProvider({ children }: any) {
       setState((prev) => ({
         ...prev,
         url
-      }))
-  
-      localStorage.setItem('url', url as string);
+      }));
+
+      const client = buildAd4mClient(url);
+      checkConnection(url, client).then((url) => {
+        checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
+          setState(prev => ({
+            ...prev,
+            client,
+            url,
+            isInitialized,
+            isUnlocked,
+            connected: true,
+            connectedLaoding: false
+          }));
+
+          localStorage.setItem('url', url as string);
+        });
+      });
     }
   }
 
