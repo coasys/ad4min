@@ -56,6 +56,10 @@
     ]
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.0.0-rc.10"
+    "@tauri-apps/cli": "1.0.0-rc.10",
+    "react-error-overlay": "6.0.9"
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   }
 }
