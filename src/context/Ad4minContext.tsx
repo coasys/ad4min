@@ -182,9 +182,7 @@ export function Ad4minProvider({ children }: any) {
   useEffect(() => {
     let localStorageURL = localStorage.getItem('url');
 
-    if (localStorageURL && localStorageURL === 'null' && !localStorageURL.includes('localhost')) {
-      console.log('gggg 1', localStorageURL);
-
+    if (localStorageURL && localStorageURL !== 'null' && !localStorageURL.includes('localhost')) {
       if (localStorageURL) {
         const client = buildAd4mClient(localStorageURL);
         checkConnection(localStorageURL, client).then((url) => {
