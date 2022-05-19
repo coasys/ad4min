@@ -29,22 +29,12 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
             let ad4min_window = app.get_window("ad4min");
 
             if let Some(window) = ad4min_window {
-                window.show().unwrap();
-                window.set_focus().unwrap();
-            } else {                
-                let url = app_url(port);
-
-                println!("URL {}", url);
-
-                let new_ad4min_window = WindowBuilder::new(
-                    app,
-                    "ad4min",
-                    WindowUrl::App(url.into()),
-                );
-
-                log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
-
-                new_ad4min_window.build();
+                if let Ok(true) = window.is_visible() {
+                    window.hide();
+                } else {
+                    window.show().unwrap();
+                    window.set_focus().unwrap();                
+                }
             }
         }
         "copy_logs" => {

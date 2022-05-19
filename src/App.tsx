@@ -10,6 +10,11 @@ import { AgentContext, AgentProvider } from './context/AgentContext';
 import { buildAd4mClient } from './util';
 import { showNotification } from '@mantine/notifications';
 
+import { appWindow } from '@tauri-apps/api/window'
+appWindow.listen('tauri://close-requested', ({ event, payload }) => {
+  appWindow.hide()
+})
+
 const App = () => {
   const {state: {
     connected, isUnlocked, candidate, connectedLaoding, did
