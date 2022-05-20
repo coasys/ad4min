@@ -58,8 +58,6 @@ fn main() {
         assert!(status.success());
     }
 
-    let free_port_clone = free_port.clone();
-
     let url = app_url(free_port);
 
     let state = FreePort(free_port);
@@ -85,7 +83,7 @@ fn main() {
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
-            .args(["serve", "--port", &free_port_clone.to_string()])
+            .args(["serve", "--port", &free_port.to_string()])
             .spawn()
             .expect("Failed to spawn ad4m serve");
     
@@ -122,7 +120,7 @@ fn main() {
         })
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id, free_port_clone)
+                handle_system_tray_event(app, id, free_port)
             }
             _ => {}
         })

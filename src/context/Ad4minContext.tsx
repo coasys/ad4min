@@ -171,13 +171,12 @@ export function Ad4minProvider({ children }: any) {
   }, [checkConnection, checkIfAgentIsInitialized]);
 
   useEffect(() => {
-    appWindow.listen('ready', () => {
-      invoke('get_port').then((message) => {
-        if (message) {
-          const url = `ws://localhost:${message}/graphql`;
-          connect(url);
-        }
-      })
+    appWindow.listen('ready', async () => {
+      const message = invoke('get_port');
+      if (message) {
+        const url = `ws://localhost:${message}/graphql`;
+        connect(url);
+      }
     })
   }, [])
 
