@@ -21,8 +21,8 @@ const Auth = (props: Props) => {
     setOpened(true);
   }, []);
 
-  const permitAuth = async () => {
-    let result = await client!.agent.permitAuth(props.info);
+  const permitCapability = async () => {
+    let result = await client!.agent.permitCapability(props.info);
 
     let permitResult = JSON.stringify(result);
     console.log(`permit result: ${permitResult}`);
@@ -47,27 +47,27 @@ const Auth = (props: Props) => {
       >
         <Stack>
           <TextInput
-            defaultValue={props.info}
+            value={props.info}
             label="Auth Information"
             disabled
           />
           <TextInput
-            defaultValue={JSON.parse(props.info).auth.appName}
+            value={JSON.parse(props.info).auth.appName}
             label="app name"
             disabled
           />
           <TextInput
-            defaultValue={JSON.parse(props.info).auth.appDesc}
+            value={JSON.parse(props.info).auth.appDesc}
             label="app desc"
             disabled
           />
           <TextInput
-            defaultValue={JSON.parse(props.info).auth.appUrl}
+            value={JSON.parse(props.info).auth.appUrl}
             label="app url"
             disabled
           />
           <TextInput
-            defaultValue={JSON.parse(props.info).auth.capabilities}
+            value={JSON.stringify(JSON.parse(props.info).auth.capabilities)}
             label="app cap"
             disabled
           />
@@ -81,7 +81,7 @@ const Auth = (props: Props) => {
               Close
             </Button>
             <Space h="md" />
-            <Button onClick={permitAuth}>
+            <Button onClick={permitCapability}>
               Confirm
             </Button>
           </Group>

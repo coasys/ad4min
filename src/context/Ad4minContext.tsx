@@ -161,7 +161,7 @@ export function Ad4minProvider({ children }: any) {
             candidate: exception.addon!
           }));
         }
-        if (exception.type === ExceptionType.RequestAuth) {
+        if (exception.type === ExceptionType.CapabilityRequested) {
           setState((prev) => ({
             ...prev,
             auth: exception.addon!
