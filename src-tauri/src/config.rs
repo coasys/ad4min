@@ -17,3 +17,13 @@ pub fn binary_path() -> PathBuf {
 pub fn holochain_binary_path() -> PathBuf {
     binary_path().join("holochain")
 }
+
+#[cfg(feature = "custom-protocol")]
+pub fn app_url(port: u16) -> String {
+    format!("index.html?ad4m=ws://localhost:{}/graphql", port)
+}
+
+#[cfg(not(feature = "custom-protocol"))]
+pub fn app_url(port: u16) -> String {
+    format!("http://localhost:3000?ad4m=ws://localhost:{}/graphql", port)
+}

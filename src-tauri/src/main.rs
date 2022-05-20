@@ -4,6 +4,7 @@
 )]
 
 use config::holochain_binary_path;
+use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{build_system_tray, handle_system_tray_event};
@@ -13,13 +14,28 @@ use tauri::{
 };
 
 mod config;
+mod util;
 mod logs;
 mod system_tray;
 mod menu;
-use core::time::Duration;
-use std::thread;
+use tauri::api::dialog;
+use tauri::Manager;
+use directories::UserDirs;
+use std::fs;
+use crate::config::log_path;
+use crate::util::find_port;
+
+// the payload type must implement `Serialize` and `Clone`.
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+  message: String,
+}
 
 fn main() {
+    let free_port = find_port(12000, 13000);
+
+    println!("Free port: {:?}", free_port);
+
     if let Err(err) = setup_logs() {
         println!("Error setting up the logs: {:?}", err);
     }
@@ -34,28 +50,69 @@ fn main() {
         assert!(status.success());
     }
 
-    let (mut rx, child) = Command::new_sidecar("ad4m")
-        .expect("Failed to create ad4m command")
-        .args(["serve"])
-        .spawn()
-        .expect("Failed to spawn ad4m serve");
+    let free_port_clone = free_port.clone();
 
-    tauri::async_runtime::spawn(async move {
-        while let Some(event) = rx.recv().await {
-            match event.clone() {
-                CommandEvent::Stdout(line) => log::info!("{}", line),
-                CommandEvent::Stderr(line) => log::info!("{}", line),
-                _ => log::info!("{:?}", event),
-            }
-        }
-    });
+    let url = app_url(free_port);
+
+    println!("URL {}", url);
 
     let builder_result = tauri::Builder::default()
         .menu(build_menu())
         .system_tray(build_system_tray())
+        .setup(move |app| {
+            let ad4min = app.get_window("ad4min").unwrap();
+
+            let ad4min_clone = ad4min.clone();
+
+            let _id = ad4min.listen("copyLogs", |event| {
+                println!("got window event-name with payload {:?} {:?}", event, event.payload());
+
+                if let Some(user_dirs) = UserDirs::new() {
+                    let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
+                    fs::copy(log_path(), path);
+                }
+            });
+
+            let (mut rx, _child) = Command::new_sidecar("ad4m")
+            .expect("Failed to create ad4m command")
+            .args(["serve", "--port", &free_port.to_string()])
+            .spawn()
+            .expect("Failed to spawn ad4m serve");
+    
+            tauri::async_runtime::spawn(async move {
+                while let Some(event) = rx.recv().await {
+                    match event.clone() {
+                        CommandEvent::Stdout(line) => {
+                            log::info!("{}", line);
+
+                            if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
+                                println!("Executor started on: {:?}", url);
+                                ad4min.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
+                                ad4min_clone.show();
+                            }
+                        },
+                        CommandEvent::Stderr(line) => log::error!("{}", line),
+                        CommandEvent::Terminated(line) => {
+                            println!("Terminated {:?}", line);
+
+                            dialog::message(
+                                Some(&ad4min_clone), 
+                                "Error", 
+                                "Something went wrong while starting ad4m-executor please check the logs"
+                            );
+                            log::info!("Terminated {:?}", line);
+                        },
+                        CommandEvent::Error(line) => log::info!("Error {:?}", line),
+                        _ => log::error!("{:?}", event),
+                    }
+                }
+            });
+
+            Ok(())
+        })
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id)
+                handle_system_tray_event(app, id, free_port_clone)
             }
             _ => {}
         })
@@ -64,7 +121,9 @@ fn main() {
     match builder_result {
         Ok(builder) => {
             builder.run(|_app_handle, event| match event {
-                RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
+                RunEvent::ExitRequested { api, .. } => {
+                    api.prevent_exit();
+                },
                 _ => {}
             });
         }

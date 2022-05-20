@@ -101,7 +101,7 @@ export function AgentProvider({ children }: any) {
       links: cleanedLinks
     })
 
-    handleLogin(agentStatus.isUnlocked, agentStatus.did!);
+    handleLogin(client!, agentStatus.isUnlocked, agentStatus.did!);
 
     console.log("agent status in generate: ", agentStatus);
 
@@ -110,8 +110,10 @@ export function AgentProvider({ children }: any) {
 
   const unlockAgent = async (password: string) => {
     setLoading(true)
+    
     let agentStatus = await client?.agent.unlock(password);
-    handleLogin(agentStatus!.isUnlocked, agentStatus!.did!);
+
+    handleLogin(client!, agentStatus!.isUnlocked, agentStatus!.did!);
 
     console.log("agent status in unlock: ", agentStatus);
 
@@ -123,7 +125,7 @@ export function AgentProvider({ children }: any) {
 
     const status = await client!.agent.lock(passphrase);
 
-    handleLogin(status!.isUnlocked, status!.did!);
+    handleLogin(client!, status!.isUnlocked, status!.did!);
 
     setLoading(false);
   } 

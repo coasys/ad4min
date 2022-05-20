@@ -5,6 +5,8 @@ import { CircleCheck } from 'tabler-icons-react';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
 import { MainContainer, MainHeader } from './styles';
 import { Ad4minContext } from '../context/Ad4minContext';
+import { buildAd4mClient } from '../util';
+import { useCallback } from 'react';
 
 type Props = {
   did: String,
@@ -12,7 +14,7 @@ type Props = {
 
 const Profile = (props: Props) => {
   const {state: {
-    client
+    url
   }} = useContext(Ad4minContext);
 
   const [trustedAgents, setTrustedAgents] = useState<any[]>([]);
@@ -22,28 +24,31 @@ const Profile = (props: Props) => {
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: ""
-  })
+  });
 
-  const getTrustedAgents = async () => {
-    const trustedAgents = await client!.runtime.getTrustedAgents()
-    
-    const tempTempAgents = [];
-    
-    for (const agent of trustedAgents) {
-      const fetchedAgent = await client!.agent.byDID(agent)
-
-      if (fetchedAgent) {
-        const profile = await fetchProfile(fetchedAgent)
+  const getTrustedAgents = useCallback(async () => {
+    if (url) {
+      const client = buildAd4mClient(url);
+      const trustedAgents = await client!.runtime.getTrustedAgents()
+      
+      const tempTempAgents = [];
+      
+      for (const agent of trustedAgents) {
+        const fetchedAgent = await client!.agent.byDID(agent)
   
-        tempTempAgents.push({did: agent, ...profile});
-      } else {
-        tempTempAgents.push({did: agent});
+        if (fetchedAgent) {
+          const profile = await fetchProfile(fetchedAgent)
+    
+          tempTempAgents.push({did: agent, ...profile});
+        } else {
+          tempTempAgents.push({did: agent});
+        }
+  
       }
-
+  
+      setTrustedAgents(tempTempAgents);
     }
-
-    setTrustedAgents(tempTempAgents);
-  }
+  }, [url])
 
   const fetchProfile = async (agent: Agent) => {
     const tempProfile = {
@@ -64,18 +69,21 @@ const Profile = (props: Props) => {
     return tempProfile;
   }
 
-  const fetchCurrentAgentProfile = async () => {
-    const agent = await client!.agent.me();
-
-    const profile = await fetchProfile(agent);
-    
-    setProfile(profile);
-  }
+  const fetchCurrentAgentProfile = useCallback(async () => {
+    if (url) {
+      const client = buildAd4mClient(url);
+      const agent = await client!.agent.me();
+  
+      const profile = await fetchProfile(agent);
+      
+      setProfile(profile);
+    }
+  }, [url])
 
   useEffect(() => {
     fetchCurrentAgentProfile();
     getTrustedAgents();
-  }, [])
+  }, [fetchCurrentAgentProfile, getTrustedAgents])
 
   return (
     <Container style={MainContainer}>
