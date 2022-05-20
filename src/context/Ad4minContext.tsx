@@ -4,6 +4,7 @@ import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolv
 import { createContext, useCallback, useEffect, useState } from "react";
 import { buildAd4mClient } from "../util";
 import { appWindow } from '@tauri-apps/api/window'
+import { invoke } from '@tauri-apps/api/tauri'
 
 type State = {
   url: string;
@@ -54,12 +55,6 @@ export const Ad4minContext = createContext(initialState);
 export function Ad4minProvider({ children }: any) {
   const [state, setState] = useState(initialState.state);
 
-  
-  const setConnected = (connected: boolean) => setState((prev) => ({
-    ...prev,
-    connected,
-    connectedLaoding: false
-  }));
 
   const checkConnection = useCallback(async (url: string, client: Ad4mClient): Promise<string> => {
     return new Promise(async (resolve, reject) => {
@@ -128,97 +123,59 @@ export function Ad4minProvider({ children }: any) {
 
     return status;
   }, [handleLogin]);
-  
-  const Timeout = () => {
-    let controller = new AbortController();
-    setTimeout(() => controller.abort(), 20);
-    return controller;
-  };
 
-  const findAd4mPort = useCallback(async () => {
-    for (let i = 12000; i <= 13000; i++) {
-      const url = `ws://localhost:${i}/graphql`;
-
-      try {
-        await fetch(`http://localhost:${i}`, {
-          signal: Timeout().signal
-        })
-        const client = buildAd4mClient(url);
-        const ad4mUrl = await checkConnection(url, client);
-
-        const {isInitialized, isUnlocked} = await checkIfAgentIsInitialized(client);
-
+  const connect = (url: string) => {
+    const client = buildAd4mClient(url);
+    checkConnection(url, client).then((url) => {
+      checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
         setState(prev => ({
           ...prev,
           client,
-          url: ad4mUrl,
+          url,
           isInitialized,
           isUnlocked,
           connected: true,
           connectedLaoding: false
         }));
+      });
+    }).catch((e) => {
+      console.log('err', e)
 
-
-        if (ad4mUrl) {
-          localStorage.setItem('url', url);
-
-          return ad4mUrl;
-        };
-      } catch (e) {
-        console.log('failed', e)
-      } 
-    }
-
-    setConnected(false);
-
-    showNotification({
-      message: 'Could not connect to ad4m executor running locally, please check if its running or submit the logs.',
-      color: 'red',
-      autoClose: false
+      showNotification({
+        message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
+        color: 'red',
+        autoClose: false
+      });
     });
-  }, [checkConnection, checkIfAgentIsInitialized])
-
+  }
 
   useEffect(() => {
     let localStorageURL = localStorage.getItem('url');
 
     if (localStorageURL && localStorageURL !== 'null' && !localStorageURL.includes('localhost')) {
       if (localStorageURL) {
-        const client = buildAd4mClient(localStorageURL);
-        checkConnection(localStorageURL, client).then((url) => {
-          console.log('pp', url);
-  
-          checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
-            setState(prev => ({
-              ...prev,
-              client,
-              url,
-              isInitialized,
-              isUnlocked,
-              connected: true,
-              connectedLaoding: false
-            }));
-          });
-        }).catch((e) => {
-          console.log('err', e)
-  
-          showNotification({
-            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-            color: 'red',
-            autoClose: false
-          });
-        });
+        connect(localStorageURL);
       }
     } else {
-      findAd4mPort();
+      invoke('get_ad4m_port').then((message) => {
+        if (message) {
+          const url = `ws://localhost:${message}/graphql`;
+          connect(url);
+        }
+      })
     }
-  }, [checkConnection, checkIfAgentIsInitialized, findAd4mPort]);
+  }, [checkConnection, checkIfAgentIsInitialized]);
 
   useEffect(() => {
     appWindow.listen('ready', () => {
-      findAd4mPort();
+      invoke('get_ad4m_port').then((message) => {
+        if (message) {
+          const url = `ws://localhost:${message}/graphql`;
+          connect(url);
+        }
+      })
     })
-  }, [findAd4mPort])
+  }, [])
 
   const handleTrustAgent = (candidate: string) => {
     setState((prev) => ({

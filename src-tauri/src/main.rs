@@ -24,11 +24,19 @@ use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
 use crate::util::find_port;
+use tauri::State;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct Payload {
   message: String,
+}
+
+pub struct FreePort(pub u16);
+
+#[tauri::command]
+fn get_ad4m_port(state: State<'_, FreePort>) -> u16 {
+    state.0.clone()
 }
 
 fn main() {
@@ -54,11 +62,13 @@ fn main() {
 
     let url = app_url(free_port);
 
-    println!("URL {}", url);
+    let state = FreePort(free_port);
 
     let builder_result = tauri::Builder::default()
+        .manage(state)
         .menu(build_menu())
         .system_tray(build_system_tray())
+        .invoke_handler(tauri::generate_handler![get_ad4m_port])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 
@@ -75,7 +85,7 @@ fn main() {
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
-            .args(["serve", "--port", &free_port.to_string()])
+            .args(["serve", "--port", &free_port_clone.to_string()])
             .spawn()
             .expect("Failed to spawn ad4m serve");
     
