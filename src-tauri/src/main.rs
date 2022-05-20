@@ -24,11 +24,19 @@ use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
 use crate::util::find_port;
+use tauri::State;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
 struct Payload {
   message: String,
+}
+
+pub struct FreePort(pub u16);
+
+#[tauri::command]
+fn get_port(state: State<'_, FreePort>) -> u16 {
+    state.0
 }
 
 fn main() {
@@ -50,15 +58,15 @@ fn main() {
         assert!(status.success());
     }
 
-    let free_port_clone = free_port.clone();
-
     let url = app_url(free_port);
 
-    println!("URL {}", url);
+    let state = FreePort(free_port);
 
     let builder_result = tauri::Builder::default()
+        .manage(state)
         .menu(build_menu())
         .system_tray(build_system_tray())
+        .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 
@@ -112,7 +120,7 @@ fn main() {
         })
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id, free_port_clone)
+                handle_system_tray_event(app, id, free_port)
             }
             _ => {}
         })
