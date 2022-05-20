@@ -9,12 +9,12 @@ use std::fs;
 use directories::UserDirs;
 
 pub fn build_system_tray() -> SystemTray {
-    let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
+    let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show/Hide Window");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let copy_logs = CustomMenuItem::new("copy_logs".to_string(), "Copy Logs");
 
     let sys_tray_menu = SystemTrayMenu::new()
-        .add_item(show_ad4min)
+        .add_item(toggle_window)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(copy_logs)
         .add_native_item(SystemTrayMenuItem::Separator)
@@ -25,7 +25,7 @@ pub fn build_system_tray() -> SystemTray {
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u16) {
     match event_id.as_str() {
-        "show_ad4min" => {
+        "toggle_window" => {
             let ad4min_window = app.get_window("ad4min");
 
             if let Some(window) = ad4min_window {
