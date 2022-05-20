@@ -124,21 +124,25 @@ export function Ad4minProvider({ children }: any) {
     return status;
   }, [handleLogin]);
 
-  const connect = (url: string) => {
+  const connect = async (url: string) => {
     const client = buildAd4mClient(url);
-    checkConnection(url, client).then((url) => {
-      checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
-        setState(prev => ({
-          ...prev,
-          client,
-          url,
-          isInitialized,
-          isUnlocked,
-          connected: true,
-          connectedLaoding: false
-        }));
-      });
-    }).catch((e) => {
+    try {
+      await checkConnection(url, client);
+
+      const { isInitialized, isUnlocked } = await checkIfAgentIsInitialized(client);
+
+      setState(prev => ({
+        ...prev,
+        client,
+        url,
+        isInitialized,
+        isUnlocked,
+        connected: true,
+        connectedLaoding: false
+      }));
+
+      localStorage.setItem('url', url as string);
+    } catch (e) {
       console.log('err', e)
 
       showNotification({
@@ -146,7 +150,7 @@ export function Ad4minProvider({ children }: any) {
         color: 'red',
         autoClose: false
       });
-    });
+    }
   }
 
   useEffect(() => {
@@ -157,7 +161,7 @@ export function Ad4minProvider({ children }: any) {
         connect(localStorageURL);
       }
     } else {
-      invoke('get_ad4m_port').then((message) => {
+      invoke('get_port').then((message) => {
         if (message) {
           const url = `ws://localhost:${message}/graphql`;
           connect(url);
@@ -168,7 +172,7 @@ export function Ad4minProvider({ children }: any) {
 
   useEffect(() => {
     appWindow.listen('ready', () => {
-      invoke('get_ad4m_port').then((message) => {
+      invoke('get_port').then((message) => {
         if (message) {
           const url = `ws://localhost:${message}/graphql`;
           connect(url);
@@ -184,29 +188,14 @@ export function Ad4minProvider({ children }: any) {
     }));
   }
 
-  const configureEndpoint = (url: string) => {
+  const configureEndpoint = async (url: string) => {
     if (url) {
       setState((prev) => ({
         ...prev,
         url
       }));
 
-      const client = buildAd4mClient(url);
-      checkConnection(url, client).then((url) => {
-        checkIfAgentIsInitialized(client).then(({isInitialized, isUnlocked}) => {
-          setState(prev => ({
-            ...prev,
-            client,
-            url,
-            isInitialized,
-            isUnlocked,
-            connected: true,
-            connectedLaoding: false
-          }));
-
-          localStorage.setItem('url', url as string);
-        });
-      });
+      await connect(url)
     }
   }
 

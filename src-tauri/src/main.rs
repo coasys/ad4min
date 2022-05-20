@@ -35,8 +35,8 @@ struct Payload {
 pub struct FreePort(pub u16);
 
 #[tauri::command]
-fn get_ad4m_port(state: State<'_, FreePort>) -> u16 {
-    state.0.clone()
+fn get_port(state: State<'_, FreePort>) -> u16 {
+    state.0
 }
 
 fn main() {
@@ -68,7 +68,7 @@ fn main() {
         .manage(state)
         .menu(build_menu())
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_ad4m_port])
+        .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 
