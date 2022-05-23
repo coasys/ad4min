@@ -46,7 +46,7 @@ fn get_port(state: State<'_, FreePort>) -> u16 {
 fn main() {
     let free_port = find_port(12000, 13000);
 
-    println!("Free port: {:?}", free_port);
+    log::info!("Free port: {:?}", free_port);
 
     if let Err(err) = setup_logs() {
         println!("Error setting up the logs: {:?}", err);
@@ -75,7 +75,7 @@ fn main() {
             let splashscreen_clone = splashscreen.clone();
 
             let _id = splashscreen.listen("copyLogs", |event| {
-                println!("got window event-name with payload {:?} {:?}", event, event.payload());
+                log::info!("got window event-name with payload {:?} {:?}", event, event.payload());
 
                 if let Some(user_dirs) = UserDirs::new() {
                     let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
@@ -99,7 +99,7 @@ fn main() {
 
                             if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
                                 let url = app_url();
-                                println!("Executor started on: {:?}", url);
+                                log::info!("Executor started on: {:?}", url);
                                 splashscreen_clone.hide();
                                 create_window(&handle);
                                 let main = handle.get_window("ad4min").unwrap();
@@ -108,7 +108,7 @@ fn main() {
                         },
                         CommandEvent::Stderr(line) => log::error!("{}", line),
                         CommandEvent::Terminated(line) => {
-                            println!("Terminated {:?}", line);
+                            log::info!("Terminated {:?}", line);
 
                             dialog::message(
                                 Some(&splashscreen_clone), 
