@@ -15,8 +15,12 @@ pub fn find_and_kill_processes(name: &str) {
 
   for process in processes.processes_by_exact_name(name) {
       log::info!("Prosses running: {} {}", process.pid(), process.name());
-      if process.kill_with(Signal::Term).is_none() {
-        log::error!("This signal isn't supported on this platform");
-    }
+      
+      match process.kill_with(Signal::Term) {
+        None => {
+          log::error!("This signal isn't supported on this platform");
+        },
+        _ => {}
+     }
   }
 }
