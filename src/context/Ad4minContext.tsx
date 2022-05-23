@@ -124,7 +124,7 @@ export function Ad4minProvider({ children }: any) {
     return status;
   }, [handleLogin]);
 
-  const connect = async (url: string) => {
+  const connect = useCallback(async (url: string) => {
     const client = buildAd4mClient(url);
     try {
       await checkConnection(url, client);
@@ -151,7 +151,7 @@ export function Ad4minProvider({ children }: any) {
         autoClose: false
       });
     }
-  }
+  }, [checkConnection, checkIfAgentIsInitialized])
 
   useEffect(() => {
     let localStorageURL = localStorage.getItem('url');
@@ -168,7 +168,7 @@ export function Ad4minProvider({ children }: any) {
         }
       })
     }
-  }, [checkConnection, checkIfAgentIsInitialized]);
+  }, [checkConnection, checkIfAgentIsInitialized, connect]);
 
   useEffect(() => {
     appWindow.listen('ready', async () => {
@@ -178,7 +178,7 @@ export function Ad4minProvider({ children }: any) {
         connect(url);
       }
     })
-  }, [])
+  }, [connect])
 
   const handleTrustAgent = (candidate: string) => {
     setState((prev) => ({
