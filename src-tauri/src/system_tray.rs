@@ -1,4 +1,4 @@
-use crate::{app_url, executor_url};
+use crate::{app_url};
 
 use tauri::{
     AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
@@ -9,12 +9,9 @@ use tauri::ClipboardManager;
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let copy_url = CustomMenuItem::new("copy_url".to_string(), "Copy executor URL");
 
     let sys_tray_menu = SystemTrayMenu::new()
         .add_item(show_ad4min)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(copy_url)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -44,10 +41,6 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
 
                 new_ad4min_window.build();
             }
-        }
-        "copy_url" => {
-            let url = executor_url(port);
-            app.clipboard_manager().write_text(url);
         }
         "quit" => {
             app.exit(0);

@@ -4,7 +4,7 @@
 )]
 
 use config::holochain_binary_path;
-use config::{app_url, executor_url};
+use config::{app_url};
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{build_system_tray, handle_system_tray_event};
