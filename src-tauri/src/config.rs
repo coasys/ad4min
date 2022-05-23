@@ -28,12 +28,6 @@ pub fn app_url(port: u16) -> String {
     format!("http://localhost:3000?ad4m=ws://localhost:{}/graphql", port)
 }
 
-#[cfg(feature = "custom-protocol")]
-pub fn executor_url(port: u16) -> String {
-    format!("ws://localhost:{}/graphql", port)
-}
-
-#[cfg(not(feature = "custom-protocol"))]
 pub fn executor_url(port: u16) -> String {
     format!("ws://localhost:{}/graphql", port)
 }

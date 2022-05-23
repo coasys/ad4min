@@ -18,13 +18,16 @@ mod util;
 mod logs;
 mod system_tray;
 mod menu;
+mod commands;
 use tauri::api::dialog;
 use tauri::Manager;
 use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
-use crate::util::find_port;
+use crate::util::{find_port, open_url};
 use tauri::State;
+use crate::commands::help::open_logs_folder;
+use crate::menu::handle_menu_event;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -65,8 +68,9 @@ fn main() {
     let builder_result = tauri::Builder::default()
         .manage(state)
         .menu(build_menu())
+        .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_port])
+        .invoke_handler(tauri::generate_handler![get_port, open_url, open_logs_folder])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 
