@@ -23,7 +23,7 @@ pub fn build_system_tray() -> SystemTray {
     SystemTray::new().with_menu(sys_tray_menu)
 }
 
-pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u16) {
+pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
     match event_id.as_str() {
         "show_ad4min" => {
             let ad4min_window = app.get_window("ad4min");
@@ -32,7 +32,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
                 window.show().unwrap();
                 window.set_focus().unwrap();
             } else {                
-                let url = app_url(port);
+                let url = app_url();
 
                 println!("URL {}", url);
 

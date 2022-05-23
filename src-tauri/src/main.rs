@@ -7,11 +7,15 @@ use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
-use system_tray::{build_system_tray, handle_system_tray_event};
+use system_tray::{ build_system_tray, handle_system_tray_event };
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent,
 };
+use tauri::WindowUrl;
+use tauri::WindowBuilder;
+use tauri::Wry;
+use tauri::AppHandle;
 
 mod config;
 mod util;
@@ -58,8 +62,6 @@ fn main() {
         assert!(status.success());
     }
 
-    let url = app_url(free_port);
-
     let state = FreePort(free_port);
 
     let builder_result = tauri::Builder::default()
@@ -68,11 +70,11 @@ fn main() {
         .system_tray(build_system_tray())
         .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {
-            let ad4min = app.get_window("ad4min").unwrap();
+            let splashscreen = app.get_window("splashscreen").unwrap();
 
-            let ad4min_clone = ad4min.clone();
+            let splashscreen_clone = splashscreen.clone();
 
-            let _id = ad4min.listen("copyLogs", |event| {
+            let _id = splashscreen.listen("copyLogs", |event| {
                 println!("got window event-name with payload {:?} {:?}", event, event.payload());
 
                 if let Some(user_dirs) = UserDirs::new() {
@@ -80,6 +82,8 @@ fn main() {
                     fs::copy(log_path(), path);
                 }
             });
+
+            let handle = app.handle().clone();
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
@@ -94,9 +98,12 @@ fn main() {
                             log::info!("{}", line);
 
                             if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
+                                let url = app_url();
                                 println!("Executor started on: {:?}", url);
-                                ad4min.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
-                                ad4min_clone.show();
+                                splashscreen_clone.hide();
+                                create_window(&handle);
+                                let main = handle.get_window("ad4min").unwrap();
+                                main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
                             }
                         },
                         CommandEvent::Stderr(line) => log::error!("{}", line),
@@ -104,7 +111,7 @@ fn main() {
                             println!("Terminated {:?}", line);
 
                             dialog::message(
-                                Some(&ad4min_clone), 
+                                Some(&splashscreen_clone), 
                                 "Error", 
                                 "Something went wrong while starting ad4m-executor please check the logs"
                             );
@@ -120,7 +127,7 @@ fn main() {
         })
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id, free_port)
+                handle_system_tray_event(app, id)
             }
             _ => {}
         })
@@ -137,4 +144,22 @@ fn main() {
         }
         Err(err) => log::error!("Error building the app: {:?}", err),
     }
+}
+
+fn create_window(app: &AppHandle<Wry>) {
+    let url = app_url();
+
+    let new_ad4min_window = WindowBuilder::new(
+        app,
+        "ad4min",
+        WindowUrl::App(url.into()),
+    )
+    .center()
+    .focus()
+    .inner_size(1000.0, 700.0)
+    .title("Admin UI");
+
+    log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
+
+    new_ad4min_window.build();
 }
