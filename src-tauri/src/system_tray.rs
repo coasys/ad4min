@@ -34,13 +34,15 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
             } else {                
                 let url = app_url();
 
-                println!("URL {}", url);
-
                 let new_ad4min_window = WindowBuilder::new(
                     app,
                     "ad4min",
                     WindowUrl::App(url.into()),
-                );
+                )
+                .focus()
+                .center()
+                .inner_size(1000.0, 700.0)
+                .title("Admin UI");
 
                 log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
 
