@@ -1,4 +1,4 @@
-use crate::app_url;
+use crate::{app_url, executor_url};
 
 use crate::config::log_path;
 use tauri::{
@@ -8,15 +8,19 @@ use tauri::{
 use std::fs;
 use crate::logs::open_logs_folder;
 use crate::util::open_url;
+use tauri::ClipboardManager;
 
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
     let report_issue = CustomMenuItem::new("report_issue".to_string(), "Report Issue");
+    let copy_url = CustomMenuItem::new("copy_url".to_string(), "Copy executor URL");
 
     let sys_tray_menu = SystemTrayMenu::new()
         .add_item(show_ad4min)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(copy_url)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(open_logs)
         .add_native_item(SystemTrayMenuItem::Separator)
@@ -50,6 +54,10 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
 
                 new_ad4min_window.build();
             }
+        }
+        "copy_url" => {
+            let url = executor_url(port);
+            app.clipboard_manager().write_text(url);
         }
         "open_logs" => {
             open_logs_folder();
