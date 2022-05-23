@@ -7,16 +7,20 @@ use tauri::{
 };
 use std::fs;
 use crate::logs::open_logs_folder;
+use crate::util::open_url;
 
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
+    let report_issue = CustomMenuItem::new("report_issue".to_string(), "Report Issue");
 
     let sys_tray_menu = SystemTrayMenu::new()
         .add_item(show_ad4min)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(open_logs)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(report_issue)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -48,11 +52,19 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
             }
         }
         "open_logs" => {
-                open_logs_folder();
+            open_logs_folder();
+        }
+        "report_issue" => {
+            report_issue();
         }
         "quit" => {
             app.exit(0);
         }
         _ => log::error!("Event is not defined."),
     }
+}
+
+#[tauri::command]
+pub fn report_issue() -> () {
+  open_url("https://github.com/perspect3vism/ad4min/issues/new".into()).unwrap();
 }

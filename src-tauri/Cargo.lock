@@ -11,6 +11,7 @@ dependencies = [
  "log",
  "log4rs",
  "nix",
+ "open",
  "opener",
  "portpicker",
  "serde",
