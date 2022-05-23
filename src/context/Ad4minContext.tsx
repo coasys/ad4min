@@ -172,7 +172,7 @@ export function Ad4minProvider({ children }: any) {
 
   useEffect(() => {
     appWindow.listen('ready', async () => {
-      const message = invoke('get_port');
+      const message = await invoke('get_port');
       if (message) {
         const url = `ws://localhost:${message}/graphql`;
         connect(url);
