@@ -23,6 +23,7 @@ nix = "0.23.1"
 portpicker = "0.1.1"
 libc = "0.2.121"
 directories = "4.0.1"
+opener = "0.5.0"
 tauri = { version = "1.0.0-rc.7", features = ["api-all", "gtk-tray", "system-tray", "wry"], default-features = false }
 
 [features]

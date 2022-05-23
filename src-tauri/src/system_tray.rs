@@ -6,17 +6,17 @@ use tauri::{
     WindowBuilder, WindowUrl, Wry,
 };
 use std::fs;
-use directories::UserDirs;
+use crate::logs::open_logs_folder;
 
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let copy_logs = CustomMenuItem::new("copy_logs".to_string(), "Copy Logs");
+    let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
 
     let sys_tray_menu = SystemTrayMenu::new()
         .add_item(show_ad4min)
         .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(copy_logs)
+        .add_item(open_logs)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -47,11 +47,8 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
                 new_ad4min_window.build();
             }
         }
-        "copy_logs" => {
-            if let Some(user_dirs) = UserDirs::new() {
-                let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
-                fs::copy(log_path(), path);
-            }
+        "open_logs" => {
+                open_logs_folder();
         }
         "quit" => {
             app.exit(0);
