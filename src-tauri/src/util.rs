@@ -34,7 +34,5 @@ pub fn save_executor_port(port: u16) {
 
   let mut file = File::create(executor_port_path()).unwrap();
 
-  println!("{:?}", file);
-
   file.write_all(port.to_string().as_bytes());
 }
