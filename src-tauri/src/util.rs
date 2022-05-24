@@ -1,6 +1,10 @@
 use sysinfo::{ProcessExt, System, SystemExt, Signal};
 use tauri::{WindowBuilder, WindowUrl, Wry, AppHandle};
 use crate::app_url;
+use crate::config::executor_port_path;
+use std::fs::remove_file;
+use std::fs::File;
+use std::io::prelude::*;
 
 pub fn find_port(start_port: u16, end_port: u16) -> u16 {
   for x in start_port..end_port {
@@ -43,4 +47,12 @@ pub fn create_main_window(app: &AppHandle<Wry>) {
   log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
 
   new_ad4min_window.build();
+}
+
+pub fn save_executor_port(port: u16) {
+  remove_file(executor_port_path());
+
+  let mut file = File::create(executor_port_path()).unwrap();
+
+  file.write_all(port.to_string().as_bytes());
 }
