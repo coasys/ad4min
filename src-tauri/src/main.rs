@@ -26,7 +26,6 @@ use std::fs;
 use crate::config::log_path;
 use crate::util::{find_port};
 use tauri::State;
-use crate::commands::help::open_logs_folder;
 use crate::menu::handle_menu_event;
 use crate::util::find_and_kill_processes;
 
@@ -77,7 +76,7 @@ fn main() {
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_port, open_logs_folder])
+        .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 

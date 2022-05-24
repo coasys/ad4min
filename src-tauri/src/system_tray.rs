@@ -4,7 +4,6 @@ use tauri::{
     AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
     WindowBuilder, WindowUrl, Wry,
 };
-use tauri::ClipboardManager;
 use std::fs;
 use directories::UserDirs;
 use crate::util::find_and_kill_processes;
