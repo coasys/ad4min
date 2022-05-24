@@ -7,6 +7,7 @@ use tauri::{
 };
 use std::fs;
 use directories::UserDirs;
+use crate::util::find_and_kill_processes;
 
 pub fn build_system_tray() -> SystemTray {
     let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
@@ -56,7 +57,11 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
             }
         }
         "quit" => {
-            app.exit(0);
+            find_and_kill_processes("ad4m");
+
+            find_and_kill_processes("holochain");
+
+            find_and_kill_processes("lair-keystore");
         }
         _ => log::error!("Event is not defined."),
     }
