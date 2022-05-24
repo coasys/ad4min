@@ -51,6 +51,8 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
             find_and_kill_processes("holochain");
 
             find_and_kill_processes("lair-keystore");
+
+            app.exit(0);
         }
         _ => log::error!("Event is not defined."),
     }
