@@ -32,16 +32,15 @@ pub fn create_main_window(app: &AppHandle<Wry>) {
 
   let new_ad4min_window = WindowBuilder::new(
       app,
-      "ad4min",
+      "AD4MIN",
       WindowUrl::App(url.into()),
   )
   .center()
   .focus()
   .inner_size(1000.0, 700.0)
-  .title("Admin UI");
+  .title("AD4MIN");
 
   log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
 
   new_ad4min_window.build();
 }
-

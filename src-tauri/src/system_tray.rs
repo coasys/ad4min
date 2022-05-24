@@ -20,7 +20,7 @@ pub fn build_system_tray() -> SystemTray {
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
     match event_id.as_str() {
         "toggle_window" => {
-            let ad4min_window = app.get_window("ad4min");
+            let ad4min_window = app.get_window("AD4MIN");
 
             if let Some(window) = ad4min_window {
                 if let Ok(true) = window.is_visible() {
@@ -31,7 +31,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
                 }
             } else {                
                 create_main_window(app);
-                let main = app.get_window("ad4min").unwrap();
+                let main = app.get_window("AD4MIN").unwrap();
                 main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
             }
         }
