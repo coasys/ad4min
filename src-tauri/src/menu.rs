@@ -1,6 +1,11 @@
+use crate::config::data_path;
 use tauri::{Menu, Submenu, MenuItem};
+use tauri::{Wry, Window, CustomMenuItem};
 
 pub fn build_menu() -> Menu {
+    let open_logs = CustomMenuItem::new("open_logs".to_string(), "Open Logs");
+    let report_issue = CustomMenuItem::new("report_issue".to_string(), "Report Issue");
+
     let edit_menu = Submenu::new(
         "Edit",
         Menu::new()
@@ -10,5 +15,39 @@ pub fn build_menu() -> Menu {
             .add_native_item(MenuItem::SelectAll),
     );
 
-    Menu::new().add_submenu(edit_menu)
+    let help_menu = Submenu::new(
+        "Help",
+        Menu::new()
+            .add_item(open_logs)
+            .add_item(report_issue)
+    );
+
+    Menu::new().add_submenu(edit_menu).add_submenu(help_menu)
 }
+
+pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
+    match event_id {
+        "open_logs" => {
+            open_logs_folder();
+        }
+        "report_issue" => {
+            report_issue();
+        }
+      _ => {}
+    }
+}
+
+
+fn report_issue() {
+  tauri::async_runtime::spawn(async move {
+    open::that("https://github.com/perspect3vism/ad4min/issues/new")
+      .map_err(|err| format!("Could not open url: {}", err))
+  });
+}
+
+fn open_logs_folder() {
+  if let Err(err) = opener::open(data_path()) {
+    log::error!("Error opening logs folder: {}", err);
+  }
+}
+

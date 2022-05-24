@@ -4,7 +4,7 @@
 )]
 
 use config::holochain_binary_path;
-use config::app_url;
+use config::{app_url};
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{build_system_tray, handle_system_tray_event};
@@ -23,8 +23,9 @@ use tauri::Manager;
 use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
-use crate::util::find_port;
+use crate::util::{find_port};
 use tauri::State;
+use crate::menu::handle_menu_event;
 use crate::util::find_and_kill_processes;
 
 // the payload type must implement `Serialize` and `Clone`.
@@ -72,6 +73,7 @@ fn main() {
     let builder_result = tauri::Builder::default()
         .manage(state)
         .menu(build_menu())
+        .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
         .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {

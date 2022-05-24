@@ -1,23 +1,17 @@
-use crate::app_url;
+use crate::{app_url};
 
-use crate::config::log_path;
 use tauri::{
     AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
     WindowBuilder, WindowUrl, Wry,
 };
-use std::fs;
-use directories::UserDirs;
 use crate::util::find_and_kill_processes;
 
 pub fn build_system_tray() -> SystemTray {
     let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show/Hide Window");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let copy_logs = CustomMenuItem::new("copy_logs".to_string(), "Copy Logs");
 
     let sys_tray_menu = SystemTrayMenu::new()
         .add_item(toggle_window)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(copy_logs)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -38,18 +32,14 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
                 }
             }
         }
-        "copy_logs" => {
-            if let Some(user_dirs) = UserDirs::new() {
-                let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
-                fs::copy(log_path(), path);
-            }
-        }
         "quit" => {
             find_and_kill_processes("ad4m");
 
             find_and_kill_processes("holochain");
 
             find_and_kill_processes("lair-keystore");
+
+            app.exit(0);
         }
         _ => log::error!("Event is not defined."),
     }

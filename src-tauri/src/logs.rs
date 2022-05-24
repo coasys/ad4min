@@ -7,7 +7,7 @@ use log4rs::{
 };
 use std::fs;
 
-use crate::config::log_path;
+use crate::config::{log_path};
 
 pub fn setup_logs() -> Result<(), String> {
     fs::remove_file(log_path());
@@ -25,4 +25,4 @@ pub fn setup_logs() -> Result<(), String> {
     log4rs::init_config(config).map_err(|err| format!("Could not init log config: {:?}", err))?;
   
     Ok(())
-  }
+}
