@@ -104,6 +104,8 @@ export function AgentProvider({ children }: any) {
     console.log("agent status in generate: ", agentStatus);
 
     setLoading(false);
+
+    navigate('/profile');
   };
 
   const unlockAgent = async (password: string) => {
