@@ -1,8 +1,9 @@
 import { Anchor, AppShell, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Grain, Stack2, User, Settings as SettingsIcon } from 'tabler-icons-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { RouteContainer } from './styles';
+import { Ad4minContext } from '../context/Ad4minContext';
 
 type Props = {
   did: String,
@@ -70,6 +71,20 @@ const data = [
 const Navigation = (props: Props) => {
   const { classes, cx } = useStyles();
   const [active, setActive] = useState('Agent Profile');
+  const {state: {
+    connected,
+    isUnlocked
+  }} = useContext(Ad4minContext);
+
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    if (!connected) {
+      navigate('/connect');
+    } else if (connected && !isUnlocked) {
+      navigate('/login');
+    }
+}, [connected, isUnlocked, navigate])
 
   const links = data.map((item) => (
     <Anchor
