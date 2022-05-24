@@ -1,7 +1,7 @@
 import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Loader, Stack, TextInput } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
@@ -9,11 +9,7 @@ import { Ad4minContext } from './context/Ad4minContext';
 import { AgentContext, AgentProvider } from './context/AgentContext';
 import { buildAd4mClient } from './util';
 import { showNotification } from '@mantine/notifications';
-
-import { appWindow } from '@tauri-apps/api/window'
-appWindow.listen('tauri://close-requested', ({ event, payload }) => {
-  appWindow.hide()
-})
+import { appWindow } from '@tauri-apps/api/window';
 
 const App = () => {
   const {state: {
@@ -26,6 +22,21 @@ const App = () => {
   const [url, setURL] = useState("");
   const [urlError, setURLError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    let unlisten: () => void;
+
+    appWindow.listen('tauri://close-requested', ({ event, payload }) => {
+      appWindow.hide();
+    }).then((func) => {
+      unlisten = func;
+    }).catch(e => console.error(e));
+
+    return () => {
+      unlisten();
+    }
+  }, []);
 
   const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
