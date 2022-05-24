@@ -1,4 +1,6 @@
 use sysinfo::{ProcessExt, System, SystemExt, Signal};
+use tauri::{WindowBuilder, WindowUrl, Wry, AppHandle};
+use crate::app_url;
 use crate::config::executor_port_path;
 use std::fs::remove_file;
 use std::fs::File;
@@ -27,6 +29,24 @@ pub fn find_and_kill_processes(name: &str) {
         _ => {}
      }
   }
+}
+
+pub fn create_main_window(app: &AppHandle<Wry>) {
+  let url = app_url();
+
+  let new_ad4min_window = WindowBuilder::new(
+      app,
+      "AD4MIN",
+      WindowUrl::App(url.into()),
+  )
+  .center()
+  .focus()
+  .inner_size(1000.0, 700.0)
+  .title("AD4MIN");
+
+  log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
+
+  new_ad4min_window.build();
 }
 
 pub fn save_executor_port(port: u16) {

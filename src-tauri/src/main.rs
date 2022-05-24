@@ -7,7 +7,7 @@ use config::holochain_binary_path;
 use config::{app_url};
 use logs::setup_logs;
 use menu::build_menu;
-use system_tray::{build_system_tray, handle_system_tray_event};
+use system_tray::{ build_system_tray, handle_system_tray_event };
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
@@ -20,13 +20,10 @@ mod system_tray;
 mod menu;
 use tauri::api::dialog;
 use tauri::Manager;
-use directories::UserDirs;
-use std::fs;
-use crate::config::log_path;
 use crate::util::{find_port};
 use tauri::State;
-use crate::menu::handle_menu_event;
-use crate::util::{find_and_kill_processes, save_executor_port};
+use crate::menu::{handle_menu_event, open_logs_folder};
+use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -44,6 +41,8 @@ fn get_port(state: State<'_, FreePort>) -> u16 {
 fn main() {
     let free_port = find_port(12000, 13000);
 
+    log::info!("Free port: {:?}", free_port);
+    
     save_executor_port(free_port);
 
     find_and_kill_processes("ad4m");
@@ -51,8 +50,6 @@ fn main() {
     find_and_kill_processes("holochain");
 
     find_and_kill_processes("lair-keystore");
-
-    println!("Free port: {:?}", free_port);
 
     if let Err(err) = setup_logs() {
         println!("Error setting up the logs: {:?}", err);
@@ -68,8 +65,6 @@ fn main() {
         assert!(status.success());
     }
 
-    let url = app_url(free_port);
-
     let state = FreePort(free_port);
 
     let builder_result = tauri::Builder::default()
@@ -79,18 +74,17 @@ fn main() {
         .system_tray(build_system_tray())
         .invoke_handler(tauri::generate_handler![get_port])
         .setup(move |app| {
-            let ad4min = app.get_window("ad4min").unwrap();
+            let splashscreen = app.get_window("splashscreen").unwrap();
 
-            let ad4min_clone = ad4min.clone();
+            let splashscreen_clone = splashscreen.clone();
 
-            let _id = ad4min.listen("copyLogs", |event| {
-                println!("got window event-name with payload {:?} {:?}", event, event.payload());
+            let _id = splashscreen.listen("copyLogs", |event| {
+                log::info!("got window event-name with payload {:?} {:?}", event, event.payload());
 
-                if let Some(user_dirs) = UserDirs::new() {
-                    let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
-                    fs::copy(log_path(), path);
-                }
+                open_logs_folder();
             });
+
+            let handle = app.handle().clone();
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
@@ -105,17 +99,20 @@ fn main() {
                             log::info!("{}", line);
 
                             if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
-                                println!("Executor started on: {:?}", url);
-                                ad4min.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
-                                ad4min_clone.show();
+                                let url = app_url();
+                                log::info!("Executor started on: {:?}", url);
+                                splashscreen_clone.hide();
+                                create_main_window(&handle);
+                                let main = handle.get_window("AD4MIN").unwrap();
+                                main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
                             }
                         },
                         CommandEvent::Stderr(line) => log::error!("{}", line),
                         CommandEvent::Terminated(line) => {
-                            println!("Terminated {:?}", line);
+                            log::info!("Terminated {:?}", line);
 
                             dialog::message(
-                                Some(&ad4min_clone), 
+                                Some(&splashscreen_clone), 
                                 "Error", 
                                 "Something went wrong while starting ad4m-executor please check the logs"
                             );
@@ -131,7 +128,7 @@ fn main() {
         })
         .on_system_tray_event(move |app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id, free_port)
+                handle_system_tray_event(app, id)
             }
             _ => {}
         })
@@ -149,3 +146,4 @@ fn main() {
         Err(err) => log::error!("Error building the app: {:?}", err),
     }
 }
+

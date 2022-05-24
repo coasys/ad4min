@@ -25,7 +25,7 @@ pub fn build_menu() -> Menu {
     Menu::new().add_submenu(edit_menu).add_submenu(help_menu)
 }
 
-pub fn handle_menu_event(event_id: &str, window: &Window<Wry>) {
+pub fn handle_menu_event(event_id: &str, _window: &Window<Wry>) {
     match event_id {
         "open_logs" => {
             open_logs_folder();
@@ -45,7 +45,7 @@ fn report_issue() {
   });
 }
 
-fn open_logs_folder() {
+pub fn open_logs_folder() {
   if let Err(err) = opener::open(data_path()) {
     log::error!("Error opening logs folder: {}", err);
   }

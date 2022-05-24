@@ -1,10 +1,7 @@
-import { showNotification } from "@mantine/notifications";
-import { Ad4mClient, ExceptionType, Link } from "@perspect3vism/ad4m";
-import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
-import { createContext, useContext, useEffect, useState } from "react";
-import { AD4M_ENDPOINT } from "../config";
+import { Link } from "@perspect3vism/ad4m";
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME } from "../constants/triples";
-import { buildAd4mClient } from "../util";
 import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
@@ -40,7 +37,8 @@ export function AgentProvider({ children }: any) {
   }, methods: {
     handleLogin
   }} = useContext(Ad4minContext);
-  
+  let navigate = useNavigate();
+
   const [state, setState] = useState(initialState.state);
 
   
@@ -106,6 +104,8 @@ export function AgentProvider({ children }: any) {
     console.log("agent status in generate: ", agentStatus);
 
     setLoading(false);
+
+    navigate('/profile');
   };
 
   const unlockAgent = async (password: string) => {
@@ -118,6 +118,8 @@ export function AgentProvider({ children }: any) {
     console.log("agent status in unlock: ", agentStatus);
 
     setLoading(false);
+
+    navigate('/profile');
   }
 
   const lockAgent = async (passphrase: string) => {

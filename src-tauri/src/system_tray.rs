@@ -1,10 +1,9 @@
-use crate::{app_url};
-
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
-    WindowBuilder, WindowUrl, Wry,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem, Wry,
 };
 use crate::util::find_and_kill_processes;
+use crate::create_main_window;
+use crate::Payload;
 use crate::config::executor_port_path;
 use std::fs::remove_file;
 
@@ -20,10 +19,10 @@ pub fn build_system_tray() -> SystemTray {
     SystemTray::new().with_menu(sys_tray_menu)
 }
 
-pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u16) {
+pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
     match event_id.as_str() {
         "toggle_window" => {
-            let ad4min_window = app.get_window("ad4min");
+            let ad4min_window = app.get_window("AD4MIN");
 
             if let Some(window) = ad4min_window {
                 if let Ok(true) = window.is_visible() {
@@ -32,6 +31,10 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
                     window.show().unwrap();
                     window.set_focus().unwrap();                
                 }
+            } else {                
+                create_main_window(app);
+                let main = app.get_window("AD4MIN").unwrap();
+                main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
             }
         }
         "quit" => {

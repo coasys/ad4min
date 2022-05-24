@@ -19,13 +19,13 @@ pub fn holochain_binary_path() -> PathBuf {
 }
 
 #[cfg(feature = "custom-protocol")]
-pub fn app_url(port: u16) -> String {
-    format!("index.html?ad4m=ws://localhost:{}/graphql", port)
+pub fn app_url() -> String {
+    "index.html".to_string()
 }
 
 #[cfg(not(feature = "custom-protocol"))]
-pub fn app_url(port: u16) -> String {
-    format!("http://localhost:3000?ad4m=ws://localhost:{}/graphql", port)
+pub fn app_url() -> String {
+    "http://localhost:3000".to_string()
 }
 
 pub fn executor_port_path() -> PathBuf {
