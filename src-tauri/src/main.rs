@@ -10,7 +10,7 @@ use menu::build_menu;
 use system_tray::{build_system_tray, handle_system_tray_event};
 use tauri::{
     api::process::{Command, CommandEvent},
-    RunEvent, SystemTrayEvent,
+    RunEvent, SystemTrayEvent
 };
 
 mod config;
@@ -28,6 +28,7 @@ use crate::util::{find_port, open_url};
 use tauri::State;
 use crate::commands::help::open_logs_folder;
 use crate::menu::handle_menu_event;
+use crate::util::find_and_kill_processes;
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -44,6 +45,12 @@ fn get_port(state: State<'_, FreePort>) -> u16 {
 
 fn main() {
     let free_port = find_port(12000, 13000);
+
+    find_and_kill_processes("ad4m");
+
+    find_and_kill_processes("holochain");
+
+    find_and_kill_processes("lair-keystore");
 
     println!("Free port: {:?}", free_port);
 
