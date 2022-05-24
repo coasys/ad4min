@@ -18,7 +18,6 @@ mod util;
 mod logs;
 mod system_tray;
 mod menu;
-mod commands;
 use tauri::api::dialog;
 use tauri::Manager;
 use directories::UserDirs;
