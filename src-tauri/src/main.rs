@@ -12,10 +12,6 @@ use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
 };
-use tauri::WindowUrl;
-use tauri::WindowBuilder;
-use tauri::Wry;
-use tauri::AppHandle;
 
 mod config;
 mod util;
@@ -27,7 +23,7 @@ use tauri::Manager;
 use crate::util::{find_port};
 use tauri::State;
 use crate::menu::{handle_menu_event, open_logs_folder};
-use crate::util::find_and_kill_processes;
+use crate::util::{find_and_kill_processes, create_main_window};
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -104,7 +100,7 @@ fn main() {
                                 let url = app_url();
                                 log::info!("Executor started on: {:?}", url);
                                 splashscreen_clone.hide();
-                                create_window(&handle);
+                                create_main_window(&handle);
                                 let main = handle.get_window("ad4min").unwrap();
                                 main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
                             }
@@ -149,20 +145,3 @@ fn main() {
     }
 }
 
-fn create_window(app: &AppHandle<Wry>) {
-    let url = app_url();
-
-    let new_ad4min_window = WindowBuilder::new(
-        app,
-        "ad4min",
-        WindowUrl::App(url.into()),
-    )
-    .center()
-    .focus()
-    .inner_size(1000.0, 700.0)
-    .title("Admin UI");
-
-    log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
-
-    new_ad4min_window.build();
-}

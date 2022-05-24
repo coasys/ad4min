@@ -1,4 +1,6 @@
 use sysinfo::{ProcessExt, System, SystemExt, Signal};
+use tauri::{WindowBuilder, WindowUrl, Wry, AppHandle};
+use crate::app_url;
 
 pub fn find_port(start_port: u16, end_port: u16) -> u16 {
   for x in start_port..end_port {
@@ -24,3 +26,22 @@ pub fn find_and_kill_processes(name: &str) {
      }
   }
 }
+
+pub fn create_main_window(app: &AppHandle<Wry>) {
+  let url = app_url();
+
+  let new_ad4min_window = WindowBuilder::new(
+      app,
+      "ad4min",
+      WindowUrl::App(url.into()),
+  )
+  .center()
+  .focus()
+  .inner_size(1000.0, 700.0)
+  .title("Admin UI");
+
+  log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
+
+  new_ad4min_window.build();
+}
+

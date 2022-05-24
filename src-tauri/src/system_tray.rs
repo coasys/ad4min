@@ -1,10 +1,9 @@
-use crate::{app_url};
-
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
-    WindowBuilder, WindowUrl, Wry,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem, Wry,
 };
 use crate::util::find_and_kill_processes;
+use crate::create_main_window;
+use crate::Payload;
 
 pub fn build_system_tray() -> SystemTray {
     let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show/Hide Window");
@@ -31,21 +30,9 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
                     window.set_focus().unwrap();                
                 }
             } else {                
-                let url = app_url();
-
-                let new_ad4min_window = WindowBuilder::new(
-                    app,
-                    "ad4min",
-                    WindowUrl::App(url.into()),
-                )
-                .focus()
-                .center()
-                .inner_size(1000.0, 700.0)
-                .title("Admin UI");
-
-                log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
-
-                new_ad4min_window.build();
+                create_main_window(app);
+                let main = app.get_window("ad4min").unwrap();
+                main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
             }
         }
         "quit" => {
