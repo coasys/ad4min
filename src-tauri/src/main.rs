@@ -26,7 +26,7 @@ use crate::config::log_path;
 use crate::util::{find_port};
 use tauri::State;
 use crate::menu::handle_menu_event;
-use crate::util::find_and_kill_processes;
+use crate::util::{find_and_kill_processes, save_executor_port};
 
 // the payload type must implement `Serialize` and `Clone`.
 #[derive(Clone, serde::Serialize)]
@@ -43,6 +43,8 @@ fn get_port(state: State<'_, FreePort>) -> u16 {
 
 fn main() {
     let free_port = find_port(12000, 13000);
+
+    save_executor_port(free_port);
 
     find_and_kill_processes("ad4m");
 

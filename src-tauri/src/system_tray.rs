@@ -5,6 +5,8 @@ use tauri::{
     WindowBuilder, WindowUrl, Wry,
 };
 use crate::util::find_and_kill_processes;
+use crate::config::executor_port_path;
+use std::fs::remove_file;
 
 pub fn build_system_tray() -> SystemTray {
     let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show/Hide Window");
@@ -38,6 +40,8 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String, port: u1
             find_and_kill_processes("holochain");
 
             find_and_kill_processes("lair-keystore");
+
+            remove_file(executor_port_path());
 
             app.exit(0);
         }

@@ -27,3 +27,7 @@ pub fn app_url(port: u16) -> String {
 pub fn app_url(port: u16) -> String {
     format!("http://localhost:3000?ad4m=ws://localhost:{}/graphql", port)
 }
+
+pub fn executor_port_path() -> PathBuf {
+    data_path().join("executor-port")
+}
