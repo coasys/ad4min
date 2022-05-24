@@ -15,6 +15,7 @@ import Perspectives from './components/Perspectives';
 import Profile from './components/Profile';
 import Language from './components/Language';
 import Settings from './components/Settings';
+import { appWindow } from '@tauri-apps/api/window';
 
 const App = () => {
   const {state: {
@@ -29,6 +30,21 @@ const App = () => {
   const [url, setURL] = useState("");
   const [urlError, setURLError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    let unlisten: () => void;
+
+    appWindow.listen('tauri://close-requested', ({ event, payload }) => {
+      appWindow.hide();
+    }).then((func) => {
+      unlisten = func;
+    }).catch(e => console.error(e));
+
+    return () => {
+      unlisten();
+    }
+  }, []);
 
   const onUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
