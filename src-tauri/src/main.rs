@@ -24,12 +24,9 @@ mod system_tray;
 mod menu;
 use tauri::api::dialog;
 use tauri::Manager;
-use directories::UserDirs;
-use std::fs;
-use crate::config::log_path;
 use crate::util::{find_port};
 use tauri::State;
-use crate::menu::handle_menu_event;
+use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::find_and_kill_processes;
 
 // the payload type must implement `Serialize` and `Clone`.
@@ -86,10 +83,7 @@ fn main() {
             let _id = splashscreen.listen("copyLogs", |event| {
                 log::info!("got window event-name with payload {:?} {:?}", event, event.payload());
 
-                if let Some(user_dirs) = UserDirs::new() {
-                    let path = user_dirs.desktop_dir().unwrap().join("ad4min.log");
-                    fs::copy(log_path(), path);
-                }
+                open_logs_folder();
             });
 
             let handle = app.handle().clone();
