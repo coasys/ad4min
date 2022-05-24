@@ -1,9 +1,11 @@
-use crate::open_url;
 use crate::config::data_path;
 
 #[tauri::command]
 pub fn report_issue() {
-  open_url("https://github.com/perspect3vism/ad4min/issues/new".into()).unwrap();
+  tauri::async_runtime::spawn(async move {
+    open::that("https://github.com/perspect3vism/ad4min/issues/new")
+      .map_err(|err| format!("Could not open url: {}", err))
+  });
 }
 
 #[tauri::command]

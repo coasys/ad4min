@@ -24,7 +24,7 @@ use tauri::Manager;
 use directories::UserDirs;
 use std::fs;
 use crate::config::log_path;
-use crate::util::{find_port, open_url};
+use crate::util::{find_port};
 use tauri::State;
 use crate::commands::help::open_logs_folder;
 use crate::menu::handle_menu_event;
@@ -77,7 +77,7 @@ fn main() {
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_port, open_url, open_logs_folder])
+        .invoke_handler(tauri::generate_handler![get_port, open_logs_folder])
         .setup(move |app| {
             let ad4min = app.get_window("ad4min").unwrap();
 
