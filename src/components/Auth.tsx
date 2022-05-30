@@ -77,7 +77,7 @@ const Auth = (props: Props) => {
       <Modal
         size="lg"
         opened={opened}
-        onClose={() => closeModal()}
+        onClose={closeModal}
         title="Request Capabilities"
       >
         <Stack>
