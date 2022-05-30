@@ -46,6 +46,10 @@ fn get_port(state: State<'_, AppState>) -> u16 {
 }
 
 fn main() {
+    if let Err(err) = setup_logs() {
+        println!("Error setting up the logs: {:?}", err);
+    }
+
     let free_port = find_port(12000, 13000);
 
     log::info!("Free port: {:?}", free_port);
@@ -57,10 +61,6 @@ fn main() {
     find_and_kill_processes("holochain");
 
     find_and_kill_processes("lair-keystore");
-
-    if let Err(err) = setup_logs() {
-        println!("Error setting up the logs: {:?}", err);
-    }
 
     if !holochain_binary_path().exists() {
         log::info!("init command by copy holochain binary");
@@ -84,7 +84,10 @@ fn main() {
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_port])
+        .invoke_handler(tauri::generate_handler![
+            get_port,
+            request_credential,
+        ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
 
@@ -148,9 +151,6 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![
-            request_credential,
-        ])
         .build(tauri::generate_context!());
 
     match builder_result {

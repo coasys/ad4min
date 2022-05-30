@@ -37,7 +37,7 @@ export function Connect() {
         setURLError('Invalid websocket URL')
       } else {
         try {
-          const client = buildAd4mClient(url!)
+          const client = await buildAd4mClient(url!)
 
           const id = setTimeout(() => {
             resolve(true)

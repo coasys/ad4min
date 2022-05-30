@@ -134,7 +134,7 @@ export function Ad4minProvider({ children }: any) {
   }, [handleLogin]);
 
   const connect = useCallback(async (url: string) => {
-    const client = buildAd4mClient(url);
+    const client = await buildAd4mClient(url);
     try {
       await checkConnection(url, client);
 
@@ -225,14 +225,17 @@ export function Ad4minProvider({ children }: any) {
   }
 
   useEffect(() => {
-    if (state.url) {
-      console.log('gggg 0', state.url);
-      const client = buildAd4mClient(state.url)
+    const build = async () => {
+      const client = await buildAd4mClient(state.url)
       
       setState((prev) => ({
         ...prev,
         client
       }));
+    }
+    if (state.url) {
+      console.log('gggg 0', state.url);
+      build();
     }
   }, [state.url])
 

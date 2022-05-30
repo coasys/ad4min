@@ -9,10 +9,6 @@ export async function buildAd4mClient(server: string): Promise<Ad4mClient> {
 	return buildClient(server, token);
 }
 
-// export function buildDefaultAd4mClient(server: string): Ad4mClient {
-// 	return buildClient(server, "test-token");
-// }
-
 function buildClient(server: string, token: string): Ad4mClient {
 	let apolloClient = new ApolloClient({
 		link: new WebSocketLink({
