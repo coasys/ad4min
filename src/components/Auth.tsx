@@ -99,7 +99,7 @@ const Auth = (props: Props) => {
           <Text>Request for these capabilities,</Text>
           {showCapabilities(authInfo.capabilities)}
           <Group>
-            <Button variant="outline" onClick={() => closeModal()}>
+            <Button variant="outline" onClick={closeModal}>
               Close
             </Button>
             <Space h="md" />
