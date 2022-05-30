@@ -18,11 +18,12 @@ Install ad4m-host binaries,
 Run frontend dev server,
 
 ```shell
-npm start
+yarn install
+yarn start
 ```
 
 In another terminal, run the tauri app,
 
 ```shell
-npm run tauri dev
+yarn run tauri dev
 ```
