@@ -25,5 +25,5 @@ yarn start
 In another terminal, run the tauri app,
 
 ```shell
-yarn run tauri dev
+yarn tauri dev
 ```
