@@ -5,10 +5,13 @@ use log4rs::{
     encode::pattern::PatternEncoder,
     Config,
 };
+use std::fs;
 
-use crate::config::log_path;
+use crate::config::{log_path};
 
 pub fn setup_logs() -> Result<(), String> {
+    fs::remove_file(log_path());
+
     let logfile = FileAppender::builder()
       .encoder(Box::new(PatternEncoder::new("[{d}] {l} - {m}\n")))
       .build(log_path())
@@ -22,4 +25,4 @@ pub fn setup_logs() -> Result<(), String> {
     log4rs::init_config(config).map_err(|err| format!("Could not init log config: {:?}", err))?;
   
     Ok(())
-  }
+}

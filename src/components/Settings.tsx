@@ -1,6 +1,8 @@
-import { Avatar, Button, Card, Container, Group, List, Modal, PasswordInput, Space, Text, ThemeIcon, Title } from '@mantine/core';
+import { ActionIcon, Button, Container, Group, Modal, PasswordInput, Space, Text, Title } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { useContext, useState } from 'react';
-import { Stack } from 'tabler-icons-react';
+import { Copy } from 'tabler-icons-react';
+import { Ad4minContext } from '../context/Ad4minContext';
 import { AgentContext } from '../context/AgentContext';
 import { MainContainer, MainHeader } from './styles';
 
@@ -11,7 +13,12 @@ function Settings() {
     },
     methods: {
     lockAgent
-  }} = useContext(AgentContext)
+  }} = useContext(AgentContext);
+
+  const {
+    state: {
+      url
+    }} = useContext(Ad4minContext);
 
   const [password, setPassword] = useState('');
   const [lockAgentModalOpen, setLockAgentModalOpen] = useState(false);
@@ -22,6 +29,14 @@ function Settings() {
     setPassword(value);
   }
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(url);
+    showNotification({
+      message: 'URL copied to clipboard',
+      autoClose: 1000
+    });
+  }
+
   return (
     <Container
       style={MainContainer}
@@ -29,11 +44,21 @@ function Settings() {
       <div style={MainHeader}>
         <Title order={3}>Settings</Title>
       </div>
-      <div style={{
-        paddingTop: 80
+      <Container style={{
+        padding: '80px 20px 20px 20px'
       }}>
+        <div>
+          <Group align="center" style={{}}>
+            <Text size="lg" weight={700}>Connected executor URL: </Text>
+            <span>{url}</span>
+            <ActionIcon onClick={copyToClipboard}>
+              <Copy />
+            </ActionIcon>
+          </Group>
+        </div>
+        <Space h="md" />
         <Button onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
-      </div>
+      </Container>
       <Modal
         opened={lockAgentModalOpen}
         onClose={() => setLockAgentModalOpen(false)}

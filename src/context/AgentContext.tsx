@@ -1,7 +1,6 @@
-import { showNotification } from "@mantine/notifications";
-import { Ad4mClient, ExceptionType, Link } from "@perspect3vism/ad4m";
-import { ExceptionInfo } from "@perspect3vism/ad4m/lib/src/runtime/RuntimeResolver";
-import { createContext, useContext, useEffect, useState } from "react";
+import { Link } from "@perspect3vism/ad4m";
+import { createContext, useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME } from "../constants/triples";
 import { Ad4minContext } from "./Ad4minContext";
 
@@ -38,7 +37,8 @@ export function AgentProvider({ children }: any) {
   }, methods: {
     handleLogin
   }} = useContext(Ad4minContext);
-  
+  let navigate = useNavigate();
+
   const [state, setState] = useState(initialState.state);
 
   
@@ -99,21 +99,27 @@ export function AgentProvider({ children }: any) {
       links: cleanedLinks
     })
 
-    handleLogin(agentStatus.isUnlocked, agentStatus.did!);
+    handleLogin(client!, agentStatus.isUnlocked, agentStatus.did!);
 
     console.log("agent status in generate: ", agentStatus);
 
     setLoading(false);
+
+    navigate('/profile');
   };
 
   const unlockAgent = async (password: string) => {
     setLoading(true)
+    
     let agentStatus = await client?.agent.unlock(password);
-    handleLogin(agentStatus!.isUnlocked, agentStatus!.did!);
+
+    handleLogin(client!, agentStatus!.isUnlocked, agentStatus!.did!);
 
     console.log("agent status in unlock: ", agentStatus);
 
     setLoading(false);
+
+    navigate('/profile');
   }
 
   const lockAgent = async (passphrase: string) => {
@@ -121,7 +127,7 @@ export function AgentProvider({ children }: any) {
 
     const status = await client!.agent.lock(passphrase);
 
-    handleLogin(status!.isUnlocked, status!.did!);
+    handleLogin(client!, status!.isUnlocked, status!.did!);
 
     setLoading(false);
   } 

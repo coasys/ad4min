@@ -1,19 +1,18 @@
-use std::thread;
-use std::time::Duration;
-
-use tauri::api::process::CommandChild;
-
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem,
-    WindowBuilder, WindowUrl, Wry,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayMenu, SystemTrayMenuItem, Wry,
 };
+use crate::util::find_and_kill_processes;
+use crate::create_main_window;
+use crate::Payload;
+use crate::config::executor_port_path;
+use std::fs::remove_file;
 
 pub fn build_system_tray() -> SystemTray {
-    let show_ad4min = CustomMenuItem::new("show_ad4min".to_string(), "Show Ad4min");
+    let toggle_window = CustomMenuItem::new("toggle_window".to_string(), "Show/Hide Window");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
 
     let sys_tray_menu = SystemTrayMenu::new()
-        .add_item(show_ad4min)
+        .add_item(toggle_window)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -22,22 +21,31 @@ pub fn build_system_tray() -> SystemTray {
 
 pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
     match event_id.as_str() {
-        "show_ad4min" => {
-            let ad4min_window = app.get_window("ad4min");
+        "toggle_window" => {
+            let ad4min_window = app.get_window("AD4MIN");
 
             if let Some(window) = ad4min_window {
-                window.show().unwrap();
-                window.set_focus().unwrap();
-            } else {
-                let new_ad4min_window = WindowBuilder::new(
-                    app,
-                    "ad4min",
-                    WindowUrl::App("index.html".into()),
-                );
-                log::info!("Creating ad4min UI {:?}", new_ad4min_window);
+                if let Ok(true) = window.is_visible() {
+                    window.hide();
+                } else {
+                    window.show().unwrap();
+                    window.set_focus().unwrap();                
+                }
+            } else {                
+                create_main_window(app);
+                let main = app.get_window("AD4MIN").unwrap();
+                main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
             }
         }
         "quit" => {
+            find_and_kill_processes("ad4m");
+
+            find_and_kill_processes("holochain");
+
+            find_and_kill_processes("lair-keystore");
+
+            remove_file(executor_port_path());
+
             app.exit(0);
         }
         _ => log::error!("Event is not defined."),

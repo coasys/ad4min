@@ -17,3 +17,17 @@ pub fn binary_path() -> PathBuf {
 pub fn holochain_binary_path() -> PathBuf {
     binary_path().join("holochain")
 }
+
+#[cfg(feature = "custom-protocol")]
+pub fn app_url() -> String {
+    "index.html".to_string()
+}
+
+#[cfg(not(feature = "custom-protocol"))]
+pub fn app_url() -> String {
+    "http://localhost:3000".to_string()
+}
+
+pub fn executor_port_path() -> PathBuf {
+    data_path().join("executor-port")
+}

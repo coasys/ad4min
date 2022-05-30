@@ -1,8 +1,9 @@
 import { PasswordInput, Button, Stack, TextInput, ActionIcon, Tooltip } from '@mantine/core';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AgentContext } from '../context/AgentContext';
 import { Link } from 'tabler-icons-react';
 import { Ad4minContext } from '../context/Ad4minContext';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = (props: any) => {
@@ -16,10 +17,13 @@ const Login = (props: any) => {
   const {state: {
     isInitialized,
     isUnlocked,
+    connected
   }, methods: {
     resetEndpoint
   }} = useContext(Ad4minContext)
   
+  let navigate = useNavigate();
+
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -42,6 +46,14 @@ const Login = (props: any) => {
     const { value } = event.target;
     setLastName(value);
   }
+
+  useEffect(() => {
+      if (!connected) {
+        navigate('/connect');
+      } else if (connected && isUnlocked) {
+        navigate('/profile');
+      }
+  }, [connected, isUnlocked, navigate])
 
   return (
     <div>

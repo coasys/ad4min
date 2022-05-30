@@ -5,8 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
-import { AgentProvider } from './context/AgentContext';
 import { Ad4minProvider } from './context/Ad4minContext';
+import { BrowserRouter as Router} from 'react-router-dom';
 
 
 ReactDOM.render(
@@ -14,7 +14,9 @@ ReactDOM.render(
     <MantineProvider>
       <NotificationsProvider>
         <Ad4minProvider>
-          <App />
+          <Router>
+            <App />
+          </Router>
         </Ad4minProvider>
       </NotificationsProvider>
     </MantineProvider>
