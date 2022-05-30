@@ -3,9 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use commands::credential::request_credential;
+use commands::state::{request_credential, get_port};
 use config::holochain_binary_path;
-use config::{app_url};
+use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{ build_system_tray, handle_system_tray_event };
@@ -24,8 +24,7 @@ mod commands;
 
 use tauri::api::dialog;
 use tauri::Manager;
-use crate::util::{find_port};
-use tauri::State;
+use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
 
@@ -38,11 +37,6 @@ struct Payload {
 pub struct AppState {
     graphql_port: u16,
     req_credential: String,
-}
-
-#[tauri::command]
-fn get_port(state: State<'_, AppState>) -> u16 {
-    state.graphql_port
 }
 
 fn main() {

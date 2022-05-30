@@ -22,7 +22,6 @@ const App = () => {
     candidate, did, auth
   }, methods: {
     handleTrustAgent,
-    handleAuth,
   }} = useContext(Ad4minContext);
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const App = () => {
       />
       </Routes>
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
-      {auth && <Auth info={auth} handleAuth={handleAuth} />}
+      {auth && <Auth />}
     </div>
   );
 }

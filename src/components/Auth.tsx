@@ -4,11 +4,6 @@ import { showNotification } from '@mantine/notifications';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { CircleCheck } from 'tabler-icons-react';
 
-type Props = {
-  info: string,
-  handleAuth: (auth: string) => void,
-}
-
 interface Capability {
   with: Resource,
   can: string[],
@@ -19,23 +14,21 @@ interface Resource {
   pointers: string[],
 }
 
-const Auth = (props: Props) => {
+const Auth = () => {
   const {
     state: {
-      client
+      client,
+      auth,
+    },
+    methods: {
+      handleAuth,
     }
   } = useContext(Ad4minContext);
 
-  const [opened, setOpened] = useState(false);
-
-  const authInfo = JSON.parse(props.info).auth;
-
-  useEffect(() => {
-    setOpened(true);
-  }, []);
+  const authInfo = JSON.parse(auth).auth;
 
   const permitCapability = async () => {
-    let result = await client!.agent.permitCapability(props.info);
+    let result = await client!.agent.permitCapability(auth);
 
     let permitResult = JSON.stringify(result);
     console.log(`permit result: ${permitResult}`);
@@ -49,7 +42,7 @@ const Auth = (props: Props) => {
   }
 
   const closeModal = () => {
-    props.handleAuth("");
+    handleAuth("");
   }
 
   const showCapabilities = (capabilities: Capability[]) => {
@@ -76,7 +69,7 @@ const Auth = (props: Props) => {
     <div>
       <Modal
         size="lg"
-        opened={opened}
+        opened
         onClose={closeModal}
         title="Request Capabilities"
       >
