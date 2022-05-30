@@ -1,11 +1,22 @@
-import { Button, Group, Modal, Space, Stack, TextInput } from '@mantine/core';
+import { Button, Group, Modal, Space, Stack, Text, TextInput, List, ThemeIcon } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
 import { showNotification } from '@mantine/notifications';
 import { Ad4minContext } from '../context/Ad4minContext';
+import { CircleCheck } from 'tabler-icons-react';
 
 type Props = {
   info: string,
   handleAuth: (auth: string) => void,
+}
+
+interface Capability {
+  with: Resource,
+  can: string[],
+}
+
+interface Resource {
+  domain: string,
+  pointers: string[],
 }
 
 const Auth = (props: Props) => {
@@ -16,6 +27,8 @@ const Auth = (props: Props) => {
   } = useContext(Ad4minContext);
 
   const [opened, setOpened] = useState(false);
+
+  const authInfo = JSON.parse(props.info).auth;
 
   useEffect(() => {
     setOpened(true);
@@ -29,12 +42,34 @@ const Auth = (props: Props) => {
 
     closeModal();
     showNotification({
-      message: `Great, the authentication is permitted now! 🤥   ${permitResult}`,
+      title: "Capability is permitted!",
+      message: `Now go to App, and input the 6 digits secret code: ${permitResult}`,
+      autoClose: false,
     })
   }
 
   const closeModal = () => {
     props.handleAuth("");
+  }
+
+  const showCapabilities = (capabilities: Capability[]) => {
+    return (
+      <List
+        spacing="xs"
+        size="sm"
+        center
+        icon={
+          <ThemeIcon color="teal" size={24} radius="xl">
+            <CircleCheck size={16} />
+          </ThemeIcon>
+        }
+      >
+        {
+          capabilities.map(cap => <List.Item>{`${cap.can} => ${cap.with.domain}.${cap.with.pointers}`}</List.Item>)
+        }
+      </List>
+
+    )
   }
 
   return (
@@ -43,39 +78,26 @@ const Auth = (props: Props) => {
         size="lg"
         opened={opened}
         onClose={() => closeModal()}
-        title="Request Authentication"
+        title="Request Capabilities"
       >
         <Stack>
-          <TextInput
-            value={props.info}
-            label="Auth Information"
+        <TextInput
+            value={authInfo.appName}
+            label="App Name"
             disabled
           />
           <TextInput
-            value={JSON.parse(props.info).auth.appName}
-            label="app name"
+            value={authInfo.appDesc}
+            label="App Description"
             disabled
           />
           <TextInput
-            value={JSON.parse(props.info).auth.appDesc}
-            label="app desc"
+            value={authInfo.appUrl}
+            label="App URL"
             disabled
           />
-          <TextInput
-            value={JSON.parse(props.info).auth.appUrl}
-            label="app url"
-            disabled
-          />
-          <TextInput
-            value={JSON.stringify(JSON.parse(props.info).auth.capabilities)}
-            label="app cap"
-            disabled
-          />
-          <TextInput
-            defaultValue={JSON.parse(props.info).requestId}
-            label="request id"
-            disabled
-          />
+          <Text>Request for these capabilities,</Text>
+          {showCapabilities(authInfo.capabilities)}
           <Group>
             <Button variant="outline" onClick={() => closeModal()}>
               Close
