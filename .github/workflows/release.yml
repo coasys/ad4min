@@ -35,10 +35,8 @@ jobs:
         if: matrix.platform == 'windows-2019'
         shell: bash
         run: |
-          ls -al
           mkdir src-tauri/bins
           cd src-tauri/bins
-          ls -al
           curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-gnu.exe
           curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-msvc.exe
       - name: build the app
