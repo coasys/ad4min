@@ -3,8 +3,9 @@
     windows_subsystem = "windows"
 )]
 
+use commands::state::{request_credential, get_port};
 use config::holochain_binary_path;
-use config::{app_url};
+use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{ build_system_tray, handle_system_tray_event };
@@ -12,16 +13,18 @@ use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
 };
+use uuid::Uuid;
 
 mod config;
 mod util;
 mod logs;
 mod system_tray;
 mod menu;
+mod commands;
+
 use tauri::api::dialog;
 use tauri::Manager;
-use crate::util::{find_port};
-use tauri::State;
+use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
 
@@ -31,14 +34,16 @@ struct Payload {
   message: String,
 }
 
-pub struct FreePort(pub u16);
-
-#[tauri::command]
-fn get_port(state: State<'_, FreePort>) -> u16 {
-    state.0
+pub struct AppState {
+    graphql_port: u16,
+    req_credential: String,
 }
 
 fn main() {
+    if let Err(err) = setup_logs() {
+        println!("Error setting up the logs: {:?}", err);
+    }
+
     let free_port = find_port(12000, 13000);
 
     log::info!("Free port: {:?}", free_port);
@@ -51,10 +56,6 @@ fn main() {
 
     find_and_kill_processes("lair-keystore");
 
-    if let Err(err) = setup_logs() {
-        println!("Error setting up the logs: {:?}", err);
-    }
-
     if !holochain_binary_path().exists() {
         log::info!("init command by copy holochain binary");
         let status = Command::new_sidecar("ad4m")
@@ -65,14 +66,22 @@ fn main() {
         assert!(status.success());
     }
 
-    let state = FreePort(free_port);
+    let req_credential = Uuid::new_v4().to_string();
+
+    let state = AppState {
+        graphql_port: free_port,
+        req_credential: req_credential.clone(),
+    };
 
     let builder_result = tauri::Builder::default()
         .manage(state)
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
-        .invoke_handler(tauri::generate_handler![get_port])
+        .invoke_handler(tauri::generate_handler![
+            get_port,
+            request_credential,
+        ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
 
@@ -88,7 +97,11 @@ fn main() {
 
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
-            .args(["serve", "--port", &free_port.to_string()])
+            .args([
+                "serve",
+                "--port", &free_port.to_string(),
+                "--reqCredential", &req_credential,
+            ])
             .spawn()
             .expect("Failed to spawn ad4m serve");
     
@@ -146,4 +159,3 @@ fn main() {
         Err(err) => log::error!("Error building the app: {:?}", err),
     }
 }
-

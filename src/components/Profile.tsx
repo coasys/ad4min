@@ -28,7 +28,7 @@ const Profile = (props: Props) => {
 
   const getTrustedAgents = useCallback(async () => {
     if (url) {
-      const client = buildAd4mClient(url);
+      const client = await buildAd4mClient(url);
       const trustedAgents = await client!.runtime.getTrustedAgents()
       
       const tempTempAgents = [];
@@ -71,7 +71,7 @@ const Profile = (props: Props) => {
 
   const fetchCurrentAgentProfile = useCallback(async () => {
     if (url) {
-      const client = buildAd4mClient(url);
+      const client = await buildAd4mClient(url);
       const agent = await client!.agent.me();
   
       const profile = await fetchProfile(agent);

@@ -41,8 +41,8 @@ jobs:
       - name: download Windows ad4m-host
         if: matrix.platform == 'windows-2019'
         run: |
-          wget "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.21/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe"
-          wget "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.21/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
+          wget "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe"
+          wget "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
       - name: build the app
         run: npm run build-all
       - uses: tauri-apps/tauri-action@v0

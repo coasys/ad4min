@@ -14,6 +14,7 @@ type State = {
   loading: boolean;
   client: Ad4mClient | null;
   candidate: string;
+  auth: string;
   connected: boolean;
   connectedLaoding: boolean;
 }
@@ -24,7 +25,7 @@ type ContextProps = {
     configureEndpoint: (str: string) => void,
     resetEndpoint: () => void
     handleTrustAgent: (str: string) => void,
-    
+    handleAuth: (str: string) => void,
     handleLogin: (client: Ad4mClient, login: Boolean, did: string) => void,
   };
 }
@@ -38,6 +39,7 @@ const initialState: ContextProps = {
     client: null,
     loading: false,
     candidate: '',
+    auth: '',
     connected: false,
     connectedLaoding: true
   },
@@ -45,6 +47,7 @@ const initialState: ContextProps = {
     configureEndpoint: () => null,
     resetEndpoint: () => null,
     handleTrustAgent: () => null,
+    handleAuth: () => null,
     handleLogin: () => null 
   }
 }
@@ -101,6 +104,12 @@ export function Ad4minProvider({ children }: any) {
             candidate: exception.addon!
           }));
         }
+        if (exception.type === ExceptionType.CapabilityRequested) {
+          setState((prev) => ({
+            ...prev,
+            auth: exception.addon!
+          }))
+        }
         Notification.requestPermission()
           .then(response => {
             if (response === 'granted') {
@@ -125,7 +134,7 @@ export function Ad4minProvider({ children }: any) {
   }, [handleLogin]);
 
   const connect = useCallback(async (url: string) => {
-    const client = buildAd4mClient(url);
+    const client = await buildAd4mClient(url);
     try {
       await checkConnection(url, client);
 
@@ -187,6 +196,13 @@ export function Ad4minProvider({ children }: any) {
     }));
   }
 
+  const handleAuth = (auth: string) => {
+    setState((prev) => ({
+      ...prev, 
+      auth
+    }));
+  }
+
   const configureEndpoint = async (url: string) => {
     if (url) {
       setState((prev) => ({
@@ -209,14 +225,17 @@ export function Ad4minProvider({ children }: any) {
   }
 
   useEffect(() => {
-    if (state.url) {
-      console.log('gggg 0', state.url);
-      const client = buildAd4mClient(state.url)
+    const build = async () => {
+      const client = await buildAd4mClient(state.url)
       
       setState((prev) => ({
         ...prev,
         client
       }));
+    }
+    if (state.url) {
+      console.log('gggg 0', state.url);
+      build();
     }
   }, [state.url])
 
@@ -227,6 +246,7 @@ export function Ad4minProvider({ children }: any) {
         methods: {
           configureEndpoint,
           handleTrustAgent,
+          handleAuth,
           resetEndpoint,
           handleLogin
         }

@@ -5,6 +5,7 @@ import { useContext, useEffect } from 'react';
 import { Stack } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
+import Auth from './components/Auth'
 import { Ad4minContext } from './context/Ad4minContext';
 import { AgentProvider } from './context/AgentContext';
 import { Route, Routes} from 'react-router-dom';
@@ -18,7 +19,7 @@ import { Connect } from './components/Connect';
 
 const App = () => {
   const {state: {
-    candidate, did
+    candidate, did, auth
   }, methods: {
     handleTrustAgent,
   }} = useContext(Ad4minContext);
@@ -64,6 +65,7 @@ const App = () => {
       />
       </Routes>
       {candidate && <TrustAgent candidate={candidate} handleTrustAgent={handleTrustAgent} />}
+      {auth && <Auth />}
     </div>
   );
 }

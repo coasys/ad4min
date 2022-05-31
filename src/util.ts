@@ -1,12 +1,29 @@
 import { Ad4mClient, LinkExpression } from '@perspect3vism/ad4m';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { WebSocketLink } from '@apollo/client/link/ws';
+import { invoke } from '@tauri-apps/api';
 
-export function buildAd4mClient(server: string): Ad4mClient {
+export async function buildAd4mClient(server: string): Promise<Ad4mClient> {
+	let token: string = await invoke("request_credential");
+
+	return buildClient(server, token);
+}
+
+function buildClient(server: string, token: string): Ad4mClient {
 	let apolloClient = new ApolloClient({
 		link: new WebSocketLink({
 			uri: server,
-			options: { reconnect: true },
+			options: {
+				lazy: true,
+				reconnect: true,
+				connectionParams: async () => {
+					return {
+						headers: {
+							authorization: token
+						}
+					}
+				}
+			},
 			webSocketImpl: WebSocket,
 		}),
 		cache: new InMemoryCache({ resultCaching: false, addTypename: false }),
