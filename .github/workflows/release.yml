@@ -45,6 +45,8 @@ jobs:
           wget "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
       - name: build the app
         run: yarn run build-all
+        env:
+         CI: ""
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

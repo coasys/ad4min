@@ -33,7 +33,7 @@
     "start": "react-scripts start",
     "tauri": "tauri",
     "build": "react-scripts build",
-    "build-all": "npm run build && npm run tauri -- build -v",
+    "build-all": "yarn run build && yarn run tauri -- build -v",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
