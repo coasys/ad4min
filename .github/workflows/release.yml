@@ -34,8 +34,8 @@ jobs:
       - name: download Windows ad4m-host
         if: matrix.platform == 'windows-2019'
         run: |
-          Invoke-WebRequest "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe"
-          Invoke-WebRequest "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -outfile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
+          Invoke-WebRequest -Uri "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -OutFile "src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe"
+          Invoke-WebRequest -Uri "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -OutFile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
       - name: build the app
         run: yarn run build-all
         env:
