@@ -1,15 +1,17 @@
 name: "release"
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - fix-ci
+    # tags:
+    #   - 'v*'
 
 jobs:
   publish-tauri:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-10.15, ubuntu-latest, windows-2019]
+        platform: [windows-2019]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -33,9 +35,10 @@ jobs:
           sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
       - name: download Windows ad4m-host
         if: matrix.platform == 'windows-2019'
+        shell: bash
         run: |
-          Invoke-WebRequest -Uri "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -OutFile "src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe"
-          Invoke-WebRequest -Uri "https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe" -OutFile "src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe"
+          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe --output src-tauri/bins/ad4m-x86_64-pc-windows-gnu.exe
+          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.22/ad4m-windows-x64.exe --output src-tauri/bins/ad4m-x86_64-pc-windows-msvc.exe
       - name: build the app
         run: yarn run build-all
         env:
