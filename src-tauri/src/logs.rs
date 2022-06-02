@@ -10,7 +10,7 @@ use std::fs;
 use crate::config::{log_path};
 
 pub fn setup_logs() -> Result<(), String> {
-    fs::remove_file(log_path());
+    let _ = fs::remove_file(log_path());
 
     let logfile = FileAppender::builder()
       .encoder(Box::new(PatternEncoder::new("[{d}] {l} - {m}\n")))

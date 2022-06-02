@@ -114,7 +114,7 @@ fn main() {
                             if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
                                 let url = app_url();
                                 log::info!("Executor started on: {:?}", url);
-                                splashscreen_clone.hide();
+                                let _ = splashscreen_clone.hide();
                                 create_main_window(&handle);
                                 let main = handle.get_window("AD4MIN").unwrap();
                                 main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();

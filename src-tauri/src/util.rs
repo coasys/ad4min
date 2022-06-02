@@ -46,13 +46,13 @@ pub fn create_main_window(app: &AppHandle<Wry>) {
 
   log::info!("Creating ad4min UI {:?}", new_ad4min_window); 
 
-  new_ad4min_window.build();
+  let _ = new_ad4min_window.build();
 }
 
 pub fn save_executor_port(port: u16) {
-  remove_file(executor_port_path());
+  let _ = remove_file(executor_port_path());
 
   let mut file = File::create(executor_port_path()).unwrap();
 
-  file.write_all(port.to_string().as_bytes());
+  file.write_all(port.to_string().as_bytes()).unwrap();
 }
