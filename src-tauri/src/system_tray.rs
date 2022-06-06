@@ -26,7 +26,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
 
             if let Some(window) = ad4min_window {
                 if let Ok(true) = window.is_visible() {
-                    window.hide();
+                    let _ = window.hide();
                 } else {
                     window.show().unwrap();
                     window.set_focus().unwrap();                
@@ -44,7 +44,7 @@ pub fn handle_system_tray_event(app: &AppHandle<Wry>, event_id: String) {
 
             find_and_kill_processes("lair-keystore");
 
-            remove_file(executor_port_path());
+            let _ = remove_file(executor_port_path());
 
             app.exit(0);
         }
