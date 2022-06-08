@@ -1,6 +1,5 @@
 import { Button, Group, Modal, Space, Stack, Text, TextInput, List, ThemeIcon } from '@mantine/core';
-import { useContext } from 'react';
-import { showNotification } from '@mantine/notifications';
+import { useContext, useEffect, useState } from 'react';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { CircleCheck } from 'tabler-icons-react';
 
@@ -19,30 +18,36 @@ const Auth = () => {
     state: {
       client,
       auth,
-    },
-    methods: {
-      handleAuth,
     }
   } = useContext(Ad4minContext);
+
+  const [requestModalOpened, setRequestModalOpened] = useState(true);
+  const [secretCodeModalOpened, setSecretCodeModalOpened] = useState(false);
+  const [secretCode, setSecretCode] = useState("");
+
+  useEffect(() => {
+    setRequestModalOpened(true);
+  }, [auth])
 
   const authInfo = JSON.parse(auth).auth;
 
   const permitCapability = async () => {
     let result = await client!.agent.permitCapability(auth);
 
-    let permitResult = JSON.stringify(result);
-    console.log(`permit result: ${permitResult}`);
+    console.log(`permit result: ${result}`);
 
-    closeModal();
-    showNotification({
-      title: "Capability is permitted!",
-      message: `Now go to App, and input the 6 digits secret code: ${permitResult}`,
-      autoClose: false,
-    })
+    closeRequestModal();
+
+    setSecretCode(result);
+    setSecretCodeModalOpened(true);
   }
 
-  const closeModal = () => {
-    handleAuth("");
+  const closeRequestModal = () => {
+    setRequestModalOpened(false)
+  }
+
+  const closeSecretCodeModal = () => {
+    setSecretCodeModalOpened(false)
   }
 
   const showCapabilities = (capabilities: Capability[]) => {
@@ -69,12 +74,12 @@ const Auth = () => {
     <div>
       <Modal
         size="lg"
-        opened
-        onClose={closeModal}
+        opened={requestModalOpened}
+        onClose={closeRequestModal}
         title="Request Capabilities"
       >
         <Stack>
-        <TextInput
+          <TextInput
             value={authInfo.appName}
             label="App Name"
             disabled
@@ -92,7 +97,7 @@ const Auth = () => {
           <Text>Request for these capabilities,</Text>
           {showCapabilities(authInfo.capabilities)}
           <Group>
-            <Button variant="outline" onClick={closeModal}>
+            <Button variant="outline" onClick={closeRequestModal}>
               Close
             </Button>
             <Space h="md" />
@@ -101,6 +106,21 @@ const Auth = () => {
             </Button>
           </Group>
         </Stack>
+      </Modal>
+
+      <Modal
+        size="lg"
+        opened={secretCodeModalOpened}
+        onClose={closeSecretCodeModal}
+        title="Secret Code"
+      >
+        <Text weight={700} size="lg" underline>{secretCode}</Text>
+        <Space h="md" />
+        <Group position="center">
+          <Button onClick={closeSecretCodeModal}>
+            Close
+          </Button>
+        </Group>
       </Modal>
     </div>
   )
