@@ -18,9 +18,6 @@ const Auth = () => {
     state: {
       client,
       auth,
-    },
-    methods: {
-      handleAuth,
     }
   } = useContext(Ad4minContext);
 
@@ -37,12 +34,11 @@ const Auth = () => {
   const permitCapability = async () => {
     let result = await client!.agent.permitCapability(auth);
 
-    let permitResult = JSON.stringify(result);
-    console.log(`permit result: ${permitResult}`);
+    console.log(`permit result: ${result}`);
 
     closeRequestModal();
 
-    setSecretCode(permitResult);
+    setSecretCode(result);
     setSecretCodeModalOpened(true);
   }
 
@@ -118,7 +114,7 @@ const Auth = () => {
         onClose={closeSecretCodeModal}
         title="Secret Code"
       >
-        <Text>{secretCode}</Text>
+        <Text weight={700} size="lg" underline>{secretCode}</Text>
         <Space h="md" />
         <Group position="center">
           <Button onClick={closeSecretCodeModal}>
