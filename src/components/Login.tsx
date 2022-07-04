@@ -25,9 +25,12 @@ const Login = (props: any) => {
   let navigate = useNavigate();
 
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [opened, setOpened] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -45,6 +48,30 @@ const Login = (props: any) => {
     event.preventDefault();
     const { value } = event.target;
     setLastName(value);
+  }
+
+  const onUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const { value } = event.target;
+    setUsername(value);
+  }
+
+  const generate = () => {
+    if (username.length === 0) {
+      setUsernameError("Username is requied");
+    } else {
+      setUsernameError(null);
+    }
+
+    if (password.length === 0) {
+      setPasswordError("Password is requied");
+    } else {
+      setPasswordError(null);
+    }
+
+    if (username.length > 0 && password.length > 0) {
+      generateAgent(username, firstName, lastName, password);
+    }
   }
 
   useEffect(() => {
@@ -83,6 +110,15 @@ const Login = (props: any) => {
           {!isInitialized && (
             <>
               <TextInput 
+                label="Username" 
+                placeholder='satoshi_01' 
+                radius="md" 
+                size="md"
+                required
+                error={usernameError}
+                onChange={onUsernameChange}
+              />
+              <TextInput 
                 label="First Name" 
                 placeholder='Satoshi' 
                 radius="md" 
@@ -104,13 +140,14 @@ const Login = (props: any) => {
             radius="md"
             size="md"
             required
+            error={passwordError}
             onChange={onPasswordChange}
           />
         </div>
 
         {
           !isInitialized &&
-          <Button onClick={() => generateAgent(firstName, lastName, password)} loading={loading}>
+          <Button onClick={() => generate()} loading={loading}>
             Generate agent
           </Button>
         }
