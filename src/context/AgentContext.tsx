@@ -1,7 +1,7 @@
 import { Link } from "@perspect3vism/ad4m";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME } from "../constants/triples";
+import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
 import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
@@ -13,7 +13,7 @@ type ContextProps = {
   methods: {
     unlockAgent: (str: string) => void,
     lockAgent: (str: string) => void,
-    generateAgent: (firstName: string, lastName: string, password: string) => void,
+    generateAgent: (username: string, firstName: string, lastName: string, password: string) => void,
   };
 }
 
@@ -49,7 +49,7 @@ export function AgentProvider({ children }: any) {
     }))
   }
 
-  const generateAgent = async (firstName: string, lastName: string, password: string) => {
+  const generateAgent = async (username: string, firstName: string, lastName: string, password: string) => {
     setLoading(true);
 
     let agentStatus = await client!.agent.generate(password);
@@ -57,6 +57,18 @@ export function AgentProvider({ children }: any) {
       "Agent Profile"
     );
     const links = [];
+
+    const link = await client!.perspective.addLink(
+      agentPerspective.uuid,
+      new Link({
+        source: SOURCE_PROFILE,
+        target: username,
+        predicate: PREDICATE_USERNAME
+      })
+    );
+
+    links.push(link);
+
 
     if (firstName) {
       const link = await client!.perspective.addLink(

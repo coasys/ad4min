@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, Theme
 import { Agent } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
-import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, SOURCE_PROFILE } from '../constants/triples';
+import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME, SOURCE_PROFILE } from '../constants/triples';
 import { MainContainer, MainHeader } from './styles';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { buildAd4mClient } from '../util';
@@ -23,7 +23,8 @@ const Profile = (props: Props) => {
   
   const [profile, setProfile] = useState({
     firstName: "",
-    lastName: ""
+    lastName: "",
+    username: ""
   });
 
   const getTrustedAgents = useCallback(async () => {
@@ -53,7 +54,8 @@ const Profile = (props: Props) => {
   const fetchProfile = async (agent: Agent) => {
     const tempProfile = {
       firstName: "",
-      lastName: ""
+      lastName: "",
+      username: ""
     }
 
     for (const { data: {source, predicate, target} } of agent.perspective?.links!) {
@@ -62,6 +64,8 @@ const Profile = (props: Props) => {
           tempProfile.firstName = target
         } else if (predicate === PREDICATE_LASTNAME) {
           tempProfile.lastName = target;
+        } else if (predicate === PREDICATE_USERNAME) {
+          tempProfile.username = target;
         }
       }
     }
@@ -98,6 +102,9 @@ const Profile = (props: Props) => {
         <Text size="md" weight="bold" underline>Agent DID: </Text>
         <Text size="md">{props.did}</Text>
         <Space h="md" />
+        <Text size="md" weight="bold" underline>Username: </Text>
+        <Text size="md">{profile?.username}</Text>
+        <Space h="md" />
         <Text size="md" weight="bold" underline>Name: </Text>
         <Text size="md">{profile.firstName} {profile.lastName}</Text>
         <Space h="md" />
@@ -127,6 +134,10 @@ const Profile = (props: Props) => {
                     <Text weight="bold">DID: </Text>
                     <Text>{e.did}</Text>
                   </Group>
+                  {e.username && (<Group  direction='row'>
+                    <Text weight="bold">Username: </Text>
+                    <Text>{e.username}</Text>
+                  </Group>)}
                   {(e.firstName || e.lastName) && (<Group>
                     <Text weight="bold">Name: </Text>
                     <Text>{`${e.firstName || ""} ${e.lastName || ""}`}</Text>
