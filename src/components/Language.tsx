@@ -122,7 +122,7 @@ const Language = (props: Props) => {
   return (
     <Container style={MainContainer}>
       <div style={MainHeader}>
-        <Title order={3}>Langauges</Title>
+        <Title order={3}>Languages</Title>
         <Menu opened={opened} onOpen={handlers.open} onClose={handlers.close}>
           <Menu.Item 
             icon={<Upload size={16}/>}
@@ -162,7 +162,7 @@ const Language = (props: Props) => {
               <Avatar radius="xl">{generateLanguageInitials(language!.name)}</Avatar>
               <Group direction='column' style={{marginTop: 4}}>
                 <Group  direction='row'>
-                  <Text weight="bold">DID: </Text>
+                  <Text weight="bold">Address: </Text>
                   <Text>{language?.address}</Text>
                 </Group>
                 <Group  direction='row'>
