@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use tauri::api::path::data_dir;
+use tauri::api::path::home_dir;
 
 pub fn data_path() -> PathBuf {
-    data_dir().expect("Could not get config dir").join("ad4m")
+    home_dir().expect("Could not get home dir").join(".ad4m")
 }
 
 pub fn log_path() -> PathBuf {
