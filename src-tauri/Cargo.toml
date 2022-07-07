@@ -28,6 +28,7 @@ open = "2.0.1"
 sysinfo = "0.23.12"
 tauri = { version = "1.0.0-rc.14", features = ["api-all", "gtk-tray", "system-tray", "wry"], default-features = false }
 uuid = { version = "0.8", features = ["v4"] }
+localtunnel = "0.0.1"
 
 [features]
 # by default Tauri runs in production mode

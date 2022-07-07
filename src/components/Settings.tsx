@@ -5,6 +5,7 @@ import { Copy } from 'tabler-icons-react';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { AgentContext } from '../context/AgentContext';
 import { MainContainer, MainHeader } from './styles';
+import { invoke } from '@tauri-apps/api';
 
 function Settings() {
   const {
@@ -37,6 +38,11 @@ function Settings() {
     });
   }
 
+  const setupProxy = async () => {
+    const tunnel = await invoke("setup_proxy", { subdomain: "kaichao" });
+    console.log("finish setup proxy, ", tunnel);
+  }
+
   return (
     <Container
       style={MainContainer}
@@ -58,6 +64,7 @@ function Settings() {
         </div>
         <Space h="md" />
         <Button onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
+        <Button onClick={setupProxy}>Setup Proxy</Button>
       </Container>
       <Modal
         opened={lockAgentModalOpen}

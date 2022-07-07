@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use commands::state::{request_credential, get_port};
 use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
@@ -24,6 +23,9 @@ mod commands;
 
 use tauri::api::dialog;
 use tauri::Manager;
+use crate::commands::proxy::setup_proxy;
+use crate::commands::state::get_port;
+use crate::commands::state::request_credential;
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -81,6 +83,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_port,
             request_credential,
+            setup_proxy,
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
