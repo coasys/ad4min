@@ -1592,16 +1592,12 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "localtunnel"
-version = "0.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ed6826c99ae377f352242934dd1f2e57bdcbdd13efb0ed8f2f838fb6bcbbbac"
+version = "0.0.4"
 dependencies = [
  "anyhow",
- "futures-util",
  "reqwest",
  "serde",
  "tokio",
- "tokio-util",
 ]
 
 [[package]]

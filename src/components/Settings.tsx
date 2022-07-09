@@ -18,7 +18,8 @@ function Settings() {
 
   const {
     state: {
-      url
+      url,
+      did,
     }} = useContext(Ad4minContext);
 
   const [password, setPassword] = useState('');
@@ -39,8 +40,8 @@ function Settings() {
   }
 
   const setupProxy = async () => {
-    const tunnel = await invoke("setup_proxy", { subdomain: "kaichao" });
-    console.log("finish setup proxy, ", tunnel);
+    const tunnel = await invoke("setup_proxy", { subdomain: did });
+    console.log("Finish setup proxy, ", tunnel);
   }
 
   return (
