@@ -41,7 +41,7 @@ function Settings() {
     setPassword(value);
   }
 
-  const copyToClipboard = () => {
+  const copyUrl = () => {
     navigator.clipboard.writeText(url);
     showNotification({
       message: 'URL copied to clipboard',
@@ -55,20 +55,28 @@ function Settings() {
     setProxy(proxy);
   }
 
+  const copyProxy = () => {
+    navigator.clipboard.writeText(proxy);
+    showNotification({
+      message: 'Proxy endpoint copied to clipboard',
+      autoClose: 1000
+    });
+  }
+
   const showProxy = () => {
     if (proxy) {
       return (
         <Group align="center" style={{}}>
           <Text size="lg" weight={700}>Proxy endpoint: </Text>
           <span>{proxy}</span>
-          <ActionIcon onClick={copyToClipboard}>
+          <ActionIcon onClick={copyProxy}>
             <Copy />
           </ActionIcon>
         </Group>
       )
     } else {
       return (
-        <Button onClick={setupProxy}>Setup Proxy</Button>
+        <Button style={{ width: '120px' }} onClick={setupProxy}>Setup Proxy</Button>
       )
     }
   }
@@ -80,22 +88,17 @@ function Settings() {
       <div style={MainHeader}>
         <Title order={3}>Settings</Title>
       </div>
-      <Container style={{
+      <Stack style={{
         padding: '80px 20px 20px 20px'
       }}>
-        <div>
-          <Group align="center" style={{}}>
-            <Text size="lg" weight={700}>Connected executor URL: </Text>
-            <span>{url}</span>
-            <ActionIcon onClick={copyToClipboard}>
-              <Copy />
-            </ActionIcon>
-          </Group>
-        </div>
-        <Space h="md" />
-        <Button onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
-      </Container>
-      <Stack>
+        <Group align="center" style={{}}>
+          <Text size="lg" weight={700}>Connected executor URL: </Text>
+          <span>{url}</span>
+          <ActionIcon onClick={copyUrl}>
+            <Copy />
+          </ActionIcon>
+        </Group>
+        <Button style={{ width: '120px' }} onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
         {showProxy()}
       </Stack>
       <Modal
