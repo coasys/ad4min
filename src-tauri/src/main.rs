@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use std::sync::Mutex;
+
 use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
@@ -23,9 +25,8 @@ mod commands;
 
 use tauri::api::dialog;
 use tauri::Manager;
-use crate::commands::proxy::setup_proxy;
-use crate::commands::state::get_port;
-use crate::commands::state::request_credential;
+use crate::commands::proxy::{get_proxy, setup_proxy};
+use crate::commands::state::{get_port, request_credential};
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -35,6 +36,8 @@ use crate::util::{find_and_kill_processes, create_main_window, save_executor_por
 struct Payload {
   message: String,
 }
+
+pub struct ProxyEndpoint(Mutex<Option<String>>);
 
 pub struct AppState {
     graphql_port: u16,
@@ -77,6 +80,7 @@ fn main() {
 
     let builder_result = tauri::Builder::default()
         .manage(state)
+        .manage(ProxyEndpoint(Default::default()))
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
@@ -84,6 +88,7 @@ fn main() {
             get_port,
             request_credential,
             setup_proxy,
+            get_proxy,
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();

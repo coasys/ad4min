@@ -1,11 +1,11 @@
 use localtunnel::open_tunnel;
 use tauri::{async_runtime::spawn, State};
 
-use crate::AppState;
+use crate::{AppState, ProxyEndpoint};
 
 #[tauri::command]
-pub async fn setup_proxy(subdomain: String, state: State<'_, AppState>) -> Result<String, String> {
-    let local_port = state.graphql_port;
+pub async fn setup_proxy(subdomain: String, app_state: State<'_, AppState>, proxy: State<'_, ProxyEndpoint>) -> Result<String, String> {
+    let local_port = app_state.graphql_port;
 
     let (endpoint, handle) = open_tunnel(
         Some("http://proxy.ad4m.dev"),
@@ -20,5 +20,12 @@ pub async fn setup_proxy(subdomain: String, state: State<'_, AppState>) -> Resul
         let _ = handle.await;
     });
 
+    *proxy.0.lock().unwrap() = Some(endpoint.clone());
+
     Ok(endpoint)
+}
+
+#[tauri::command]
+pub fn get_proxy(proxy: State<'_, ProxyEndpoint>) -> Option<String> {
+    (*proxy.0.lock().unwrap()).clone()
 }

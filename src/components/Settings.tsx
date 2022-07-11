@@ -1,6 +1,6 @@
-import { ActionIcon, Button, Container, Group, Modal, PasswordInput, Space, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Container, Group, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Copy } from 'tabler-icons-react';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { AgentContext } from '../context/AgentContext';
@@ -13,18 +13,28 @@ function Settings() {
       loading
     },
     methods: {
-    lockAgent
-  }} = useContext(AgentContext);
+      lockAgent
+    } } = useContext(AgentContext);
 
   const {
     state: {
       url,
       did,
-    }} = useContext(Ad4minContext);
+    } } = useContext(Ad4minContext);
 
   const [password, setPassword] = useState('');
   const [lockAgentModalOpen, setLockAgentModalOpen] = useState(false);
-  
+  const [proxy, setProxy] = useState('');
+
+  useEffect(() => {
+    const getProxy = async () => {
+      const proxy: string = await invoke("get_proxy");
+      console.log(proxy);
+      setProxy(proxy);
+    }
+    getProxy().catch(console.error);;
+  }, []);
+
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     let { value } = event.target;
@@ -40,8 +50,27 @@ function Settings() {
   }
 
   const setupProxy = async () => {
-    const tunnel = await invoke("setup_proxy", { subdomain: did });
-    console.log("Finish setup proxy, ", tunnel);
+    const proxy: string = await invoke("setup_proxy", { subdomain: did });
+    console.log("Finish setup proxy, ", proxy);
+    setProxy(proxy);
+  }
+
+  const showProxy = () => {
+    if (proxy) {
+      return (
+        <Group align="center" style={{}}>
+          <Text size="lg" weight={700}>Proxy endpoint: </Text>
+          <span>{proxy}</span>
+          <ActionIcon onClick={copyToClipboard}>
+            <Copy />
+          </ActionIcon>
+        </Group>
+      )
+    } else {
+      return (
+        <Button onClick={setupProxy}>Setup Proxy</Button>
+      )
+    }
   }
 
   return (
@@ -65,14 +94,16 @@ function Settings() {
         </div>
         <Space h="md" />
         <Button onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
-        <Button onClick={setupProxy}>Setup Proxy</Button>
       </Container>
+      <Stack>
+        {showProxy()}
+      </Stack>
       <Modal
         opened={lockAgentModalOpen}
         onClose={() => setLockAgentModalOpen(false)}
         title="Lock Agent"
         size={700}
-        style={{zIndex: 100}}
+        style={{ zIndex: 100 }}
       >
         <PasswordInput
           placeholder="Password"
