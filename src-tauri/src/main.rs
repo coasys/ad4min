@@ -111,7 +111,7 @@ fn main() {
                         CommandEvent::Stdout(line) => {
                             log::info!("{}", line);
 
-                            if line == "\u{1b}[32m AD4M init complete \u{1b}[0m" {
+                            if line.contains("GraphQL server started, Unlock the agent to start holohchain") {
                                 let url = app_url();
                                 log::info!("Executor started on: {:?}", url);
                                 let _ = splashscreen_clone.hide();
