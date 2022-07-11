@@ -57,6 +57,11 @@ function Settings() {
     setProxy(proxy);
   }
 
+  const stopProxy = async () => {
+    await invoke("stop_proxy");
+    setProxy('');
+  }
+
   const copyProxy = () => {
     navigator.clipboard.writeText(proxy);
     showNotification({
@@ -72,16 +77,20 @@ function Settings() {
   const showProxy = () => {
     if (proxy) {
       return (
-        <Group align="center" style={{}}>
-          <Text size="lg" weight={700}>Proxy endpoint: </Text>
-          <span>{proxy}</span>
-          <ActionIcon onClick={copyProxy}>
-            <Copy />
-          </ActionIcon>
-          <ActionIcon onClick={showProxyQRCode}>
-            <QRCodeIcon />
-          </ActionIcon>
-        </Group>
+        <div>
+          <Group align="center" style={{}}>
+            <Text size="lg" weight={700}>Proxy endpoint: </Text>
+            <span>{proxy}</span>
+            <ActionIcon onClick={copyProxy}>
+              <Copy />
+            </ActionIcon>
+            <ActionIcon onClick={showProxyQRCode}>
+              <QRCodeIcon />
+            </ActionIcon>
+          </Group>
+          <Space h="md" />
+          <Button style={{ width: '120px' }} onClick={stopProxy}>Stop Proxy</Button>
+        </div>
       )
     } else {
       return (

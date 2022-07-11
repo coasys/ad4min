@@ -10,6 +10,7 @@ use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{ build_system_tray, handle_system_tray_event };
+use tauri::async_runtime::TokioJoinHandle;
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
@@ -25,7 +26,7 @@ mod commands;
 
 use tauri::api::dialog;
 use tauri::Manager;
-use crate::commands::proxy::{get_proxy, setup_proxy};
+use crate::commands::proxy::{get_proxy, setup_proxy, stop_proxy};
 use crate::commands::state::{get_port, request_credential};
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
@@ -37,7 +38,12 @@ struct Payload {
   message: String,
 }
 
-pub struct ProxyEndpoint(Mutex<Option<String>>);
+pub struct ProxyState(Mutex<Option<ProxyService>>);
+
+pub struct ProxyService {
+    endpoint: String,
+    handle: TokioJoinHandle<()>,
+}
 
 pub struct AppState {
     graphql_port: u16,
@@ -80,7 +86,7 @@ fn main() {
 
     let builder_result = tauri::Builder::default()
         .manage(state)
-        .manage(ProxyEndpoint(Default::default()))
+        .manage(ProxyState(Default::default()))
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
@@ -89,6 +95,7 @@ fn main() {
             request_credential,
             setup_proxy,
             get_proxy,
+            stop_proxy,
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
