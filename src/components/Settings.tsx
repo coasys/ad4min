@@ -1,11 +1,12 @@
-import { ActionIcon, Button, Container, Group, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Center, Container, Group, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useContext, useEffect, useState } from 'react';
-import { Copy } from 'tabler-icons-react';
+import { Copy, Qrcode as QRCodeIcon } from 'tabler-icons-react';
 import { Ad4minContext } from '../context/Ad4minContext';
 import { AgentContext } from '../context/AgentContext';
 import { MainContainer, MainHeader } from './styles';
 import { invoke } from '@tauri-apps/api';
+import QRCode from 'react-qr-code';
 
 function Settings() {
   const {
@@ -25,6 +26,7 @@ function Settings() {
   const [password, setPassword] = useState('');
   const [lockAgentModalOpen, setLockAgentModalOpen] = useState(false);
   const [proxy, setProxy] = useState('');
+  const [qrcodeModal, setQRCodeModal] = useState(false);
 
   useEffect(() => {
     const getProxy = async () => {
@@ -63,6 +65,10 @@ function Settings() {
     });
   }
 
+  const showProxyQRCode = () => {
+    setQRCodeModal(true);
+  }
+
   const showProxy = () => {
     if (proxy) {
       return (
@@ -71,6 +77,9 @@ function Settings() {
           <span>{proxy}</span>
           <ActionIcon onClick={copyProxy}>
             <Copy />
+          </ActionIcon>
+          <ActionIcon onClick={showProxyQRCode}>
+            <QRCodeIcon />
           </ActionIcon>
         </Group>
       )
@@ -120,6 +129,16 @@ function Settings() {
         <Button onClick={() => lockAgent(password)} loading={loading}>
           Lock agent
         </Button>
+      </Modal>
+      <Modal
+        opened={qrcodeModal}
+        onClose={() => setQRCodeModal(false)}
+        title="Proxy QR Code"
+        centered
+      >
+        <Center>
+          <QRCode value={proxy} />
+        </Center>
       </Modal>
     </Container>
   )
