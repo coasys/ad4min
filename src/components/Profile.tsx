@@ -59,7 +59,7 @@ const Profile = (props: Props) => {
     }
 
     for (const { data: {source, predicate, target} } of agent.perspective?.links!) {
-      if (source === SOURCE_PROFILE) {
+      if (source === agent.did) {
         if (predicate === PREDICATE_FIRSTNAME) {
           tempProfile.firstName = Literal.fromUrl(target).get()
         } else if (predicate === PREDICATE_LASTNAME) {

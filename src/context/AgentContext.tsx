@@ -61,7 +61,7 @@ export function AgentProvider({ children }: any) {
     const link = await client!.perspective.addLink(
       agentPerspective.uuid,
       new Link({
-        source: SOURCE_PROFILE,
+        source: agentStatus.did!,
         target: Literal.from(username).toUrl(),
         predicate: PREDICATE_USERNAME
       })
@@ -74,7 +74,7 @@ export function AgentProvider({ children }: any) {
       const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: SOURCE_PROFILE,
+          source: agentStatus.did!,
           target: Literal.from(firstName).toUrl(),
           predicate: PREDICATE_FIRSTNAME
         })
@@ -87,7 +87,7 @@ export function AgentProvider({ children }: any) {
       const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: SOURCE_PROFILE,
+          source: agentStatus.did!,
           target: Literal.from(lastName).toUrl(),
           predicate: PREDICATE_LASTNAME
         })
