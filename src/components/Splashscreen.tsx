@@ -1,4 +1,4 @@
-import { Title, Text, Button, createStyles, Space } from '@mantine/core'
+import { Title, Text, Button, createStyles, Space, Image } from '@mantine/core'
 import { appWindow } from '@tauri-apps/api/window';
 import React from 'react'
 import { useState } from 'react';
@@ -61,7 +61,10 @@ export default function Splashscreen() {
     <div className={classes.container}>
       <Title order={1} style={{
             fontSize: 90
-          }}>ADMIN UI</Title>
+          }}>
+            <Image src="Logo310.png"></Image>
+            AD4M UI
+      </Title>
       <div id="error" className={classes.error}>
         <div className={classes.errorFlex}>
           <Text align="center" size='xl' weight={700} style={{
