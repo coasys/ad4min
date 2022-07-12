@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Code, createStyles, Group, Navbar, Text } from '@mantine/core';
+import { Anchor, AppShell, Code, createStyles, Group, Navbar, Text, Image } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
 import { Grain, Stack2, User, Settings as SettingsIcon } from 'tabler-icons-react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
@@ -110,8 +110,9 @@ const Navigation = (props: Props) => {
         <Navbar height='100vh' width={{ sm: 300 }} p="md" fixed>
           <Navbar.Section grow>
             <Group className={classes.header} position="apart">
-              <Text>Ad4min</Text>
-              <Code>v0.0.3</Code>
+              <Image src="Logo44.png"></Image>
+              <Text>AD4Min</Text>
+              <Code>v0.0.6-alpha</Code>
             </Group>
             {links}
           </Navbar.Section>
