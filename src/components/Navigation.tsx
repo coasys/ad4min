@@ -4,6 +4,7 @@ import { Grain, Stack2, User, Settings as SettingsIcon } from 'tabler-icons-reac
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { RouteContainer } from './styles';
 import { Ad4minContext } from '../context/Ad4minContext';
+import { version } from '../../package.json'
 
 type Props = {
   did: String,
@@ -112,7 +113,7 @@ const Navigation = (props: Props) => {
             <Group className={classes.header} position="apart">
               <Image src="Logo44.png"></Image>
               <Text>AD4Min</Text>
-              <Code>v0.0.6-alpha</Code>
+              <Code>{version}</Code>
             </Group>
             {links}
           </Navbar.Section>
