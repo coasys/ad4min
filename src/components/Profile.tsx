@@ -1,5 +1,5 @@
 import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, ThemeIcon, Title } from '@mantine/core';
-import { Agent } from '@perspect3vism/ad4m';
+import { Agent, Literal } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
 import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME, SOURCE_PROFILE } from '../constants/triples';
@@ -59,13 +59,13 @@ const Profile = (props: Props) => {
     }
 
     for (const { data: {source, predicate, target} } of agent.perspective?.links!) {
-      if (source === SOURCE_PROFILE) {
+      if (source === agent.did) {
         if (predicate === PREDICATE_FIRSTNAME) {
-          tempProfile.firstName = target
+          tempProfile.firstName = Literal.fromUrl(target).get()
         } else if (predicate === PREDICATE_LASTNAME) {
-          tempProfile.lastName = target;
+          tempProfile.lastName = Literal.fromUrl(target).get();
         } else if (predicate === PREDICATE_USERNAME) {
-          tempProfile.username = target;
+          tempProfile.username = Literal.fromUrl(target).get();
         }
       }
     }
