@@ -10,11 +10,11 @@ use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{ build_system_tray, handle_system_tray_event };
-use tauri::async_runtime::TokioJoinHandle;
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
 };
+use tokio::sync::broadcast;
 use uuid::Uuid;
 
 mod config;
@@ -42,7 +42,7 @@ pub struct ProxyState(Mutex<Option<ProxyService>>);
 
 pub struct ProxyService {
     endpoint: String,
-    handle: TokioJoinHandle<()>,
+    shutdown_signal: broadcast::Sender<()>,
 }
 
 pub struct AppState {

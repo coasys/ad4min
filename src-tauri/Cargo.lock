@@ -20,6 +20,7 @@ dependencies = [
  "sysinfo",
  "tauri",
  "tauri-build",
+ "tokio",
  "uuid 0.8.2",
 ]
 
@@ -1592,9 +1593,9 @@ checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "localtunnel"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ccc0eb433c1df2f3bdf52b71932a9491f54bd33ea616c77a708d69fb4e55588"
+checksum = "ffce7f901437d518bb46497f26c65cd86696e045668867ca0020f79197d3f529"
 dependencies = [
  "anyhow",
  "reqwest",
