@@ -1,4 +1,4 @@
-import { Link } from "@perspect3vism/ad4m";
+import { Link, Literal } from "@perspect3vism/ad4m";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
@@ -61,8 +61,8 @@ export function AgentProvider({ children }: any) {
     const link = await client!.perspective.addLink(
       agentPerspective.uuid,
       new Link({
-        source: SOURCE_PROFILE,
-        target: username,
+        source: agentStatus.did!,
+        target: Literal.from(username).toUrl(),
         predicate: PREDICATE_USERNAME
       })
     );
@@ -74,8 +74,8 @@ export function AgentProvider({ children }: any) {
       const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: SOURCE_PROFILE,
-          target: firstName,
+          source: agentStatus.did!,
+          target: Literal.from(firstName).toUrl(),
           predicate: PREDICATE_FIRSTNAME
         })
       );
@@ -87,8 +87,8 @@ export function AgentProvider({ children }: any) {
       const link = await client!.perspective.addLink(
         agentPerspective.uuid,
         new Link({
-          source: SOURCE_PROFILE,
-          target: lastName,
+          source: agentStatus.did!,
+          target: Literal.from(lastName).toUrl(),
           predicate: PREDICATE_LASTNAME
         })
       );
