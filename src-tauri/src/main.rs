@@ -3,7 +3,8 @@
     windows_subsystem = "windows"
 )]
 
-use commands::state::{request_credential, get_port};
+use std::sync::Mutex;
+
 use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
@@ -13,6 +14,7 @@ use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
 };
+use tokio::sync::broadcast;
 use uuid::Uuid;
 
 mod config;
@@ -24,6 +26,8 @@ mod commands;
 
 use tauri::api::dialog;
 use tauri::Manager;
+use crate::commands::proxy::{get_proxy, setup_proxy, stop_proxy};
+use crate::commands::state::{get_port, request_credential};
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -32,6 +36,13 @@ use crate::util::{find_and_kill_processes, create_main_window, save_executor_por
 #[derive(Clone, serde::Serialize)]
 struct Payload {
   message: String,
+}
+
+pub struct ProxyState(Mutex<Option<ProxyService>>);
+
+pub struct ProxyService {
+    endpoint: String,
+    shutdown_signal: broadcast::Sender<()>,
 }
 
 pub struct AppState {
@@ -75,12 +86,16 @@ fn main() {
 
     let builder_result = tauri::Builder::default()
         .manage(state)
+        .manage(ProxyState(Default::default()))
         .menu(build_menu())
         .on_menu_event(|event| handle_menu_event(event.menu_item_id(), event.window()))
         .system_tray(build_system_tray())
         .invoke_handler(tauri::generate_handler![
             get_port,
             request_credential,
+            setup_proxy,
+            get_proxy,
+            stop_proxy,
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
