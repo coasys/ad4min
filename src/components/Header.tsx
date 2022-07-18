@@ -1,11 +1,14 @@
-import { Title } from '@mantine/core';
+import { Title, Image } from '@mantine/core';
 
 type Props = {}
 
 const Header = (props: Props) => {
   return (
     <>
-      <Title order={1}> Ad4min UI</Title>
+      <Title order={1}>
+        <Image src="Logo142.png"></Image>
+        AD4Min
+      </Title>
     </>
   )
 }
