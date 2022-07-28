@@ -74,6 +74,16 @@ const Login = (props: any) => {
     }
   }
 
+  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      if(isInitialized) {
+        unlockAgent(password);
+      } else {
+        generate();
+      }
+    }
+  }
+
   useEffect(() => {
       if (!connected) {
         navigate('/connect');
@@ -142,6 +152,7 @@ const Login = (props: any) => {
             required
             error={passwordError}
             onChange={onPasswordChange}
+            onKeyDown={onKeyDown}
           />
         </div>
 
