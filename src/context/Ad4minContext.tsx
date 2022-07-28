@@ -86,7 +86,7 @@ export function Ad4minProvider({ children }: any) {
     })
   }, [])
 
-  const handleLogin = useCallback((client: Ad4mClient, login: Boolean, did: string) => {
+  const handleLogin = useCallback(async (client: Ad4mClient, login: Boolean, did: string) => {
     setState((prev) => ({
       ...prev,
       isUnlocked: login,
@@ -115,6 +115,9 @@ export function Ad4minProvider({ children }: any) {
             }
           });
         console.log(exception);
+        
+        appWindow.setFocus();
+
         return null
       })
     }
