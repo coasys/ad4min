@@ -46,7 +46,7 @@ const initialState: ContextProps = {
     configureEndpoint: () => null,
     resetEndpoint: () => null,
     handleTrustAgent: () => null,
-    handleLogin: () => null 
+    handleLogin: () => null
   }
 }
 
@@ -98,7 +98,7 @@ export function Ad4minProvider({ children }: any) {
       client.runtime.addExceptionCallback((exception: ExceptionInfo) => {
         if (exception.type === ExceptionType.AgentIsUntrusted) {
           setState((prev) => ({
-            ...prev, 
+            ...prev,
             candidate: exception.addon!
           }));
         }
@@ -115,11 +115,14 @@ export function Ad4minProvider({ children }: any) {
             }
           });
         console.log(exception);
+
+        appWindow.setFocus();
+
         return null
       })
     }
   }, []);
-  
+
   const checkIfAgentIsInitialized = useCallback(async (client: Ad4mClient) => {
     console.log("Check if agent is initialized.", client)
 
@@ -189,7 +192,7 @@ export function Ad4minProvider({ children }: any) {
 
   const handleTrustAgent = (candidate: string) => {
     setState((prev) => ({
-      ...prev, 
+      ...prev,
       candidate
     }));
   }
@@ -218,7 +221,7 @@ export function Ad4minProvider({ children }: any) {
   useEffect(() => {
     const build = async () => {
       const client = await buildAd4mClient(state.url)
-      
+
       setState((prev) => ({
         ...prev,
         client
@@ -231,7 +234,7 @@ export function Ad4minProvider({ children }: any) {
   }, [state.url])
 
   return (
-    <Ad4minContext.Provider 
+    <Ad4minContext.Provider
       value={{
         state,
         methods: {
