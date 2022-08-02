@@ -165,7 +165,7 @@ fn main() {
                     let tray_window = app.get_window("tray");
 
                     if let Some(window) = tray_window {
-                        window.move_window(Position::TrayCenter).unwrap();
+                        // window.move_window(Position::TrayCenter).unwrap();
                         if let Ok(true) = window.is_visible() {
                             let _ = window.hide();
                         } else {
@@ -176,10 +176,12 @@ fn main() {
                         let tray_window_builder = WindowBuilder::new(
                             app,
                             "tray",
-                            WindowUrl::App("/tray".into()),
+                            WindowUrl::App("/".into()),
                         );
                         tray_window_builder.build().unwrap();
-                        let tray_window = app.get_window("tray").unwrap().move_window(Position::TrayCenter);
+                        let tray_window = app.get_window("tray").unwrap();
+                        let _ = tray_window.set_decorations(false);
+                        let _ = tray_window.move_window(Position::TrayCenter);
                     }
                     
                 },
