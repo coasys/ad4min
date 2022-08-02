@@ -9,11 +9,14 @@ use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
-use system_tray::{ build_system_tray, handle_system_tray_event };
+use system_tray::{ build_system_tray };
+use tauri::WindowBuilder;
+use tauri::WindowUrl;
 use tauri::{
     api::process::{Command, CommandEvent},
     RunEvent, SystemTrayEvent
 };
+use tauri_plugin_positioner::{ WindowExt, Position, on_tray_event};
 use tokio::sync::broadcast;
 use uuid::Uuid;
 
@@ -85,6 +88,7 @@ fn main() {
     };
 
     let builder_result = tauri::Builder::default()
+        .plugin(tauri_plugin_positioner::init())
         .manage(state)
         .manage(ProxyState(Default::default()))
         .menu(build_menu())
@@ -154,11 +158,33 @@ fn main() {
 
             Ok(())
         })
-        .on_system_tray_event(move |app, event| match event {
-            SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id)
+        .on_system_tray_event(move |app, event| {
+            on_tray_event(app, &event);
+            match event {
+                SystemTrayEvent::LeftClick { position: _, size: _, .. } => {
+                    let tray_window = app.get_window("tray");
+
+                    if let Some(window) = tray_window {
+                        window.move_window(Position::TrayCenter).unwrap();
+                        if let Ok(true) = window.is_visible() {
+                            let _ = window.hide();
+                        } else {
+                            window.show().unwrap();
+                            window.set_focus().unwrap();                
+                        }
+                    } else {                
+                        let tray_window_builder = WindowBuilder::new(
+                            app,
+                            "tray",
+                            WindowUrl::App("/tray".into()),
+                        );
+                        tray_window_builder.build().unwrap();
+                        let tray_window = app.get_window("tray").unwrap().move_window(Position::TrayCenter);
+                    }
+                    
+                },
+                _ => {}
             }
-            _ => {}
         })
         .build(tauri::generate_context!());
 

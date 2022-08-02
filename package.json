@@ -9,7 +9,7 @@
     "@mantine/modals": "^4.2.4",
     "@mantine/notifications": "^4.2.4",
     "@perspect3vism/ad4m": "^0.1.30",
-    "@tauri-apps/api": "^1.0.0-rc.2",
+    "@tauri-apps/api": "^1.0.2",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
@@ -57,7 +57,7 @@
     ]
   },
   "devDependencies": {
-    "@tauri-apps/cli": "1.0.0-rc.11",
+    "@tauri-apps/cli": "1.0.5",
     "react-error-overlay": "6.0.9"
   },
   "resolutions": {

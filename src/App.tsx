@@ -16,6 +16,7 @@ import Language from './components/Language';
 import Settings from './components/Settings';
 import { appWindow } from '@tauri-apps/api/window';
 import { Connect } from './components/Connect';
+import SystemTrayWindow from './window/SystemTrayWindow';
 
 const App = () => {
   const {state: {
@@ -50,6 +51,7 @@ const App = () => {
             </AgentProvider>
           </Stack>
         }/>
+        <Route path="/tray" element={<SystemTrayWindow />} />
         <Route path="/" element={<Navigation did={did} />}>
           <Route path="profile" element={<Profile did={did} />} />
           <Route path="language" element={<Language />} />
