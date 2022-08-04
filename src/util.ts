@@ -1,7 +1,8 @@
 import { Ad4mClient, LinkExpression } from '@perspect3vism/ad4m';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { WebSocketLink } from '@apollo/client/link/ws';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { invoke } from '@tauri-apps/api';
+import { createClient } from 'graphql-ws';
 
 export async function buildAd4mClient(server: string): Promise<Ad4mClient> {
 	let token: string = await invoke("request_credential");
@@ -10,34 +11,29 @@ export async function buildAd4mClient(server: string): Promise<Ad4mClient> {
 }
 
 function buildClient(server: string, token: string): Ad4mClient {
-	let apolloClient = new ApolloClient({
-		link: new WebSocketLink({
-			uri: server,
-			options: {
-				lazy: true,
-				reconnect: true,
-				connectionParams: async () => {
-					return {
-						headers: {
-							authorization: token
-						}
-					}
-				}
-			},
-			webSocketImpl: WebSocket,
-		}),
-		cache: new InMemoryCache({ resultCaching: false, addTypename: false }),
-		defaultOptions: {
-			watchQuery: {
-				fetchPolicy: "no-cache",
-			},
-			query: {
-				fetchPolicy: "no-cache",
-			}
-		},
-	});
+	const wsLink = new GraphQLWsLink(createClient({
+    url: server,
+    connectionParams: () => {
+        return {
+            headers: {
+                authorization: token
+            }
+        }
+    },
+  }));
+  const apolloClient = new ApolloClient({
+    link: wsLink,
+    cache: new InMemoryCache({ resultCaching: false, addTypename: false }),
+    defaultOptions: {
+        watchQuery: {
+            fetchPolicy: "no-cache",
+        },
+        query: {
+            fetchPolicy: "no-cache",
+        }
+    },
+  });
 
-	//@ts-ignore
 	return new Ad4mClient(apolloClient);
 }
 
