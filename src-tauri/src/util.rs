@@ -54,10 +54,10 @@ pub fn create_main_window(app: &AppHandle<Wry>) {
 
   let window_clone = tray_window.clone();
   tray_window.on_window_event(move |event| {
-    println!("window event: {:?}", event);
+    //println!("window event: {:?}", event);
     match event {
       WindowEvent::Focused(f) => {
-        println!("focused: {}", f);
+        //println!("focused: {}", f);
         if !f {
           let _ = window_clone.hide();
         }
