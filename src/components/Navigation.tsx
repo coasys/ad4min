@@ -16,8 +16,8 @@ const useStyles = createStyles((theme, _params, getRef) => {
     header: {
       paddingBottom: theme.spacing.md,
       marginBottom: theme.spacing.md * 1.5,
-      borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
-        }`,
+      borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]}`,
+      backgroundColor: 'black'
     },
 
     link: {
@@ -108,11 +108,10 @@ const Navigation = (props: Props) => {
     <AppShell
       padding={0}
       navbar={
-        <Navbar height='100vh' width={{ sm: 300 }} p="md" fixed>
+        <Navbar height='100vh' width={{ sm: 300 }} p="md" fixed style={{padding: 0}}>
           <Navbar.Section grow>
             <Group className={classes.header} position="apart">
-              <Image src="Logo44.png"></Image>
-              <Text>AD4Min</Text>
+              <Image src="ad4mlogo_white_angle2_colouremblem.png"></Image>
               <Code>{version}</Code>
             </Group>
             {links}

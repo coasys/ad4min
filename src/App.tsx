@@ -2,7 +2,7 @@ import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
 import { useContext, useEffect } from 'react';
-import { Stack } from '@mantine/core';
+import { Global, Stack } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
 import Auth from './components/Auth'
@@ -41,6 +41,17 @@ const App = () => {
 
   return (
     <div className="App">
+      <Global
+        styles={(theme) => ({
+          '*': {
+            fontFamily: 'comfortaa',
+          },
+
+          '.mantine-riils3': {
+            color: 'white'
+          }
+        })}
+      />
       <Routes>
         <Route path="/splashscreen" element={<Splashscreen />} />
         <Route path="/login" element={

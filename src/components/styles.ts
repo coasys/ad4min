@@ -11,13 +11,14 @@ export const MainHeader = {
   width: 'calc(100% - 341px)',
   marginLeft: 301,
   position: 'fixed' as 'fixed',
-  background: '#fff',
+  background: '#000',
   zIndex: 98,
   top: 0,
   right: 0,
   display: 'flex',
   justifyContent: 'space-between',
   padding: `20px`,
+  fontFamily: 'comfortaa'
 }
 
 export const RouteContainer = { 
