@@ -12,7 +12,9 @@ const useStyles = createStyles((theme, _params, getRef) => {
       justifyContent: 'center',
       flexDirection: 'column',
       height: '100vh',
-      width: '100vw'
+      width: '100vw',
+      background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(38,3,23,1) 41%, rgba(51,4,31,1) 100%)',
+      color: 'white',
     },
     error: {
       padding: '40px 80px',
@@ -62,8 +64,7 @@ export default function Splashscreen() {
       <Title order={1} style={{
             fontSize: 90
           }}>
-            <Image src="Logo310.png"></Image>
-            AD4M UI
+            <Image style={{width: '300px'}} src="ad4msquarelogo2_white_colouremblem.png"></Image>
       </Title>
       <div id="error" className={classes.error}>
         <div className={classes.errorFlex}>
