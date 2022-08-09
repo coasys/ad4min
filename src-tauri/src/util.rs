@@ -1,5 +1,5 @@
 use sysinfo::{ProcessExt, System, SystemExt, Signal};
-use tauri::{WindowBuilder, WindowUrl, Wry, AppHandle, Manager};
+use tauri::{WindowBuilder, WindowEvent, WindowUrl, Wry, AppHandle, Manager};
 use tauri_plugin_positioner::{Position, WindowExt};
 use crate::app_url;
 use crate::config::executor_port_path;
@@ -50,7 +50,21 @@ pub fn create_main_window(app: &AppHandle<Wry>) {
   let tray_window = app.get_window("AD4MIN").unwrap();
   let _ = tray_window.set_decorations(false);
   let _ = tray_window.set_always_on_top(true);
-  let _ = tray_window.move_window(Position::TrayCenter);
+  //let _ = tray_window.move_window(Position::TrayCenter);
+
+  let window_clone = tray_window.clone();
+  tray_window.on_window_event(move |event| {
+    println!("window event: {:?}", event);
+    match event {
+      WindowEvent::Focused(f) => {
+        println!("focused: {}", f);
+        if !f {
+          let _ = window_clone.hide();
+        }
+      },
+      _ => {}
+    }
+  });
 
   log::info!("Creating ad4min UI {:?}", tray_window);
 }
