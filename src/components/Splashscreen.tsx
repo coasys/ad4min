@@ -15,6 +15,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
       width: '100vw',
       background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(38,3,23,1) 41%, rgba(51,4,31,1) 100%)',
       color: 'white',
+      fontFamily: 'comfortaa'
     },
     error: {
       padding: '40px 80px',
@@ -22,11 +23,13 @@ const useStyles = createStyles((theme, _params, getRef) => {
       opacity: 0,
       transition: 'visibility 0s, opacity 0.5s linear, height 1s',
       height: 0,
+      fontFamily: 'comfortaa'
     },
     errorFlex: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      fontFamily: 'comfortaa'
     }
   };
 });
@@ -69,11 +72,13 @@ export default function Splashscreen() {
       <div id="error" className={classes.error}>
         <div className={classes.errorFlex}>
           <Text align="center" size='xl' weight={700} style={{
-            fontSize: 40
+            fontSize: 40,
+            fontFamily: 'comfortaa',
           }} >Whoops, something broke! 😅</Text>
           <Space h="md" />
           <Text align="center" size='lg' style={{
-            fontSize: 22
+            fontSize: 22,
+            fontFamily: 'comfortaa',
           }}>
             If you have also been asked to include a log file with your report,
             click the button below to copy a log file to your desktop:
