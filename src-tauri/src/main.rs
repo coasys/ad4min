@@ -13,8 +13,10 @@ use system_tray::{ build_system_tray };
 use tauri::WindowBuilder;
 use tauri::WindowUrl;
 use tauri::{
+    AppHandle,
     api::process::{Command, CommandEvent},
-    RunEvent, SystemTrayEvent
+    RunEvent, SystemTrayEvent,
+    Window
 };
 use tauri_plugin_positioner::{ WindowExt, Position, on_tray_event};
 use tokio::sync::broadcast;
@@ -112,8 +114,6 @@ fn main() {
                 open_logs_folder();
             });
 
-            let handle = app.handle().clone();
-
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
             .args([
@@ -123,6 +123,8 @@ fn main() {
             ])
             .spawn()
             .expect("Failed to spawn ad4m serve");
+
+            let handle = app.handle().clone();
     
             tauri::async_runtime::spawn(async move {
                 while let Some(event) = rx.recv().await {
@@ -134,8 +136,7 @@ fn main() {
                                 let url = app_url();
                                 log::info!("Executor started on: {:?}", url);
                                 let _ = splashscreen_clone.hide();
-                                create_main_window(&handle);
-                                let main = handle.get_window("AD4MIN").unwrap();
+                                let main = get_main_window(&handle);
                                 main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
                             }
                         },
@@ -162,28 +163,17 @@ fn main() {
             on_tray_event(app, &event);
             match event {
                 SystemTrayEvent::LeftClick { position: _, size: _, .. } => {
-                    let tray_window = app.get_window("tray");
+                    let window = get_main_window(&app);
+                    let _ = window.set_decorations(false);
+                    let _ = window.set_always_on_top(true);
+                    let _ = window.move_window(Position::TrayCenter);
 
-                    if let Some(window) = tray_window {
-                        // window.move_window(Position::TrayCenter).unwrap();
-                        if let Ok(true) = window.is_visible() {
-                            let _ = window.hide();
-                        } else {
-                            window.show().unwrap();
-                            window.set_focus().unwrap();                
-                        }
-                    } else {                
-                        let tray_window_builder = WindowBuilder::new(
-                            app,
-                            "tray",
-                            WindowUrl::App("/".into()),
-                        );
-                        tray_window_builder.build().unwrap();
-                        let tray_window = app.get_window("tray").unwrap();
-                        let _ = tray_window.set_decorations(false);
-                        let _ = tray_window.move_window(Position::TrayCenter);
+                    if let Ok(true) = window.is_visible() {
+                        let _ = window.hide();
+                    } else {
+                        window.show().unwrap();
+                        window.set_focus().unwrap();                
                     }
-                    
                 },
                 _ => {}
             }
@@ -192,13 +182,26 @@ fn main() {
 
     match builder_result {
         Ok(builder) => {
-            builder.run(|_app_handle, event| match event {
-                RunEvent::ExitRequested { api, .. } => {
-                    api.prevent_exit();
-                },
-                _ => {}
+            builder.run(|_app_handle, event| {
+                match event {
+                    RunEvent::ExitRequested { api, .. } => {
+                        api.prevent_exit();
+                    },
+                    _ => {}
+                }
             });
         }
         Err(err) => log::error!("Error building the app: {:?}", err),
+    }
+}
+
+fn get_main_window(handle: &AppHandle) -> Window {
+    let main = handle.get_window("AD4MIN");
+    if let Some(window) = main {
+        window
+    } else {
+        create_main_window(&handle);
+        let main = handle.get_window("AD4MIN");                
+        main.expect("Couldn't get main window right after creating it")
     }
 }
