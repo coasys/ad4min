@@ -37,8 +37,8 @@ jobs:
         run: |
           mkdir src-tauri/bins
           cd src-tauri/bins
-          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.23-fix-1/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-gnu.exe
-          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.23-fix-1/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-msvc.exe
+          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.25-alpha1/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-gnu.exe
+          curl -vLJ https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.25-alpha1/ad4m-windows-x64.exe --output ad4m-x86_64-pc-windows-msvc.exe
       - name: build the app
         run: yarn run build-all
         env:
