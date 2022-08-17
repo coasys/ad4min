@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Center, Container, Group, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Burger, Button, Center, Container, Group, MediaQuery, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useContext, useEffect, useState } from 'react';
 import { Copy, Qrcode as QRCodeIcon } from 'tabler-icons-react';
@@ -8,7 +8,12 @@ import { MainContainer, MainHeader } from './styles';
 import { invoke } from '@tauri-apps/api';
 import QRCode from 'react-qr-code';
 
-function Settings() {
+type Props = {
+  opened: boolean,
+  setOpened: (val: boolean) => void
+}
+
+function Settings(props: Props) {
   const {
     state: {
       loading
@@ -104,10 +109,21 @@ function Settings() {
       style={MainContainer}
     >
       <div style={MainHeader}>
-        <Title order={3}>Settings</Title>
+        <div style={{display: 'flex'}}>          
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+              <Burger
+                opened={props.opened}
+                onClick={() => props.setOpened(!props.opened)}
+                size="sm"
+                color={'#fff'}
+                mr="xl"
+              />
+            </MediaQuery>
+          <Title order={3}>Settings</Title>
+        </div>
       </div>
       <Stack style={{
-        padding: '80px 20px 20px 20px'
+        padding: '20px'
       }}>
         <Group align="center" style={{}}>
           <Text size="lg" weight={700}>Connected executor URL: </Text>

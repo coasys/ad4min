@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu, Select, Space, Switch, TextInput, Title, Text } from '@mantine/core';
+import { Avatar, Button, Card, Container, Group, List, Modal, MultiSelect, Menu, Select, Space, Switch, TextInput, Title, Text, MediaQuery, Burger } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { LanguageHandle, Link, Perspective, PerspectiveProxy } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useMemo, useState } from 'react';
@@ -10,6 +10,8 @@ import { Ad4minContext } from '../context/Ad4minContext';
 import { nanoid } from 'nanoid';
 
 type Props = {
+  opened: boolean,
+  setOpened: (val: boolean) => void
 }
 
 const PerspectiveMenu = ({uuid, reload}: {uuid: string, reload: () => {}}) => {
@@ -156,7 +158,18 @@ const Perspectives = (props: Props) => {
       style={MainContainer}
     >
       <div style={MainHeader}>
-        <Title order={3}>Perspectives</Title>
+        <div style={{display: 'flex'}}>          
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={props.opened}
+              onClick={() => props.setOpened(!props.opened)}
+              size="sm"
+              color={'#fff'}
+              mr="xl"
+            />
+          </MediaQuery>
+          <Title order={3}>Perspectives</Title>
+        </div>
         <Button onClick={() => setPerspectiveModalOpen(true)}>Add Perspective</Button>
       </div>
 
@@ -165,13 +178,12 @@ const Perspectives = (props: Props) => {
         size="sm"
         center
         pl={20}
-        mt={20}
-        mr={20}
+        pr={20}
         style={{
-          overflow: 'auto',
+          overflowY: 'auto',
+          overflowX: 'hidden',
           height: 'auto',
-          paddingTop: 80,
-          maxWidth: 960
+          maxWidth: 900
         }}
       >
         {perspectives.map((e, i) => {

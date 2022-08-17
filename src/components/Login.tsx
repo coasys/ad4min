@@ -112,7 +112,7 @@ const Login = (props: any) => {
               onMouseLeave={() => setOpened(false)}
               onClick={() => resetEndpoint()}
             >
-              <Link />
+              <Link color={opened ? '#000' : '#fff'} />
             </ActionIcon >
           </Tooltip>
         </div>

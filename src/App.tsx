@@ -1,7 +1,7 @@
 import Header from './components/Header';
 import Login from './components/Login';
 import './App.css';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Global, Stack } from '@mantine/core';
 import TrustAgent from './components/TrustAgent';
 import Navigation from './components/Navigation';
@@ -19,12 +19,13 @@ import { Connect } from './components/Connect';
 import SystemTrayWindow from './window/SystemTrayWindow';
 
 const App = () => {
+  const [opened, setOpened] = useState(false);
   const {state: {
     candidate, did, auth
   }, methods: {
     handleTrustAgent,
   }} = useContext(Ad4minContext);
-
+  
   useEffect(() => {
     let unlisten: () => void;
 
@@ -44,7 +45,7 @@ const App = () => {
       <Global
         styles={(theme) => ({
           '*': {
-            fontFamily: 'comfortaa',
+            fontFamily: 'comfortaa !important',
           },
 
           '.mantine-riils3': {
@@ -63,13 +64,13 @@ const App = () => {
           </Stack>
         }/>
         <Route path="/tray" element={<SystemTrayWindow />} />
-        <Route path="/" element={<Navigation did={did} />}>
-          <Route path="profile" element={<Profile did={did} />} />
-          <Route path="language" element={<Language />} />
-          <Route path="perspective" element={<Perspectives />} />
+        <Route path="/" element={<Navigation did={did} setOpened={setOpened} opened={opened} />}>
+          <Route path="profile" element={<Profile did={did} setOpened={setOpened} opened={opened} />} />
+          <Route path="language" element={<Language setOpened={setOpened} opened={opened} />} />
+          <Route path="perspective" element={<Perspectives  setOpened={setOpened} opened={opened} />} />
           <Route path="settings" element={
             <AgentProvider>
-              <Settings />
+              <Settings setOpened={setOpened} opened={opened} />
             </AgentProvider>
             }
           />

@@ -1,4 +1,4 @@
-import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Title, Menu } from '@mantine/core';
+import { Button, Container, TextInput, Text, Modal, MultiSelect, Space, Group, List, Card, Avatar, Title, Menu, MediaQuery, Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { LanguageMeta } from '@perspect3vism/ad4m';
@@ -9,6 +9,8 @@ import { generateLanguageInitials, isSystemLanguage } from '../util';
 import { MainContainer, MainHeader } from './styles';
 
 type Props = {
+  opened: boolean,
+  setOpened: (val: boolean) => void
 }
 
 const Language = (props: Props) => {
@@ -122,7 +124,18 @@ const Language = (props: Props) => {
   return (
     <Container style={MainContainer}>
       <div style={MainHeader}>
-        <Title order={3}>Languages</Title>
+        <div style={{display: 'flex'}}>
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={props.opened}
+              onClick={() => props.setOpened(!props.opened)}
+              size="sm"
+              color={'#fff'}
+              mr="xl"
+            />
+          </MediaQuery>
+          <Title order={3}>Languages</Title>
+        </div>
         <Menu opened={opened} onOpen={handlers.open} onClose={handlers.close}>
           <Menu.Item 
             icon={<Upload size={16}/>}
@@ -143,13 +156,14 @@ const Language = (props: Props) => {
         size="sm"
         center
         pl={20}
+        pr={20}
         mt={20}
         mr={20}
         style={{
-          overflow: 'auto',
+          overflowY: 'auto',
+          overflowX: 'hidden',
           height: 'auto',
-          paddingTop: 80,
-          maxWidth: 960
+          maxWidth: 920
         }}
       >
         {languages.map((e, i) => {
