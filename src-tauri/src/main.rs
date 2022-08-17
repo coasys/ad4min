@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use tauri::LogicalSize;
+use tauri::Size;
 use std::sync::Mutex;
 
 use config::holochain_binary_path;
@@ -164,12 +166,13 @@ fn main() {
             match event {
                 SystemTrayEvent::LeftClick { position: _, size: _, .. } => {
                     let window = get_main_window(&app);
+                    let _ = window.set_size(Size::Logical(LogicalSize { width: 400.0, height: 700.0 }));
                     let _ = window.set_decorations(false);
                     let _ = window.set_always_on_top(true);
                     let _ = window.move_window(Position::TrayCenter);
 
                     if let Ok(true) = window.is_visible() {
-                        let _ = window.hide();
+                        // let _ = window.hide();
                     } else {
                         window.show().unwrap();
                         window.set_focus().unwrap();                
