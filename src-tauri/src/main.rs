@@ -172,7 +172,7 @@ fn main() {
                     let _ = window.move_window(Position::TrayCenter);
 
                     if let Ok(true) = window.is_visible() {
-                        // let _ = window.hide();
+                        let _ = window.hide();
                     } else {
                         window.show().unwrap();
                         window.set_focus().unwrap();                
