@@ -118,7 +118,7 @@ const Navigation = (props: Props) => {
       asideOffsetBreakpoint="sm"
       navbar={
         <MediaQuery smallerThan="sm" styles={{ display: !props.opened ? 'none' : 'block', position: !props.opened ? 'relative' : 'fixed' }}>
-          <Navbar height='100vh' width={{ sm: 300, lg: 700 }} hidden={!props.opened} hiddenBreakpoint="sm" p="md" style={{padding: 0, background: 'black'}}>
+          <Navbar height='100vh' width={{ sm: 300 }} hidden={!props.opened} hiddenBreakpoint="sm" p="md" style={{padding: 0, background: 'black'}}>
             <Navbar.Section grow>
               <Group className={classes.header} position="apart">
                 <Image src="ad4mlogo_white_angle2_colouremblem.png"></Image>
