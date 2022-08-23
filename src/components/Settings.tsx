@@ -94,12 +94,12 @@ function Settings(props: Props) {
             </ActionIcon>
           </Group>
           <Space h="md" />
-          <Button style={{ width: '120px' }} onClick={stopProxy}>Stop Proxy</Button>
+          <Button style={{ width: '160px' }} onClick={stopProxy}>Stop Proxy</Button>
         </div>
       )
     } else {
       return (
-        <Button style={{ width: '120px' }} onClick={setupProxy}>Setup Proxy</Button>
+        <Button style={{ width: '160px' }} onClick={setupProxy}>Setup Proxy</Button>
       )
     }
   }
@@ -132,7 +132,8 @@ function Settings(props: Props) {
             <Copy />
           </ActionIcon>
         </Group>
-        <Button style={{ width: '120px' }} onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
+        <Button style={{ width: '160px' }} onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
+        <Button style={{ width: '160px' }} onClick={() => invoke("close_application")}>Poweroff AD4Min</Button>
         {showProxy()}
       </Stack>
       <Modal
