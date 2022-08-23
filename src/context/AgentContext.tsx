@@ -1,4 +1,5 @@
 import { Link, Literal } from "@perspect3vism/ad4m";
+import { invoke } from "@tauri-apps/api";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
@@ -117,6 +118,8 @@ export function AgentProvider({ children }: any) {
 
     setLoading(false);
 
+    await invoke('close_main_window');
+    
     navigate('/profile');
   };
 
@@ -130,6 +133,8 @@ export function AgentProvider({ children }: any) {
     console.log("agent status in unlock: ", agentStatus);
 
     setLoading(false);
+
+    await invoke('close_main_window');
 
     navigate('/profile');
   }

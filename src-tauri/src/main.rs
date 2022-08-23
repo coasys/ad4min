@@ -35,7 +35,7 @@ use tauri::api::dialog;
 use tauri::Manager;
 use crate::commands::proxy::{get_proxy, setup_proxy, stop_proxy};
 use crate::commands::state::{get_port, request_credential};
-use crate::commands::exit::{close_application};
+use crate::commands::app::{close_application, close_main_window};
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -105,7 +105,8 @@ fn main() {
             setup_proxy,
             get_proxy,
             stop_proxy,
-            close_application
+            close_application,
+            close_main_window
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
