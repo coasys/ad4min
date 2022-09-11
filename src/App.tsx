@@ -16,7 +16,6 @@ import Language from './components/Language';
 import Settings from './components/Settings';
 import { appWindow } from '@tauri-apps/api/window';
 import { Connect } from './components/Connect';
-import SystemTrayWindow from './window/SystemTrayWindow';
 
 const App = () => {
   const [opened, setOpened] = useState(false);
@@ -63,7 +62,6 @@ const App = () => {
             </AgentProvider>
           </Stack>
         }/>
-        <Route path="/tray" element={<SystemTrayWindow />} />
         <Route path="/" element={<Navigation did={did} setOpened={setOpened} opened={opened} />}>
           <Route path="profile" element={<Profile did={did} setOpened={setOpened} opened={opened} />} />
           <Route path="language" element={<Language setOpened={setOpened} opened={opened} />} />
