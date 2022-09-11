@@ -11,6 +11,7 @@ type State = {
   did: string;
   isInitialized: Boolean;
   isUnlocked: Boolean;
+  hasLoginError: Boolean;
   loading: boolean;
   client: Ad4mClient | null;
   candidate: string;
@@ -35,6 +36,7 @@ const initialState: ContextProps = {
     isInitialized: false,
     did: '',
     isUnlocked: false,
+    hasLoginError: false,
     client: null,
     loading: false,
     candidate: '',

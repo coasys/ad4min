@@ -17,6 +17,7 @@ const Login = (props: any) => {
   const {state: {
     isInitialized,
     isUnlocked,
+    hasLoginError,
     connected
   }, methods: {
     resetEndpoint
@@ -30,7 +31,11 @@ const Login = (props: any) => {
   const [lastName, setLastName] = useState("");
   const [opened, setOpened] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  let [passwordError, setPasswordError] = useState<string | null>(null);
+
+  if (hasLoginError) {
+    passwordError = "Invalid password"
+  }
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
