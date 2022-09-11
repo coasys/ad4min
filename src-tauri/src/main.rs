@@ -11,7 +11,7 @@ use config::holochain_binary_path;
 use config::app_url;
 use logs::setup_logs;
 use menu::build_menu;
-use system_tray::{ build_system_tray };
+use system_tray::{ build_system_tray, handle_system_tray_event };
 use tauri::WindowBuilder;
 use tauri::WindowUrl;
 use tauri::{
@@ -180,6 +180,9 @@ fn main() {
                         window.show().unwrap();
                         window.set_focus().unwrap();                
                     }
+                },
+                SystemTrayEvent::MenuItemClick { id, .. } => {
+                    handle_system_tray_event(app, id)
                 },
                 _ => {}
             }
