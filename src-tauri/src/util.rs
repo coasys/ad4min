@@ -1,6 +1,5 @@
 use sysinfo::{ProcessExt, System, SystemExt, Signal};
 use tauri::{WindowBuilder, WindowEvent, WindowUrl, Wry, AppHandle, Manager};
-use tauri_plugin_positioner::{Position, WindowExt};
 use crate::app_url;
 use crate::config::executor_port_path;
 use std::fs::remove_file;
