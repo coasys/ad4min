@@ -68,10 +68,10 @@ const useStyles = createStyles((theme, _params, getRef) => {
 });
 
 const data = [
+  { label: 'Main Settings', link: 'settings', icon: SettingsIcon },
   { label: 'Agent Profile', link: 'profile', icon: User },
   { label: 'Language & Expression', link: 'language', icon: Stack2 },
   { label: 'Perspectives', link: 'perspective', icon: Grain },
-  { label: 'Settings', link: 'settings', icon: SettingsIcon },
 ]
 
 const Navigation = (props: Props) => {

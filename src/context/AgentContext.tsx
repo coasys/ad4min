@@ -136,7 +136,7 @@ export function AgentProvider({ children }: any) {
 
     await invoke('close_main_window');
 
-    navigate('/profile');
+    navigate('/settings');
   }
 
   const lockAgent = async (passphrase: string) => {

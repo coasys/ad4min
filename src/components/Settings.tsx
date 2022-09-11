@@ -1,4 +1,4 @@
-import { ActionIcon, Burger, Button, Center, Container, Group, MediaQuery, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Burger, Button, Center, Container, Group, Image, MediaQuery, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useContext, useEffect, useState } from 'react';
 import { Copy, Qrcode as QRCodeIcon } from 'tabler-icons-react';
@@ -119,9 +119,10 @@ function Settings(props: Props) {
                 mr="xl"
               />
             </MediaQuery>
-          <Title order={3}>Settings</Title>
+          <Image src="ad4mlogo_white_angle2_colouremblem.png"></Image>
         </div>
       </div>
+      
       <Stack style={{
         padding: '20px'
       }}>
