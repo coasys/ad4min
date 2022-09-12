@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "ad4min",
+    "productName": "AD4Min",
     "version": "0.0.6"
   },
   "build": {
@@ -12,12 +12,13 @@
   "tauri": {
     "systemTray": {
       "iconPath": "icons/icon.png",
-      "iconAsTemplate": true
+      "iconAsTemplate": true,
+      "menuOnLeftClick": false
     },
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.ad4min.dev",
+      "identifier": "dev.ad4m.ad4min",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

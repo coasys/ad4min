@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, Container, Group, List, Modal, Space, Text, ThemeIcon, Title } from '@mantine/core';
+import { Avatar, Burger, Button, Card, Container, Group, List, MediaQuery, Modal, Space, Text, ThemeIcon, Title } from '@mantine/core';
 import { Agent, Literal } from '@perspect3vism/ad4m';
 import { useContext, useEffect, useState } from 'react';
 import { CircleCheck } from 'tabler-icons-react';
@@ -10,6 +10,8 @@ import { useCallback } from 'react';
 
 type Props = {
   did: String,
+  opened: boolean,
+  setOpened: (val: boolean) => void
 }
 
 const Profile = (props: Props) => {
@@ -92,11 +94,22 @@ const Profile = (props: Props) => {
   return (
     <Container style={MainContainer}>
       <div style={MainHeader}>
-        <Title order={3}>Agent Profile</Title>
+        <div style={{display: 'flex'}}>          
+          <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+            <Burger
+              opened={props.opened}
+              onClick={() => props.setOpened(!props.opened)}
+              size="sm"
+              color={'#fff'}
+              mr="xl"
+            />
+          </MediaQuery>
+          <Title order={3}>Agent Profile</Title>
+        </div>
         <Button onClick={() => settrustedAgentModalOpen(true)}>Trusted Agents</Button>
       </div>
       <Container
-        style={{ marginLeft: 10, marginTop: 62 }}
+        style={{ marginLeft: 10, marginTop: 12 }}
       >
         <Space h="md" />
         <Text size="md" weight="bold" underline>Agent DID: </Text>
