@@ -1,6 +1,6 @@
 {
   "name": "ad4min",
-  "version": "0.0.6-alpha-2",
+  "version": "0.0.7",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.9",
