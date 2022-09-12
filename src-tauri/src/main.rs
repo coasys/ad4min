@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use tauri::LogicalSize;
+use tauri::Size;
 use std::sync::Mutex;
 
 use config::holochain_binary_path;
@@ -11,9 +13,12 @@ use logs::setup_logs;
 use menu::build_menu;
 use system_tray::{ build_system_tray, handle_system_tray_event };
 use tauri::{
+    AppHandle,
     api::process::{Command, CommandEvent},
-    RunEvent, SystemTrayEvent
+    RunEvent, SystemTrayEvent,
+    Window
 };
+use tauri_plugin_positioner::{ WindowExt, Position, on_tray_event};
 use tokio::sync::broadcast;
 use uuid::Uuid;
 
@@ -28,6 +33,7 @@ use tauri::api::dialog;
 use tauri::Manager;
 use crate::commands::proxy::{get_proxy, setup_proxy, stop_proxy};
 use crate::commands::state::{get_port, request_credential};
+use crate::commands::app::{close_application, close_main_window};
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -85,6 +91,7 @@ fn main() {
     };
 
     let builder_result = tauri::Builder::default()
+        .plugin(tauri_plugin_positioner::init())
         .manage(state)
         .manage(ProxyState(Default::default()))
         .menu(build_menu())
@@ -96,6 +103,8 @@ fn main() {
             setup_proxy,
             get_proxy,
             stop_proxy,
+            close_application,
+            close_main_window
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
@@ -108,8 +117,6 @@ fn main() {
                 open_logs_folder();
             });
 
-            let handle = app.handle().clone();
-
             let (mut rx, _child) = Command::new_sidecar("ad4m")
             .expect("Failed to create ad4m command")
             .args([
@@ -119,6 +126,8 @@ fn main() {
             ])
             .spawn()
             .expect("Failed to spawn ad4m serve");
+
+            let handle = app.handle().clone();
     
             tauri::async_runtime::spawn(async move {
                 while let Some(event) = rx.recv().await {
@@ -130,8 +139,7 @@ fn main() {
                                 let url = app_url();
                                 log::info!("Executor started on: {:?}", url);
                                 let _ = splashscreen_clone.hide();
-                                create_main_window(&handle);
-                                let main = handle.get_window("AD4MIN").unwrap();
+                                let main = get_main_window(&handle);
                                 main.emit("ready", Payload { message: "ad4m-executor is ready".into() }).unwrap();
                             }
                         },
@@ -154,23 +162,53 @@ fn main() {
 
             Ok(())
         })
-        .on_system_tray_event(move |app, event| match event {
-            SystemTrayEvent::MenuItemClick { id, .. } => {
-                handle_system_tray_event(app, id)
+        .on_system_tray_event(move |app, event| {
+            on_tray_event(app, &event);
+            match event {
+                SystemTrayEvent::LeftClick { position: _, size: _, .. } => {
+                    let window = get_main_window(&app);
+                    let _ = window.set_size(Size::Logical(LogicalSize { width: 400.0, height: 700.0 }));
+                    let _ = window.set_decorations(false);
+                    let _ = window.set_always_on_top(true);
+                    let _ = window.move_window(Position::TrayCenter);
+
+                    if let Ok(true) = window.is_visible() {
+                        let _ = window.hide();
+                    } else {
+                        window.show().unwrap();
+                        window.set_focus().unwrap();                
+                    }
+                },
+                SystemTrayEvent::MenuItemClick { id, .. } => {
+                    handle_system_tray_event(app, id)
+                },
+                _ => {}
             }
-            _ => {}
         })
         .build(tauri::generate_context!());
 
     match builder_result {
         Ok(builder) => {
-            builder.run(|_app_handle, event| match event {
-                RunEvent::ExitRequested { api, .. } => {
-                    api.prevent_exit();
-                },
-                _ => {}
+            builder.run(|_app_handle, event| {
+                match event {
+                    RunEvent::ExitRequested { api, .. } => {
+                        api.prevent_exit();
+                    },
+                    _ => {}
+                }
             });
         }
         Err(err) => log::error!("Error building the app: {:?}", err),
+    }
+}
+
+fn get_main_window(handle: &AppHandle) -> Window {
+    let main = handle.get_window("AD4MIN");
+    if let Some(window) = main {
+        window
+    } else {
+        create_main_window(&handle);
+        let main = handle.get_window("AD4MIN");                
+        main.expect("Couldn't get main window right after creating it")
     }
 }

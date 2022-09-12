@@ -6,8 +6,7 @@ const Header = (props: Props) => {
   return (
     <>
       <Title order={1}>
-        <Image src="Logo142.png"></Image>
-        AD4Min
+        <Image style={{width: '200px'}} src="ad4msquarelogo2_white_colouremblem.png"></Image>
       </Title>
     </>
   )

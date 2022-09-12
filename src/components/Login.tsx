@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const Login = (props: any) => {
   const {state: {
     loading,
+    hasLoginError,
   }, methods: {
     generateAgent,
     unlockAgent,
@@ -30,7 +31,11 @@ const Login = (props: any) => {
   const [lastName, setLastName] = useState("");
   const [opened, setOpened] = useState(false);
   const [usernameError, setUsernameError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  let [passwordError, setPasswordError] = useState<string | null>(null);
+
+  if (hasLoginError) {
+    passwordError = "Invalid password"
+  }
 
   const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -112,7 +117,7 @@ const Login = (props: any) => {
               onMouseLeave={() => setOpened(false)}
               onClick={() => resetEndpoint()}
             >
-              <Link />
+              <Link color={opened ? '#000' : '#fff'} />
             </ActionIcon >
           </Tooltip>
         </div>

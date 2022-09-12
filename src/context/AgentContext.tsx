@@ -1,4 +1,5 @@
 import { Link, Literal } from "@perspect3vism/ad4m";
+import { invoke } from "@tauri-apps/api";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
@@ -6,6 +7,7 @@ import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
   loading: boolean;
+  hasLoginError: Boolean;
 }
 
 type ContextProps = {
@@ -20,6 +22,7 @@ type ContextProps = {
 const initialState: ContextProps = {
   state: {
     loading: false,
+    hasLoginError: false,
   },
   methods: {
     unlockAgent: () => null,
@@ -117,6 +120,8 @@ export function AgentProvider({ children }: any) {
 
     setLoading(false);
 
+    await invoke('close_main_window');
+    
     navigate('/profile');
   };
 
@@ -125,13 +130,17 @@ export function AgentProvider({ children }: any) {
     
     let agentStatus = await client?.agent.unlock(password);
 
-    handleLogin(client!, agentStatus!.isUnlocked, agentStatus!.did!);
-
-    console.log("agent status in unlock: ", agentStatus);
-
     setLoading(false);
 
-    navigate('/profile');
+    if(agentStatus!.isUnlocked) {
+      handleLogin(client!, agentStatus!.isUnlocked, agentStatus!.did!);
+      console.log("agent status in unlock: ", agentStatus);
+      await invoke('close_main_window');
+      navigate('/settings');
+    } else {
+      setState((prev) => ({ ...prev, hasLoginError: true }));
+    }
+
   }
 
   const lockAgent = async (passphrase: string) => {
