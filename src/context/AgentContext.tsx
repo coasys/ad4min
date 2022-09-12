@@ -7,6 +7,7 @@ import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
   loading: boolean;
+  hasLoginError: Boolean;
 }
 
 type ContextProps = {
@@ -21,6 +22,7 @@ type ContextProps = {
 const initialState: ContextProps = {
   state: {
     loading: false,
+    hasLoginError: false,
   },
   methods: {
     unlockAgent: () => null,

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const Login = (props: any) => {
   const {state: {
     loading,
+    hasLoginError,
   }, methods: {
     generateAgent,
     unlockAgent,
@@ -17,7 +18,6 @@ const Login = (props: any) => {
   const {state: {
     isInitialized,
     isUnlocked,
-    hasLoginError,
     connected
   }, methods: {
     resetEndpoint
