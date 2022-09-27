@@ -15,7 +15,11 @@ pub fn binary_path() -> PathBuf {
 }
 
 pub fn holochain_binary_path() -> PathBuf {
-    binary_path().join("holochain")
+    if cfg!(windows) {
+        binary_path().join("holochain.exe")
+    } else {
+        binary_path().join("holochain")
+    }
 }
 
 #[cfg(feature = "custom-protocol")]

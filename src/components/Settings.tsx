@@ -1,4 +1,4 @@
-import { ActionIcon, Burger, Button, Center, Container, Group, Image, MediaQuery, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, Burger, Button, Center, Container, createStyles, Group, Image, MediaQuery, Modal, PasswordInput, Space, Stack, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useContext, useEffect, useState } from 'react';
 import { Copy, Qrcode as QRCodeIcon } from 'tabler-icons-react';
@@ -13,10 +13,18 @@ type Props = {
   setOpened: (val: boolean) => void
 }
 
+const useStyles = createStyles((theme) => ({
+  label: {
+    color: theme.colors.dark[1]
+  },
+}));
+
 function Settings(props: Props) {
+  const { classes } = useStyles();
+
   const {
     state: {
-      loading
+      loading,
     },
     methods: {
       lockAgent
@@ -26,10 +34,12 @@ function Settings(props: Props) {
     state: {
       url,
       did,
+      client
     } } = useContext(Ad4minContext);
 
   const [password, setPassword] = useState('');
   const [lockAgentModalOpen, setLockAgentModalOpen] = useState(false);
+  const [clearAgentModalOpen, setClearAgentModalOpen] = useState(false);
   const [proxy, setProxy] = useState('');
   const [qrcodeModal, setQRCodeModal] = useState(false);
 
@@ -65,6 +75,15 @@ function Settings(props: Props) {
   const stopProxy = async () => {
     await invoke("stop_proxy");
     setProxy('');
+  }
+
+  const clearAgent = async (password: string) => {
+    console.log('clearAgent 0', password)
+    let agentStatus = await client?.agent.lock(password);
+    console.log('clearAgent 1', agentStatus)
+    if (!agentStatus?.isUnlocked) {
+      await invoke("clear_state");
+    }
   }
 
   const copyProxy = () => {
@@ -134,6 +153,7 @@ function Settings(props: Props) {
           </ActionIcon>
         </Group>
         <Button style={{ width: '160px' }} onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
+        <Button style={{ width: '160px' }} onClick={() => setClearAgentModalOpen(true)}>Clear Agent</Button>
         <Button style={{ width: '160px' }} onClick={() => invoke("close_application")}>Poweroff AD4Min</Button>
         {showProxy()}
       </Stack>
@@ -151,9 +171,37 @@ function Settings(props: Props) {
           size="md"
           required
           onChange={onPasswordChange}
+          classNames={{
+            label: classes.label
+          }}
         />
         <Space h={20} />
         <Button onClick={() => lockAgent(password)} loading={loading}>
+          Lock agent
+        </Button>
+      </Modal>
+      <Modal
+        opened={clearAgentModalOpen}
+        onClose={() => setClearAgentModalOpen(false)}
+        title="Clear Agent"
+        size={700}
+        style={{ zIndex: 100 }}
+      >
+        <Text size="sm"><span style={{color: 'red'}}>Warning:</span> By clearing the agent you will loose all the data and will have to start with a fresh agent.<br /><br /> Please enter your pass below to proceed.</Text>
+        <Space h="md" />
+        <PasswordInput
+          placeholder="Password"
+          label="Input your passphrase"
+          radius="md"
+          size="md"
+          required
+          onChange={onPasswordChange}
+          classNames={{
+            label: classes.label
+          }}
+        />
+        <Space h={20} />
+        <Button onClick={() => clearAgent(password)} loading={loading}>
           Lock agent
         </Button>
       </Modal>

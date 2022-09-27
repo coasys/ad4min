@@ -6,6 +6,8 @@
 use tauri::LogicalSize;
 use tauri::Size;
 use std::sync::Mutex;
+extern crate remove_dir_all;
+use remove_dir_all::*;
 
 use config::holochain_binary_path;
 use config::app_url;
@@ -33,7 +35,8 @@ use tauri::api::dialog;
 use tauri::Manager;
 use crate::commands::proxy::{get_proxy, setup_proxy, stop_proxy};
 use crate::commands::state::{get_port, request_credential};
-use crate::commands::app::{close_application, close_main_window};
+use crate::commands::app::{close_application, close_main_window, clear_state};
+use crate::config::data_path;
 use crate::util::find_port;
 use crate::menu::{handle_menu_event, open_logs_folder};
 use crate::util::{find_and_kill_processes, create_main_window, save_executor_port};
@@ -57,6 +60,12 @@ pub struct AppState {
 }
 
 fn main() {
+    if data_path().exists() {
+        if !data_path().join("ad4m").join("agent.json").exists() {
+            remove_dir_all(data_path());
+        }
+    }
+    
     if let Err(err) = setup_logs() {
         println!("Error setting up the logs: {:?}", err);
     }
@@ -72,7 +81,6 @@ fn main() {
     find_and_kill_processes("holochain");
 
     find_and_kill_processes("lair-keystore");
-
     if !holochain_binary_path().exists() {
         log::info!("init command by copy holochain binary");
         let status = Command::new_sidecar("ad4m")
@@ -104,7 +112,8 @@ fn main() {
             get_proxy,
             stop_proxy,
             close_application,
-            close_main_window
+            close_main_window,
+            clear_state
         ])
         .setup(move |app| {
             let splashscreen = app.get_window("splashscreen").unwrap();
