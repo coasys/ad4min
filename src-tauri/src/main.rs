@@ -146,12 +146,16 @@ fn main() {
                         CommandEvent::Stderr(line) => log::error!("{}", line),
                         CommandEvent::Terminated(line) => {
                             log::info!("Terminated {:?}", line);
+                            let main = get_main_window(&handle);
 
-                            dialog::message(
-                                Some(&splashscreen_clone), 
-                                "Error", 
-                                "Something went wrong while starting ad4m-executor please check the logs"
-                            );
+                            if let Ok(true) = &splashscreen_clone.is_visible() {
+                                log_error(&splashscreen_clone);
+                            }
+
+                            if let Ok(true) = main.is_visible() {
+                                log_error(&main);
+                            }
+
                             log::info!("Terminated {:?}", line);
                         },
                         CommandEvent::Error(line) => log::info!("Error {:?}", line),
@@ -211,4 +215,12 @@ fn get_main_window(handle: &AppHandle) -> Window {
         let main = handle.get_window("AD4MIN");                
         main.expect("Couldn't get main window right after creating it")
     }
+}
+
+fn log_error(window: &Window) {
+    dialog::message(
+        Some(window), 
+        "Error", 
+        "Something went wrong while starting ad4m-executor please check the logs"
+    );
 }
