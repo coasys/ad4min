@@ -195,7 +195,7 @@ const Perspectives = (props: Props) => {
                 <Avatar radius="xl">{generateLanguageInitials(e!.name)}</Avatar>
                 <Group direction='column' style={{marginTop: 4}}>
                   <Group  direction='row'>
-                    <Text weight="bold">DID: </Text>
+                    <Text weight="bold">Identifier: </Text>
                     <Text>{e?.uuid}</Text>
                   </Group>
                   <Group  direction='row'>
@@ -225,9 +225,7 @@ const Perspectives = (props: Props) => {
                   )}
                 </Group>
               </Group>
-              {!e?.neighbourhood && (
-                <PerspectiveMenu uuid={e!.uuid} reload={fetchPerspective} />
-              )}
+              <PerspectiveMenu uuid={e!.uuid} reload={fetchPerspective} />
             </Group>
           </Card>
         )})}
