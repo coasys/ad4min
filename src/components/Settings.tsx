@@ -78,7 +78,7 @@ function Settings(props: Props) {
   }
 
   const formatProxy = (proxy: string) => {
-    return proxy.replace("https", "wss") + "/graphql";
+    return proxy.replace(/^https(.*)/, 'wss$1').replace(/^http(.*)/, 'ws$1') + "/graphql";
   }
 
   const clearAgent = async (password: string) => {
