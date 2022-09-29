@@ -47,7 +47,7 @@ function Settings(props: Props) {
     const getProxy = async () => {
       const proxy: string = await invoke("get_proxy");
       console.log(proxy);
-      setProxy(proxy);
+      setProxy(formatProxy(proxy));
     }
     getProxy().catch(console.error);;
   }, []);
@@ -69,12 +69,16 @@ function Settings(props: Props) {
   const setupProxy = async () => {
     const proxy: string = await invoke("setup_proxy", { subdomain: did });
     console.log("Finish setup proxy, ", proxy);
-    setProxy(proxy);
+    setProxy(formatProxy(proxy));
   }
 
   const stopProxy = async () => {
     await invoke("stop_proxy");
     setProxy('');
+  }
+
+  const formatProxy = (proxy: string) => {
+    return proxy.replace("https", "wss") + "/graphql";
   }
 
   const clearAgent = async (password: string) => {
