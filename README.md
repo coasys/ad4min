@@ -1,11 +1,6 @@
-# Ad4min UI
+# AD4MIN
 
-This desktop interface handles the administration of ad4m services, inclues
-
-- show agent profile
-- add trusted agents
-- install a new language
-- authenticate and authorize a new app to access ad4m
+A desktop application to handle the running and administration of an AD4M user. 
 
 ## Development
 
