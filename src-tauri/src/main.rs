@@ -149,11 +149,11 @@ fn main() {
                             let main = get_main_window(&handle);
 
                             if let Ok(true) = &splashscreen_clone.is_visible() {
-                                log_error(&splashscreen_clone);
+                                log_error(&splashscreen_clone, "Something went wrong while starting ad4m-executor please check the logs");
                             }
 
                             if let Ok(true) = main.is_visible() {
-                                log_error(&main);
+                                log_error(&main, "There was an error with AD4MIN. Restarting may fix this, otherwise please contact the AD4M team for support.");
                             }
 
                             log::info!("Terminated {:?}", line);
@@ -217,10 +217,10 @@ fn get_main_window(handle: &AppHandle) -> Window {
     }
 }
 
-fn log_error(window: &Window) {
+fn log_error(window: &Window, message: &str) {
     dialog::message(
         Some(window), 
         "Error", 
-        "Something went wrong while starting ad4m-executor please check the logs"
+        message
     );
 }
