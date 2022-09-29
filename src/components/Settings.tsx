@@ -153,7 +153,7 @@ function Settings(props: Props) {
           </ActionIcon>
         </Group>
         <Button style={{ width: '160px' }} onClick={() => setLockAgentModalOpen(true)}>Lock Agent</Button>
-        <Button style={{ width: '160px' }} onClick={() => setClearAgentModalOpen(true)}>Clear Agent</Button>
+        <Button style={{ width: '160px' }} onClick={() => setClearAgentModalOpen(true)}>Delete Agent</Button>
         <Button style={{ width: '160px' }} onClick={() => invoke("close_application")}>Poweroff AD4Min</Button>
         {showProxy()}
       </Stack>
@@ -202,7 +202,7 @@ function Settings(props: Props) {
         />
         <Space h={20} />
         <Button onClick={() => clearAgent(password)} loading={loading}>
-          Lock agent
+          Delete Agent
         </Button>
       </Modal>
       <Modal
