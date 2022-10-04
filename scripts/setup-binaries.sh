@@ -9,8 +9,8 @@ TARGET_TRIPLE=$(rustc -vV | sed -n 's/^.*host: \(.*\)*$/\1/p')
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
-    Linux*)     AD4M_HOST_BINARY=https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.30/ad4m-linux-x64;;
-    Darwin*)    AD4M_HOST_BINARY=https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.30/ad4m-macos-x64;;
+    Linux*)     AD4M_HOST_BINARY=https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.31/ad4m-linux-x64;;
+    Darwin*)    AD4M_HOST_BINARY=https://github.com/perspect3vism/ad4m-host/releases/download/v0.0.31/ad4m-macos-x64;;
     *)          echo "Machine is not supported: ${unameOut}" && exit 1;;
 esac
 echo ${machine}
