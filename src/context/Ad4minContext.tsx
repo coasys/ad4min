@@ -74,11 +74,7 @@ export function Ad4minProvider({ children }: any) {
         }
       } catch (err) {
         if (url) {
-          showNotification({
-            message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-            color: 'red',
-            autoClose: false
-          })
+          console.error("Could not connect to the executor on a given url: ", url);
         }
 
         resolve('')
@@ -154,12 +150,6 @@ export function Ad4minProvider({ children }: any) {
       localStorage.setItem('url', url as string);
     } catch (e) {
       console.log('err', e)
-
-      showNotification({
-        message: 'Cannot connect to the URL provided please check if the executor is running or pass a different URL',
-        color: 'red',
-        autoClose: false
-      });
     }
   }, [checkConnection, checkIfAgentIsInitialized])
 
