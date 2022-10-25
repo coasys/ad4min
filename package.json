@@ -1,6 +1,6 @@
 {
   "name": "ad4min",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": true,
   "dependencies": {
     "@apollo/client": "=3.6.9",
@@ -8,7 +8,7 @@
     "@mantine/hooks": "^4.2.4",
     "@mantine/modals": "^4.2.4",
     "@mantine/notifications": "^4.2.4",
-    "@perspect3vism/ad4m": "^0.1.37",
+    "@perspect3vism/ad4m": "^0.1.40",
     "@tauri-apps/api": "^1.0.2",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
