@@ -2,7 +2,7 @@ import { Link, Literal } from "@perspect3vism/ad4m";
 import { invoke } from "@tauri-apps/api";
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SOURCE_PROFILE, PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
+import { PREDICATE_FIRSTNAME, PREDICATE_LASTNAME, PREDICATE_USERNAME } from "../constants/triples";
 import { Ad4minContext } from "./Ad4minContext";
 
 type State = {
@@ -56,13 +56,10 @@ export function AgentProvider({ children }: any) {
     setLoading(true);
 
     let agentStatus = await client!.agent.generate(password);
-    const agentPerspective = await client!.perspective.add(
-      "Agent Profile"
-    );
-    const links = [];
 
-    const link = await client!.perspective.addLink(
-      agentPerspective.uuid,
+    const additions = [];
+
+    additions.push(
       new Link({
         source: agentStatus.did!,
         target: Literal.from(username).toUrl(),
@@ -70,48 +67,30 @@ export function AgentProvider({ children }: any) {
       })
     );
 
-    links.push(link);
-
 
     if (firstName) {
-      const link = await client!.perspective.addLink(
-        agentPerspective.uuid,
+      additions.push(
         new Link({
           source: agentStatus.did!,
           target: Literal.from(firstName).toUrl(),
           predicate: PREDICATE_FIRSTNAME
         })
       );
-
-      links.push(link);
     }
 
     if (lastName) {
-      const link = await client!.perspective.addLink(
-        agentPerspective.uuid,
+      additions.push(
         new Link({
           source: agentStatus.did!,
           target: Literal.from(lastName).toUrl(),
           predicate: PREDICATE_LASTNAME
         })
       );
-
-      links.push(link)
     }
 
-    const cleanedLinks = [];
-
-    for (const link of links) {
-      const newLink = JSON.parse(JSON.stringify(link));
-      newLink.__typename = undefined;
-      newLink.data.__typename = undefined;
-      newLink.proof.__typename = undefined;
-
-      cleanedLinks.push(newLink);
-    }
-
-    await client?.agent.updatePublicPerspective({
-      links: cleanedLinks
+    await client?.agent.mutatePublicPerspective({
+      additions,
+      removals: []
     })
 
     handleLogin(client!, agentStatus.isUnlocked, agentStatus.did!);
